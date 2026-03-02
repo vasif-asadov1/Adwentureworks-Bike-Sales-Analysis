@@ -8,7 +8,7 @@ This project explores the Business-to-Customer (B2C) internet sales data within 
 
 **Documentation:** SQL Queries, Explanations and Analysis is given in the following link: [SQL Queries Docs](https://vasif-asadov.gitbook.io/adventureworks-analysis)
 
-**SQL Query Results:** You can observe the SQL Query results by following the given link: [SQL Query results](https://docs.google.com/spreadsheets/d/1q9_WyjrXjWc_S7sqvuiSEB62ZsJcYuLFSrcODvy3leQ/edit?gid=167198953#gid=167198953)
+**SQL Query Results:** You can observe the SQL Query results by following the given link: [SQL Query results](https://docs.google.com/spreadsheets/d/1q9_WyjrXjWc_S7sqvuiSEB62ZsJcYuLFSrcODvy3leQ/edit?gid=0#gid=0)
 
 
 
