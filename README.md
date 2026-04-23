@@ -16,7 +16,7 @@ The analysis relies on advanced SQL techniques—including Window Functions, CTE
 ## 🔗 Quick Links
 - 📊 **Tableau Dashboard:** [Explore the Interactive Dashboard Here](https://public.tableau.com/app/profile/vasif.asadov2730/viz/AdventureWorksExecutiveDashboard_17723260919680/Dashboard2)
 - 📖 **Documentation & Analysis:** [SQL Queries, Explanations and Analysis](https://vasif-asadov1.github.io/Adwentureworks-Bike-Sales-Analysis/)
-- 
+
 ---
 
 ## 🏗️ Project Structure
