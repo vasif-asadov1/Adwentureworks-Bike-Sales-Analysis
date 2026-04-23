@@ -1,0 +1,42 @@
+project:
+  type: website
+  output-dir: docs # GitHub Pages için en ideali 'docs' klasörüdür.
+
+execute:
+  enabled: false # Sadece render edilmiş hallerini göstereceksen kalsın
+
+website:
+  title: "Vasif Asadov | AdventureWorks Bike Sales Analysis"
+  description: "A comprehensive analysis of AdventureWorks bike sales data, including data preparation, macro performance, customer analysis, performance analysis, sales reasons, regional analysis, and an executive dashboard."
+  favicon: assets/favicon.ico
+  navbar:
+    background: primary
+    left:
+      - href: index.qmd
+        text: Home
+  
+  # Sol Menü (QMD dosyaların)
+  sidebar:
+    style: "docked"
+    search: true
+    contents:
+      - section: "AdventureWorks Bike Sales"
+        contents:
+          - 00_problem_description.qmd
+          - 01_data_preparation.qmd
+          - 02_macro_performance.qmd
+          - 03_customer_analysis.qmd
+          - 04_performance_analysis.qmd
+          - 05_sales_reasons.qmd
+          - 06_regional_analysis.qmd
+          - 07_executive_dashboard.qmd
+
+format:
+  html:
+    theme: [cosmo, custom.scss]
+    highlight-style: dracula
+    # page-layout: custom sildik çünkü sağ/sol düzenini bozuyordu
+    code-fold: true     
+    code-summary: "Show Code" 
+    toc: true
+    toc-location: right # TOC (İçindekiler) sağ tarafa alındı

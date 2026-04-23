@@ -1,0 +1,601 @@
+---
+title: "Macro Performance Analysis"
+---
+
+# Introduction
+
+In this section, we will answer the 23 business questions that we defined in the previous section using SQL queries and data analysis techniques. We will use the star schema that we created in the previous section to write SQL queries. Each question will be answered with a SQL query that retrieves the relevant data from the database, and we will also provide insights and interpretations of the results to help us understand the implications of our findings for the business. 
+
+The questions are designed in a way that they will help us to get business insights on the following domains:
+
+1. Makro Performance Analysis: Here we will analyze the overall performance of the business by looking at metrics such as total sales, profit, and customer count. We will also analyze the performance of different product categories and subcategories to identify trends and patterns in customer behavior. Questions 1-5 fall under this domain.
+2. Customer Behavior Analysis: In this domain, we will analyze customer behavior by looking at metrics such as customer demographics, purchasing patterns, and customer loyalty. We will also analyze the impact of different factors such as discounts and promotions on customer behavior. Questions 6-10 fall under this domain.
+3. Product Performance Analysis: Here we will analyze the performance of different products and product categories by looking at financial metrics such as Gross Profit, Gross Margin, Product Margin, and Sales Amount. We will also analyze the impact of different factors such as discounts and promotions on product performance. Questions 11-15 fall under this domain.
+4. Sales Reason and Customer Preference Analysis: In this domain, we will analyze the reasons behind sales and customer preferences by looking at metrics such as sales reasons, importance of promotional discounts, and preference of product categories. Questions 16-19 fall under this domain.
+5. Regional and Logistic Operations Analysis: Here we will analyze the performance of the business in different regions by looking at the Regional Preferences, Tax and Freight Costs, and Regional Bias for specific product categories. SLA and delivery performance will also be analyzed in this domain. Questions 20-23 fall under this domain.
+
+For better clarity and organization, I will give a separate page for each domain and answer the relevant questions in that page. This way, we can focus on specific areas of analysis and gain deeper insights into each domain. As this is the first page of the SQL analysis section, we will start with the first domain, which is Makro Performance Analysis, and answer the first 5 questions related to that domain.
+
+
+# Macro Performance Analysis
+
+## Gross Profit and Gross Margin over Time
+
+`1.  What is the overall Gross Profit and Gross Margin for the B2C channel, and how has it trended year over year?`
+
+**Solution Method:** To answer this question, we will write a SQL query that retrieves the Gross Profit and Gross Margin for the B2C channel from the fact table, and then we will group the results by year to analyze the trend over time. We will also calculate the year-over-year growth rate for both Gross Profit and Gross Margin to understand how they have changed over time. This requires  simple select statements grouped by year and filtered by the B2C channel.
+
+
+<details>
+<summary>Show SQL Code</summary>
+
+
+```sql
+select
+	c.CalendarYear as [year],
+	round(sum(fis.SalesAmount),2) as total_revenue,
+	round(sum(fis.TotalProductCost),2) as total_cost,
+	round(sum(fis.SalesAmount) - sum(fis.TotalProductCost),2) as gross_profit,
+	cast(100.0 * (sum(fis.salesamount) - sum(fis.TotalProductCost)) /
+		nullif(sum(fis.SalesAmount), 0) as decimal(5,2)) as gross_margin_pct
+from FactInternetSales fis
+left join Calendar c
+	on c.DateKey = fis.OrderDateKey
+where c.CalendarYear not in (2010,2014)
+group by c.CalendarYear
+order by [year] asc;
+```
+
+</details>
+
+
+**Results:**
+
+|year|total_revenue|total_cost|gross_profit|gross_margin_pct|
+|----|-------------|----------|------------|----------------|
+|2011|7075525.9300|4231462.1900|2844063.7400|40.20|
+|2012|5842485.2000|3414478.1700|2428007.0300|41.56|
+|2013|16351550.3400|9586139.3700|6765410.9700|41.37|
+
+**Insights:**
+
+The overall Gross Profit for the B2C channel has shown a significant increase from 2011 to 2013, with a growth rate of approximately 138% from 2011 to 2013. The Gross Margin has also improved over the years, increasing from 40.20% in 2011 to 41.37% in 2013. This indicates that the B2C channel has been able to generate more profit from its sales while maintaining a healthy margin, which is a positive sign for the business. The increase in Gross Profit and Gross Margin could be attributed to various factors such as increased sales volume, better pricing strategies, or improved cost management. Further analysis would be needed to identify the specific drivers behind this growth.
+
+
+
+## Year-over-Year (YoY) Revenue Growth Rate
+
+`2. What is the Year-over-Year (YoY) revenue growth rate for each month? `
+
+**Solution Method:** To answer this question, we will write a SQL query that retrieves the revenue for each month from the fact table, and then we will group the results by month and year to calculate the Year-over-Year (YoY) revenue growth rate. We will use the LAG function to compare the revenue of each month with the same month in the previous year to calculate the growth rate. In order to prevent any duplication problem, we should use Common Table Expressions (CTEs) which helps us to organize our query and make it more readable as well as to avoid any potential issues with duplicate data when calculating the YoY growth rate.
+
+<details>
+<summary>Show SQL Code</summary>
+
+
+
+```sql
+with calculations as (
+select
+	c.CalendarYear as [year], 
+	c.MonthNumberOfYear as month_number,
+	c.MonthName as month_name,
+	round(sum(fis.SalesAmount),2) as curr_total_revenue,
+	lag(sum(fis.SalesAmount), 1) over (partition by c.MonthNumberOfYear 
+		order by c.CalendarYear asc) as prev_total_revenue
+from FactInternetSales fis 
+join Calendar c 
+	on c.DateKey = fis.OrderDateKey
+	and c.CalendarYear not in (2010,2014)
+group by 
+	c.CalendarYear, 
+	c.MonthNumberOfYear,
+	c.MonthName
+)
+
+select
+	[year], 
+	month_number, 
+	round(curr_total_revenue,2), 
+	round(prev_total_revenue,2), 
+	cast(100.0 * (curr_total_revenue - prev_total_revenue) / 
+		nullif(prev_total_revenue, 0) as decimal(7,2)) as revenue_growth_pct
+from calculations cal
+order by [year], month_number;
+```
+
+</details>
+
+
+**Results:**
+
+|year|month_number|curr_total_revenue|prev_total_revenue|revenue_growth_pct|
+|----|------------|------------------|------------------|------------------|
+|2011|1|469823.9100| | |
+|2011|2|466334.9000| | |
+|2011|3|485198.6600| | |
+|2011|4|502073.8500| | |
+|2011|5|561681.4800| | |
+|2011|6|737839.8200| | |
+|2011|7|596746.5600| | |
+|2011|8|614557.9400| | |
+|2011|9|603083.5000| | |
+|2011|10|708208.0000| | |
+|2011|11|660545.8100| | |
+|2011|12|669431.5000| | |
+|2012|1|495364.1300|469823.9100|5.44|
+|2012|2|506994.1900|466334.9000|8.72|
+|2012|3|373483.0100|485198.6600|-23.02|
+|2012|4|400335.6100|502073.8500|-20.26|
+|2012|5|358877.8900|561681.4800|-36.11|
+|2012|6|555160.1400|737839.8200|-24.76|
+|2012|7|444558.2300|596746.5600|-25.50|
+|2012|8|523917.3800|614557.9400|-14.75|
+|2012|9|486177.4500|603083.5000|-19.38|
+|2012|10|535159.4800|708208.0000|-24.43|
+|2012|11|537955.5200|660545.8100|-18.56|
+|2012|12|624502.1700|669431.5000|-6.71|
+|2013|1|857689.9100|495364.1300|73.14|
+|2013|2|771348.7400|506994.1900|52.14|
+|2013|3|1049907.3900|373483.0100|181.11|
+|2013|4|1046022.7700|400335.6100|161.29|
+|2013|5|1284592.9300|358877.8900|257.95|
+|2013|6|1643177.7800|555160.1400|195.98|
+|2013|7|1371675.8100|444558.2300|208.55|
+|2013|8|1551065.5600|523917.3800|196.05|
+|2013|9|1447495.6900|486177.4500|197.73|
+|2013|10|1673293.4100|535159.4800|212.67|
+|2013|11|1780920.0600|537955.5200|231.05|
+|2013|12|1874360.2900|624502.1700|200.14|
+
+
+**Insights:** The Year-over-Year (YoY) revenue growth rate for each month shows significant fluctuations over the years. In 2012, there was a decline in revenue growth for most months compared to 2011, with some months experiencing a negative growth rate. However, in 2013, there was a substantial increase in revenue growth for all months compared to 2012, with some months experiencing a growth rate of over 200%. This indicates that the business experienced a significant recovery and growth in revenue in 2013 after a challenging year in 2012. The fluctuations in revenue growth could be attributed to various factors such as changes in market conditions, customer behavior, or the effectiveness of marketing and sales strategies. Or maybe the company launched better and became a more competitive player in the market in 2013, which led to a significant increase in revenue growth. 
+
+
+## Seasonality of Sales and Quarterly Revenue Drivers
+
+`3. What is the monthly seasonality of our sales, and which quarter  drives the most revenue historically?`
+
+**Solution Method:** To answer this question, I have written a SQL query that calculates the monthly revenue for each month and quarter, and then identifies the quarter that drives the most revenue historically. The query uses Common Table Expressions (CTEs) to organize the calculations and make it easier to read. The first CTE calculates the monthly revenue for each month and quarter, while the second CTE calculates the total revenue for each quarter. Finally, we calculate the growth rate of each quarter compared to the previous quarter to identify trends in seasonality. To prevent any duplication and wrong calculations, we have used CTEs in a sequence in which the financial metrics are derived first, then grouped by quarter, and then grouped with window functions get the previous quarter's revenue for growth rate calculation.
+
+
+
+<details>
+<summary>Show SQL Code</summary>
+
+
+```sql
+with revenue_calculations as (
+	select
+		c.CalendarQuarter as [Quarter], 
+		c.MonthNumberOfYear as month_number,
+		c.MonthName as [Month],
+		coalesce(sum(fis.SalesAmount),0) as revenue
+	from FactInternetSales fis
+	join Calendar c 
+		on c.DateKey = fis.OrderDateKey
+		and c.CalendarYear not in (2010, 2014)
+	group by 
+		c.CalendarQuarter, 
+		c.MonthNumberOfYear,
+		c.MonthName
+),
+curr_quarter_revenue_calc as (
+	select
+		[Quarter], 
+		month_number,
+		[Month], 
+		revenue as monthly_revenue, 
+		sum(revenue) over (partition by [Quarter]) as curr_quarter_revenue
+	from revenue_calculations
+),
+growth_calc as (
+	select
+			[Quarter], 
+			month_number,
+			[Month], 
+			monthly_revenue, 
+			curr_quarter_revenue,
+			lag(curr_quarter_revenue,3) over (order by [Quarter], month_number) as prev_quarter_revenue
+	from curr_quarter_revenue_calc 
+)
+
+select 
+	*,
+	cast ((curr_quarter_revenue - prev_quarter_revenue) / nullif(prev_quarter_revenue,0) as decimal(10,2))
+		as Q_revenue_growth_pct
+from growth_calc
+order by 
+	[Quarter], 
+	month_number;
+```
+
+</details>
+
+
+**Results:**
+
+|Quarter|month_number|Month|monthly_revenue|curr_quarter_revenue|prev_quarter_revenue|Q_revenue_growth_pct|
+|-------|------------|-----|---------------|--------------------|--------------------|--------------------|
+|1|1|January|1822877.9509|5476144.8363|||
+|1|2|February|1744677.8306|5476144.8363|||
+|1|3|March|1908589.0548|5476144.8363|||
+|2|4|April|1948432.2303|7089762.2710|5476144.8363|0.29|
+|2|5|May|2205152.2965|7089762.2710|5476144.8363|0.29|
+|2|6|June|2936177.7442|7089762.2710|5476144.8363|0.29|
+|3|7|July|2412980.5949|7639278.1092|7089762.2710|0.08|
+|3|8|August|2689540.8765|7639278.1092|7089762.2710|0.08|
+|3|9|September|2536756.6378|7639278.1092|7089762.2710|0.08|
+|4|10|October|2916660.8978|9064376.2478|7639278.1092|0.19|
+|4|11|November|2979421.3902|9064376.2478|7639278.1092|0.19|
+|4|12|December|3168293.9598|9064376.2478|7639278.1092|0.19|
+
+
+**Insights:** The monthly seasonality of our sales shows that the revenue tends to increase in the second and fourth quarters of the year, with the fourth quarter driving the most revenue historically. The growth rate of the second quarter compared to the first quarter is approximately 29%, while the growth rate of the fourth quarter compared to the third quarter is approximately 19%. This indicates that there is a significant increase in sales during these quarters, which could be attributed to various factors such as seasonal demand, holidays, or promotional activities. Understanding this seasonality can help us to plan our inventory, marketing campaigns, and staffing levels more effectively to capitalize on these peak periods and maximize our revenue.
+
+
+
+## Average Order Value (AOV) vs Total Order Volume (TOV)
+
+`4. What is the Average Order Value (AOV) for the B2C channel, and how has it trended over time?`
+
+
+**Solution Method:** This question is quite straitforward. We should calculate the Average Order Value (AOV) for the B2C channel by dividing the total sales amount by the number of distinct orders. We will group the results by year and month to analyze the trend over time. The query uses a simple aggregation to calculate the total sales amount and count of distinct orders, and then divides these two metrics to get the AOV for each month and year. I did not include the years - 2010 and 2014 in the analysis as they are incomplete years in our dataset, which could skew the results and provide an inaccurate representation of the AOV trend over time. By excluding these years, we can ensure that our analysis is based on complete data and provides a more accurate picture of the AOV trend for the B2C channel.
+
+
+
+<details>
+<summary>Show SQL Code</summary>
+
+
+```sql
+select
+	c.CalendarYear calendar_year, 
+	c.MonthNumberOfYear as month_number,
+	count(distinct fis.SalesOrderNumber) as num_distinct_orders, 
+	sum(fis.OrderQuantity) as num_items, 
+	cast(sum(fis.SalesAmount) / nullif(count (distinct fis.SalesOrderNumber),0) as float)
+		as avg_order_value
+from FactInternetSales fis
+join Calendar c
+	on c.DateKey = fis.OrderDateKey
+	and c.CalendarYear not in (2010, 2014)
+group by 
+	c.CalendarYear,
+	c.MonthNumberOfYear
+order by 
+	calendar_year,
+	month_number;
+```
+
+</details>
+
+
+**Results:**
+
+|calendar_year|month_number|num_distinct_orders|num_items|avg_order_value|
+|-------------|------------|-------------------|---------|---------------|
+|2011|1|144|144|3262.666|
+|2011|2|144|144|3238.4368|
+|2011|3|150|150|3234.6577|
+|2011|4|157|157|3197.9225|
+|2011|5|174|174|3228.0544|
+|2011|6|230|230|3207.9992|
+|2011|7|188|188|3174.1838|
+|2011|8|193|193|3184.238|
+|2011|9|185|185|3259.9107|
+|2011|10|221|221|3204.5611|
+|2011|11|208|208|3175.701|
+|2011|12|222|222|3015.4572|
+|2012|1|252|252|1965.7306|
+|2012|2|260|260|1949.9776|
+|2012|3|212|212|1761.7122|
+|2012|4|219|219|1828.0165|
+|2012|5|207|207|1733.7096|
+|2012|6|318|318|1745.7866|
+|2012|7|246|246|1807.1472|
+|2012|8|294|294|1782.0319|
+|2012|9|269|269|1807.3511|
+|2012|10|313|313|1709.7747|
+|2012|11|324|324|1660.3565|
+|2012|12|355|483|1759.161|
+|2013|1|632|1662|1357.1042|
+|2013|2|1421|3453|542.821|
+|2013|3|1690|4087|621.2469|
+|2013|4|1612|3979|648.8975|
+|2013|5|1792|4399|716.8487|
+|2013|6|2007|5025|818.7233|
+|2013|7|1875|4671|731.5604|
+|2013|8|1966|4865|788.9448|
+|2013|9|1884|4616|768.3098|
+|2013|10|2131|5300|785.2151|
+|2013|11|2087|5224|853.3397|
+|2013|12|2192|5520|855.0913|
+
+
+
+**Insights:** The Average Order Value (AOV) has shown a significant decline from 2011 to 2013. In 2011, the AOV was consistently above $3000, while in 2012, it dropped to around $1700-$1900, and in 2013, it further declined to around $500-$800. This indicates that customers in the B2C channel are spending less per order over time. The decline in AOV could be attributed to various factors such as changes in customer behavior, increased competition, or the effectiveness of marketing and sales strategies. It is important for the business to analyze the underlying reasons for this decline and take appropriate actions to improve the AOV, such as offering promotions or bundling products to encourage customers to spend more per order. Conversely, the increase in the number of distinct orders and items sold over the years suggests that while customers are spending less per order, they are making more purchases overall, which could indicate a shift in customer behavior towards more frequent but smaller purchases. Toward the end of 2013, customers tend to buy more items per order, but spend less on average per order, which could indicate a shift in customer behavior towards more frequent but smaller purchases. Overall, that compensates for the decline in AOV and could be a positive sign for the business as it indicates that customers are still engaged and making purchases, even if they are spending less per order. However, it is important to monitor this trend closely and take appropriate actions to ensure that the business continues to grow and remain competitive in the market. 
+
+
+## Year-to-Date (YTD) Revenue and Profitability
+
+`5. What is the Year-to-Date (YTD) revenue and profitability for the current year compared to the previous year?`
+
+**Solution Method:** I solved this question by using window function `sum` with `order by day_number` to calculate the cumulative revenue for each day of the year. The financial metrics are calculated in a CTE on a daily basis and then for the cumulative ytd calculations, `sum` window function is used. 
+
+<details>
+<summary>Show SQL Code</summary>
+
+
+```sql
+with revenue_calculation as (
+	select
+		c.CalendarYear as calendar_year,
+		c.MonthNumberOfYear as month_number,
+		c.DayNumberOfYear as day_number,
+		count(distinct fis.SalesOrderNumber) as num_orders,
+		coalesce(sum(fis.salesamount), 0) as daily_revenue
+	from FactInternetSales fis 
+	right join Calendar c 
+		on c.DateKey = fis.OrderDateKey
+	where c.CalendarYear = 2013
+	group by 
+		c.CalendarYear,
+		c.MonthNumberOfYear,
+		c.DayNumberOfYear		
+)
+
+select
+	*,
+	sum(daily_revenue) over (order by day_number) as cumulative_revenue
+from revenue_calculation r
+order by 
+	calendar_year,
+	month_number,
+	day_number
+```
+
+</details>
+
+
+**Results:**
+
+|calendar_year|month_number|day_number|num_orders|daily_revenue|cumulative_revenue|
+|-------------|------------|----------|----------|-------------|------------------|
+|2013|1|1|15|29456.2500|29456.2500|
+|2013|1|2|6|12775.3300|42231.5800|
+|2013|1|3|17|32708.4500|74940.0300|
+|2013|1|4|15|27369.3400|102309.3700|
+|2013|1|5|21|32681.4400|134990.8100|
+|2013|1|6|15|21787.0200|156777.8300|
+|2013|1|7|23|43285.7400|200063.5700|
+|2013|1|8|15|22765.5900|222829.1600|
+|2013|1|9|17|29735.1400|252564.3000|
+|2013|1|10|16|27143.7400|279708.0400|
+|2013|1|11|19|30792.0700|310500.1100|
+|2013|1|12|14|24151.7200|334651.8300|
+|2013|1|13|16|29332.0600|363983.8900|
+|2013|1|14|9|16864.1700|380848.0600|
+|2013|1|15|13|17740.4800|398588.5400|
+|2013|1|16|24|43007.0600|441595.6000|
+|2013|1|17|9|10662.1000|452257.7000|
+|2013|1|18|17|29251.1300|481508.8300|
+|2013|1|19|15|27969.6300|509478.4600|
+|2013|1|20|28|46251.4900|555729.9500|
+|2013|1|21|15|24486.9700|580216.9200|
+|2013|1|22|18|37173.2900|617390.2100|
+|2013|1|23|15|20063.2400|637453.4500|
+|2013|1|24|16|21670.4100|659123.8600|
+|2013|1|25|25|46265.1100|705388.9700|
+|2013|1|26|12|21245.6500|726634.6200|
+|2013|1|27|18|32820.6000|759455.2200|
+|2013|1|28|46|22444.7800|781900.0000|
+|2013|1|29|43|17544.6500|799444.6500|
+|2013|1|30|54|34958.3200|834402.9700|
+|2013|1|31|46|23286.9400|857689.9100|
+|2013|2|32|42|10631.9600|868321.8700|
+|2013|2|33|46|31641.0400|899962.9100|
+|2013|2|34|58|39821.9000|939784.8100|
+|2013|2|35|67|41050.1100|980834.9200|
+|2013|2|36|51|36502.4900|1017337.4100|
+|2013|2|37|36|9256.8800|1026594.2900|
+|2013|2|38|43|23441.9800|1050036.2700|
+|2013|2|39|61|38978.8800|1089015.1500|
+|2013|2|40|53|27145.6800|1116160.8300|
+|2013|2|41|55|22354.9400|1138515.7700|
+|2013|2|42|38|8935.5300|1147451.3000|
+|2013|2|43|55|24718.8800|1172170.1800|
+|2013|2|44|56|30727.6500|1202897.8300|
+|2013|2|45|52|43821.1300|1246718.9600|
+|2013|2|46|63|32532.8800|1279251.8400|
+|2013|2|47|42|22848.5000|1302100.3400|
+|2013|2|48|47|22208.3300|1324308.6700|
+|2013|2|49|33|16582.6700|1340891.3400|
+|2013|2|50|41|23768.6400|1364659.9800|
+|2013|2|51|64|38394.4200|1403054.4000|
+|2013|2|52|65|34077.1600|1437131.5600|
+|2013|2|53|52|33445.8200|1470577.3800|
+|2013|2|54|55|16562.7900|1487140.1700|
+|2013|2|55|49|29636.8500|1516777.0200|
+|2013|2|56|56|33871.0600|1550648.0800|
+|2013|2|57|53|30886.4900|1581534.5700|
+|2013|2|58|52|25334.1600|1606868.7300|
+|2013|2|59|36|22169.9200|1629038.6500|
+|2013|3|60|58|39771.1000|1668809.7500|
+|2013|3|61|52|39824.6300|1708634.3800|
+|2013|3|62|58|27876.1300|1736510.5100|
+|2013|3|63|44|37420.7100|1773931.2200|
+|2013|3|64|46|34742.5300|1808673.7500|
+|2013|3|65|57|30966.9000|1839640.6500|
+|2013|3|66|62|36027.7100|1875668.3600|
+|2013|3|67|64|39610.7600|1915279.1200|
+|2013|3|68|45|31852.7300|1947131.8500|
+|2013|3|69|37|22015.5400|1969147.3900|
+|2013|3|70|64|38930.5000|2008077.8900|
+|2013|3|71|67|55983.3400|2064061.2300|
+|2013|3|72|60|36316.7000|2100377.9300|
+|2013|3|73|54|31670.5900|2132048.5200|
+|2013|3|74|47|22219.7800|2154268.3000|
+|2013|3|75|50|25425.5800|2179693.8800|
+|2013|3|76|58|32091.4500|2211785.3300|
+|2013|3|77|72|57809.7900|2269595.1200|
+|2013|3|78|59|46671.4900|2316266.6100|
+|2013|3|79|54|23583.0900|2339849.7000|
+|2013|3|80|51|41473.8800|2381323.5800|
+|2013|3|81|60|36721.2200|2418044.8000|
+|2013|3|82|51|25622.8100|2443667.6100|
+|2013|3|83|44|31296.5600|2474964.1700|
+|2013|3|84|54|28647.1200|2503611.2900|
+|2013|3|85|62|38171.1600|2541782.4500|
+|2013|3|86|47|22332.0700|2564114.5200|
+|2013|3|87|40|22851.9900|2586966.5100|
+|2013|3|88|54|30160.3500|2617126.8600|
+|2013|3|89|52|23935.6900|2641062.5500|
+|2013|3|90|67|37883.4900|2678946.0400|
+|2013|4|91|54|31103.1300|2710049.1700|
+|2013|4|92|50|34252.6900|2744301.8600|
+|2013|4|93|58|40796.0400|2785097.9000|
+|2013|4|94|69|44971.0700|2830068.9700|
+|2013|4|95|54|25428.9400|2855497.9100|
+|2013|4|96|77|45482.0100|2900979.9200|
+|2013|4|97|54|39051.4200|2940031.3400|
+|2013|4|98|55|27693.9000|2967725.2400|
+|2013|4|99|46|39658.4900|3007383.7300|
+|2013|4|100|52|37216.3600|3044600.0900|
+|2013|4|101|48|34319.7400|3078919.8300|
+|2013|4|102|57|37204.9100|3116124.7400|
+|2013|4|103|63|37378.3400|3153503.0800|
+|2013|4|104|37|26819.8400|3180322.9200|
+|2013|4|105|48|36773.1100|3217096.0300|
+|2013|4|106|59|45650.0900|3262746.1200|
+|2013|4|107|45|39352.1200|3302098.2400|
+|2013|4|108|53|22301.6700|3324399.9100|
+|2013|4|109|53|34310.9300|3358710.8400|
+|2013|4|110|57|43325.9800|3402036.8200|
+|2013|4|111|59|38076.7000|3440113.5200|
+|2013|4|112|45|17996.0600|3458109.5800|
+|2013|4|113|48|27583.8400|3485693.4200|
+|2013|4|114|65|44684.9300|3530378.3500|
+|2013|4|115|39|31332.8100|3561711.1600|
+|2013|4|116|55|35940.8000|3597651.9600|
+|2013|4|117|56|27813.4100|3625465.3700|
+|2013|4|118|52|36069.5700|3661534.9400|
+|2013|4|119|53|36041.5000|3697576.4400|
+|2013|4|120|51|27392.3700|3724968.8100|
+|2013|5|121|59|38023.4200|3762992.2300|
+|2013|5|122|69|49081.4000|3812073.6300|
+|2013|5|123|58|28476.5400|3840550.1700|
+|2013|5|124|53|32476.9600|3873027.1300|
+|2013|5|125|52|38762.5700|3911789.7000|
+|2013|5|126|60|39303.6200|3951093.3200|
+|2013|5|127|41|28390.2200|3979483.5400|
+|2013|5|128|55|46553.4100|4026036.9500|
+|2013|5|129|58|52843.5600|4078880.5100|
+|2013|5|130|41|18442.1900|4097322.7000|
+|2013|5|131|55|36868.6700|4134191.3700|
+|2013|5|132|58|36145.2100|4170336.5800|
+|2013|5|133|57|36084.7400|4206421.3200|
+|2013|5|134|61|41838.9900|4248260.3100|
+|2013|5|135|52|38193.1600|4286453.4700|
+|2013|5|136|59|41496.5200|4327949.9900|
+|2013|5|137|62|39300.1900|4367250.1800|
+|2013|5|138|57|43510.9200|4410761.1000|
+|2013|5|139|39|26966.2000|4437727.3000|
+|2013|5|140|62|38025.5000|4475752.8000|
+|2013|5|141|65|58402.9600|4534155.7600|
+|2013|5|142|54|38000.7600|4572156.5200|
+|2013|5|143|72|61004.7500|4633161.2700|
+|2013|5|144|44|35148.8500|4668310.1200|
+|2013|5|145|55|42799.3400|4711109.4600|
+|2013|5|146|62|50332.8200|4761442.2800|
+|2013|5|147|75|53495.7100|4814937.9900|
+|2013|5|148|62|45631.1100|4860569.1000|
+|2013|5|149|62|33988.4500|4894557.5500|
+|2013|5|150|66|63052.5900|4957610.1400|
+|2013|5|151|67|51951.6000|5009561.7400|
+|2013|6|152|62|62935.4600|5072497.2000|
+|2013|6|153|71|51323.5800|5123820.7800|
+|2013|6|154|64|55816.6800|5179637.4600|
+|2013|6|155|81|72376.4600|5252013.9200|
+|2013|6|156|91|77359.3400|5329373.2600|
+|2013|6|157|69|47438.0100|5376811.2700|
+|2013|6|158|61|46708.2500|5423519.5200|
+|2013|6|159|52|28462.0600|5451981.5800|
+|2013|6|160|71|57790.0200|5509771.6000|
+|2013|6|161|72|69712.4900|5579484.0900|
+|2013|6|162|79|59151.7000|5638635.7900|
+|2013|6|163|61|60327.8000|5698963.5900|
+|2013|6|164|79|57660.1800|5756623.7700|
+|2013|6|165|56|36793.0700|5793416.8400|
+|2013|6|166|70|49744.4100|5843161.2500|
+|2013|6|167|69|67078.7600|5910240.0100|
+|2013|6|168|64|63750.5500|5973990.5600|
+|2013|6|169|71|67958.6800|6041949.2400|
+|2013|6|170|66|63875.1500|6105824.3900|
+|2013|6|171|43|34686.2900|6140510.6800|
+|2013|6|172|69|54909.8000|6195420.4800|
+|2013|6|173|66|43262.2000|6238682.6800|
+|2013|6|174|68|51595.5600|6290278.2400|
+|2013|6|175|72|60689.6500|6350967.8900|
+|2013|6|176|58|48388.7800|6399356.6700|
+|2013|6|177|61|54856.9200|6454213.5900|
+|2013|6|178|77|53955.4300|6508169.0200|
+|2013|6|179|60|59653.1500|6567822.1700|
+|2013|6|180|80|58523.1500|6626345.3200|
+|2013|6|181|44|26394.2000|6652739.5200|
+|2013|7|182|59|42043.5000|6694783.0200|
+|2013|7|183|56|46519.0800|6741302.1000|
+|2013|7|184|54|39773.7300|6781075.8300|
+|2013|7|185|57|38727.3700|6819803.2000|
+|2013|7|186|59|35559.6100|6855362.8100|
+|2013|7|187|59|53206.9300|6908569.7400|
+|2013|7|188|75|49743.6100|6958313.3500|
+|2013|7|189|51|35343.9500|6993657.3000|
+|2013|7|190|73|48424.3400|7042081.6400|
+|2013|7|191|66|48800.9800|7090882.6200|
+|2013|7|192|50|46615.6000|7137498.2200|
+|2013|7|193|50|41774.3100|7179272.5300|
+|2013|7|194|66|45260.8300|7224533.3600|
+|2013|7|195|70|50908.5600|7275441.9200|
+|2013|7|196|75|43804.2400|7319246.1600|
+|2013|7|197|52|30545.3700|7349791.5300|
+|2013|7|198|62|29326.1400|7379117.6700|
+|2013|7|199|49|34962.3400|7414080.0100|
+|2013|7|200|75|59580.2200|7473660.2300|
+
+
+**Insights:** The Year-to-Date (YTD) revenue for the current year (2013) shows a steady increase over time, with cumulative revenue reaching approximately $7.47 million by the end of July. The profitability trend can be analyzed by comparing the daily revenue and cumulative revenue, which indicates that the business is generating consistent revenue growth throughout the year. The significant increase in revenue in June and July could be attributed to seasonal factors, promotional activities, or increased customer demand during these months. It is important for the business to continue monitoring the YTD revenue and profitability trends to make informed decisions about inventory management, marketing strategies, and resource allocation to sustain growth and maximize profitability.
+
+
+
+# Conclusion 
+
+The first domain is focused on analyzing the revenue growth, seasonality of sales, average order value, and year-to-date revenue and profitability for the B2C channel. According to the results of the SQL queries we derived following insights:
+
+- The Year-over-Year (YoY) revenue growth rate for each month shows significant fluctuations over the years, with a substantial increase in revenue growth in 2013 compared to 2012.
+- The monthly seasonality of sales indicates that the second and fourth quarters of the year drive the most revenue historically, with significant growth rates compared to the previous quarters.
+- The Average Order Value (AOV) for the B2C channel has shown a significant decline from 2011 to 2013, while the number of distinct orders and items sold has increased, indicating a shift in customer behavior towards more frequent but smaller purchases.
+- The Year-to-Date (YTD) revenue for the current year (2013) shows a steady increase over time, with significant growth in June and July, which could be attributed to seasonal factors or increased customer demand during these months.
+Overall, these insights provide valuable information for the business to make informed decisions about inventory management, marketing strategies, and resource allocation to sustain growth and maximize profitability in the B2C channel. It is important for the business to continue monitoring these trends and take appropriate actions to ensure continued growth and competitiveness in the market.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

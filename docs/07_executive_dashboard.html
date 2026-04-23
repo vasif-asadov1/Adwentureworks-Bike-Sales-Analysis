@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Executive Dashboard – Vasif Asadov | AdventureWorks Bike Sales Analysis</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./assets/favicon.ico" rel="icon">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark-0cda25dcbb8fe09c7138904322940710.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-095c5612e4422d114998b098e0e10f6c.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="dark">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+</head>
+
+<body class="nav-sidebar docked nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">Vasif Asadov | AdventureWorks Bike Sales Analysis</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="./index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">AdventureWorks Bike Sales</li><li class="breadcrumb-item"><a href="./07_executive_dashboard.html">Executive Dashboard</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">AdventureWorks Bike Sales</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+ <span class="menu-text">00_problem_description.qmd</span>
+  </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./01_data_preparation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data Preparation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./02_macro_performance.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Macro Performance Analysis</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./03_customer_analysis.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Customer Segmentation Analysis</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./04_performance_analysis.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Product Profit Analysis</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./05_sales_reasons.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Sales Reasons Analysis</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./06_regional_analysis.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Regional Sales Analysis</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./07_executive_dashboard.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Executive Dashboard</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a></li>
+  <li><a href="#selecting-dashboard-tool" id="toc-selecting-dashboard-tool" class="nav-link" data-scroll-target="#selecting-dashboard-tool">Selecting Dashboard Tool</a></li>
+  <li><a href="#data-for-dashboard" id="toc-data-for-dashboard" class="nav-link" data-scroll-target="#data-for-dashboard">Data for Dashboard</a></li>
+  <li><a href="#building-the-dashboard" id="toc-building-the-dashboard" class="nav-link" data-scroll-target="#building-the-dashboard">Building the Dashboard</a></li>
+  <li><a href="#dashboard" id="toc-dashboard" class="nav-link" data-scroll-target="#dashboard">Dashboard</a></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">Conclusion</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">AdventureWorks Bike Sales</li><li class="breadcrumb-item"><a href="./07_executive_dashboard.html">Executive Dashboard</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Executive Dashboard</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="introduction" class="level1">
+<h1>Introduction</h1>
+<p>Solving business questions with SQL queries is a powerful way to gain insights and make informed decisions. However, tabular results are mainly for the analysts and may not be easily digestible for executives or stakeholders who have limited time and want to quickly understand the key takeaways. To address this, as a data analyst we should always build an executive dashboard that summarizes the key insights from our analysis in a visually appealing and easy-to-understand format. This dashboard will include charts, graphs, key performance indicators (KPIs) and concise summaries that highlight the most important findings from our analysis. By doing so, we can effectively communicate our insights to not only the analysts but also to the executives and stakeholders, enabling them to make informed decisions based on the data.</p>
+<p>Since the dashboard will be used by executives, it is crucial to be concise and focus on the most impactful insights that can drive business decisions. We should prioritize the key findings that have the greatest potential to influence strategic initiatives. Additionally, we should use clear and simple visualizations without overloading the dashboard with too much and complex information. Some people may think that colorful and flashy dashboards are more engaging, but in reality, a clean and minimalist design is often more effective in conveying the message and allowing the executives to quickly focus on the key insights rather than getting distracted by unnecessary elements and themes. Therefore, we should aim for a balance between visual appeal and clarity, ensuring that the dashboard is both informative and easy to understand for our executive audience. By doing so, we can maximize the impact of our analysis and facilitate data-driven decision-making at the executive level.</p>
+</section>
+<section id="selecting-dashboard-tool" class="level1">
+<h1>Selecting Dashboard Tool</h1>
+<p>When it comes to selecting a dashboard tool for our executive dashboard, there are several options available in the market, each with its own strengths and weaknesses. Some popular dashboard tools include Tableau, Power BI, Looker, and Google Data Studio. As a data analyst, I am experienced mainly with Tableau and Power BI, which are both powerful and widely used tools for creating interactive and visually appealing dashboards. Tableau is known for its user-friendly interface and robust data visualization capabilities, making it a great choice for creating complex and dynamic dashboards. Power BI, on the other hand, is tightly integrated with Microsoft products and offers strong data modeling and reporting features, making it a good option for organizations that are already using the Microsoft ecosystem. Ultimately, the choice of dashboard tool will depend on factors such as the specific requirements of the dashboard, the existing technology stack of the organization, and the preferences of the stakeholders.</p>
+<p>Besides the drag-and-drop BI tools, there are also other options for creating dashboards, such as using programming languages like Python or R with libraries like Dash or Shiny. These options can provide more flexibility and customization but require more technical expertise and coding skills. Therefore, as a data analyst, if you have limited time and want to quickly create a dashboard, using a BI tool is often the most efficient and effective choice. However, if you have enough domain knowledge and technical understanding, you can build quite highly customized dashboards even with the Microsoft Excel and Google Sheets, which are widely accessible and familiar to many users. Ultimately, the key is to choose a tool that allows you to effectively communicate your insights and meet the needs of your executive audience while also considering your own skills and resources as a data analyst.</p>
+<p>In this project I will use Tableau as a BI tool to build my executive dashboard, as I have experience with it and it offers a wide range of features for creating interactive and visually appealing dashboards.</p>
+</section>
+<section id="data-for-dashboard" class="level1">
+<h1>Data for Dashboard</h1>
+<p>In order to create an effective executive dashboard, we have two options for the data we can use:</p>
+<ol type="1">
+<li><strong>Using original data:</strong> We can use the original data which is multi-table in our case and require creating lots of calculated fields and paramaters in Tableau. We should also connect / join these tables in Tableau and then create the dashboard in order to make the filters applicable. This approach is not preferred in large-scale projects as it will definitely cause performance issues and slow down the dashboard, especially if the data is large and complex. Each time we apply a filter, Tableau will have to query the data source and perform calculations on the fly, which can lead to long loading times and a poor user experience for the executives who are using the dashboard.</li>
+<li><strong>Using aggregated data:</strong> We can create an aggregated table in SQL that contains all the necessary metrics and dimensions for our dashboard. This approach is more efficient and will significantly improve the performance of the dashboard, as Tableau will be querying a pre-aggregated dataset rather than performing calculations on the fly. By using an aggregated table, we can ensure that the dashboard loads quickly and provides a smooth user experience for the executives who are using it. We can create this aggregated tables by writing SQL queries and then restoring them as views in our database. Then we can connect Tableau to our SQL database and use these views as the data source for our dashboard. This way, we can leverage the power of SQL for data transformation and aggregation while still benefiting from the interactive and visual capabilities of Tableau for our executive dashboard. In that case, all heavy calculations and groupings will be applied in SQL and making the Tableau free from heavy calculations and improving the performance of the dashboard significantly.</li>
+</ol>
+<p>I created a single aggregated table in SQL that contains all the necessary metrics and dimensions for our executive dashboard. I prepared my data at the order line level in which each row represents a single order line item, and includes dimensions such as Order Date, Ship Date, Country, Product Category, and measures such as Sales Amount, Profit Margin, Freight Cost, Tax Amount, etc. I joined all dimension tables to the fact table at the order line level and then performed all necessary calculations and aggregations in SQL to create a comprehensive dataset that can be easily used in Tableau for building the executive dashboard. These types of aggregated tables are often referred to as 360-degree views or data marts, as they provide a holistic view of the data and allow for efficient analysis and reporting in BI tools like Tableau. By using this approach, we can ensure that our executive dashboard is both performant and provides the necessary insights for informed decision-making at the executive level. Following SQL query is used to create the aggregated table for our executive dashboard:</p>
+<details>
+<summary>
+SQL Query for Creating Aggregated Table
+</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">create</span> <span class="kw">or</span> <span class="kw">alter</span> <span class="kw">view</span> orderline_level_agg <span class="kw">as</span> </span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="kw">with</span> get_last_date <span class="kw">as</span> (</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">select</span> </span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>        <span class="fu">max</span>(orderdate) <span class="kw">as</span> reference_day</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">from</span> FactInternetSales</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="kw">select</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    fis.SalesOrderNumber <span class="kw">as</span> order_number,</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    fis.SalesOrderLineNumber <span class="kw">as</span> order_line_number,</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="co">-- product info</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    fis.ProductKey <span class="kw">as</span> product_key,</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    pr.ProductName <span class="kw">as</span> product_name,</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    sub.ProductSubcategoryName <span class="kw">as</span> product_subcategory,</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    cat.ProductCategoryName <span class="kw">as</span> product_category,</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    pr.ListPrice <span class="kw">as</span> product_list_price,</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    <span class="co">-- customer info</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>    cus.customerkey <span class="kw">as</span> customer_key,</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">concat</span>(cus.FirstName, <span class="st">' '</span>, cus.LastName) <span class="kw">as</span> customer_name,</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>    DATEDIFF(<span class="dt">year</span>, cus.BirthDate, gld.reference_day) <span class="kw">as</span> customer_age,</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>    cus.Gender <span class="kw">as</span> customer_gender,</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>    cus.MaritalStatus <span class="kw">as</span> customer_marital_status,</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>    cus.Education <span class="kw">as</span> customer_education,</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>    cus.Occupation <span class="kw">as</span> customer_occupation,</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>    cus.YearlyIncome <span class="kw">as</span> customer_income,</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>    <span class="co">-- regional sales info</span></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>    st.SalesTerritoryGroup <span class="kw">as</span> sales_territory_group,</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>    st.SalesTerritoryCountry <span class="kw">as</span> sales_country,</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>    st.SalesTerritoryRegion <span class="kw">as</span> sales_region,</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>    geo.StateProvinceName <span class="kw">as</span> sales_state,</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>    geo.City <span class="kw">as</span> sales_city,</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>    geo.PostalCode <span class="kw">as</span> sales_postal_code,</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>    geo.IpAddressLocator <span class="kw">as</span> sales_ip_address,</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>    <span class="co">-- financial data</span></span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>    <span class="fu">cast</span>(fis.SalesAmount <span class="kw">as</span> <span class="dt">decimal</span>(<span class="dv">20</span>,<span class="dv">3</span>)) <span class="kw">as</span> revenue,</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>    <span class="fu">cast</span>(fis.TotalProductCost <span class="kw">as</span> <span class="dt">decimal</span>(<span class="dv">20</span>,<span class="dv">3</span>)) <span class="kw">as</span> <span class="kw">cost</span>,</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>    <span class="fu">cast</span>(fis.SalesAmount <span class="op">-</span> fis.TotalProductCost <span class="kw">as</span> <span class="dt">decimal</span>(<span class="dv">20</span>,<span class="dv">3</span>)) <span class="kw">as</span> profit,</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>    <span class="fu">cast</span>(fis.TaxAmt <span class="kw">as</span> <span class="dt">decimal</span>(<span class="dv">20</span>,<span class="dv">3</span>)) <span class="kw">as</span> tax,</span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>    <span class="fu">cast</span>(fis.Freight <span class="kw">as</span> <span class="dt">decimal</span>(<span class="dv">20</span>,<span class="dv">3</span>)) <span class="kw">as</span> freight,</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>    <span class="fu">cast</span>(fis.UnitPrice <span class="kw">as</span> <span class="dt">decimal</span>(<span class="dv">20</span>,<span class="dv">4</span>)) <span class="kw">as</span> unit_price,</span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>    fis.OrderQuantity <span class="kw">as</span> quantity,</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>    cur.CurrencyName <span class="kw">as</span> currency, </span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>    <span class="co">-- time data</span></span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>    fis.OrderDate <span class="kw">as</span> order_date,</span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>    fis.ShipDate <span class="kw">as</span> ship_date,</span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>    fis.DueDate <span class="kw">as</span> due_date</span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a><span class="kw">from</span> FactInternetSales fis</span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a><span class="kw">left</span> <span class="kw">join</span> Customer cus </span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>    <span class="kw">on</span> cus.CustomerKey <span class="op">=</span> fis.CustomerKey</span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a><span class="kw">left</span> <span class="kw">join</span> geography geo</span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>    <span class="kw">on</span> geo.geographykey <span class="op">=</span> cus.geographykey</span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a><span class="kw">left</span> <span class="kw">join</span> SalesTerritory st</span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>    <span class="kw">on</span> st.SalesTerritoryKey <span class="op">=</span> fis.SalesTerritoryKey</span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a><span class="kw">left</span> <span class="kw">join</span> Products pr</span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a>    <span class="kw">on</span> pr.ProductKey <span class="op">=</span> fis.ProductKey</span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a><span class="kw">left</span> <span class="kw">join</span> ProductSubcategory sub</span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a>    <span class="kw">on</span> sub.ProductSubcategoryKey <span class="op">=</span> pr.ProductSubcategoryKey</span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a><span class="kw">left</span> <span class="kw">join</span> ProductCategory cat</span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a>    <span class="kw">on</span> cat.ProductCategoryKey <span class="op">=</span> sub.ProductCategoryKey</span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a><span class="kw">left</span> <span class="kw">join</span> Currency cur</span>
+<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a>    <span class="kw">on</span> cur.CurrencyKey <span class="op">=</span> fis.CurrencyKey</span>
+<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a><span class="kw">left</span> <span class="kw">join</span> Calendar cal </span>
+<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a>    <span class="kw">on</span> cal.DateKey <span class="op">=</span> fis.OrderDateKey</span>
+<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a><span class="kw">cross</span> <span class="kw">join</span> get_last_date gld;</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<p>I have taken the last date from the data as a reference day to calculate the customer age, which is a common practice in data analysis when we want to calculate age based on a specific point in time. By using the last date from the data as the reference day, we can ensure that our age calculations are consistent and accurate based on the most recent information available in the dataset. This approach allows us to have a clear understanding of the age distribution of our customers at the time of their last purchase, which can provide valuable insights for marketing and customer segmentation strategies.</p>
+</section>
+<section id="building-the-dashboard" class="level1">
+<h1>Building the Dashboard</h1>
+<p>Before building the dashboard, we should firstly define the key metrics and dimensions that we want to include in our executive dashboard. These should be aligned with the business questions we want to answer and the insights we want to communicate to the executives. Then for each question - task we will dedicate one sheet in Tableau and create the necessary visualizations and calculations to answer that specific question. In my dashboard, I have included the following key metrics and dimensions:</p>
+<ol type="1">
+<li><strong>Total Revenue:</strong> This metric represents the total sales revenue generated from our B2C operations. It is a key indicator of our overall business performance and growth.</li>
+<li><strong>Total Customers:</strong> This metric represents the total number of unique customers who have made purchases in our B2C operations. It provides insights into our customer base and market reach.</li>
+<li><strong>Total Cost:</strong> This metric represents the total cost incurred in our B2C operations, including product costs, freight costs, and tax amounts. It helps us understand our cost structure and profitability.</li>
+<li><strong>Total Orders:</strong> This metric defines the number of unique orders placed.</li>
+<li><strong>Total Profit:</strong> The difference between total revenue and total cost, which indicates the overall profitability of our sales operations.</li>
+</ol>
+<p>The above metrics are called Key Performance Indicators (KPIs) in finance and business analysis, as they provide a quick snapshot of the overall performance and health of our B2C operations. These KPIs are essential for executives to monitor and evaluate the success of our business strategies and make informed decisions based on the data. By including these KPIs in our executive dashboard, we can effectively communicate the key insights and trends in our sales performance to the executives and stakeholders, enabling them to take appropriate actions to drive business growth and profitability.</p>
+<p>In the other visualizations, I always showed / compared these metrics since our focus are these KPIs. To make the dashboard dynamic and interactive, I created a parameter in Tableau which allows the user/executive to select the specific KPI they want to focus on, and then all the visualizations below will be updated accordingly to show the selected KPI. This way, we will have a single compact and clean dashboard that can provide insights on all the key metrics without overwhelming the user with too many visualizations at once. The user can simply select the KPI they are interested in and the dashboard will update to show the relevant insights for that specific metric. This approach allows us to effectively communicate the key insights and trends in our sales performance while keeping the dashboard concise and easy to understand for our executive audience.</p>
+<ol start="6" type="1">
+<li><strong>Revenue by Months-Years:</strong> This is a time series visualization that shows the trend of revenue over time, broken down by months and years. It helps us identify seasonal patterns, growth trends, and any fluctuations in our sales performance over time.</li>
+</ol>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="./home/vasif/Desktop/portfolio_projects/images/revenue_bullet_chart.png" class="img-fluid figure-img"></p>
+<figcaption>Revenue by Months-Years</figcaption>
+</figure>
+</div>
+<ol start="7" type="1">
+<li><strong>Education and Occupation Segmentation:</strong> This is a heatmap visualization that shows the distribution of KPIs based on their education and occupation. It helps us understand the demographics of our customer base and identify any patterns or trends in their purchasing behavior based on their education and occupation.</li>
+</ol>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="../../images/education_vs_occupation.png" class="img-fluid figure-img"></p>
+<figcaption>Education and Occupation Segmentation</figcaption>
+</figure>
+</div>
+<ol start="8" type="1">
+<li><strong>Age and Marital-Gender Segmentation:</strong> This is a heatmap that shows segmentation of KPIs based on age and marital status and gender. For making the dashboard more compact, I combined the marital status and gender dimensions into a single dimension in Tableau, which allows us to show the segmentation of KPIs based on both age and marital-gender in a single visualization. This created a groups - “married male”, “married female”, “single male”, “single female” groups and these groups together with age groups created a heatmap that shows the distribution of KPIs.</li>
+</ol>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="../../images/age_marital_gender.png" class="img-fluid figure-img"></p>
+<figcaption>Age and Marital-Gender Segmentation</figcaption>
+</figure>
+</div>
+<ol start="9" type="1">
+<li><strong>Countries by Revenue:</strong> This is a bar chart that shows the revenue generated from different countries. It helps us identify which countries are driving the most revenue and allows us to compare the performance of our sales across different regions.</li>
+</ol>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="../../images/countries_by_revenue.png" class="img-fluid figure-img"></p>
+<figcaption>Countries by Revenue</figcaption>
+</figure>
+</div>
+<ol start="10" type="1">
+<li><strong>Products Pareto Analysis:</strong> This is a Pareto chart that shows the cumulative contribution of different products to our total revenue. Pareto Analysis is a technique used to identify the most important factors that contribute to a particular outcome. For example, in our case, we can use Pareto Analysis to identify the top products that contribute to the 80% of our total revenue. For interactivity, I created a parameter that defines the pareto threshold, which allows the user to select the percentage threshold (e.g., 80%) and the chart will update accordingly to show the products that contribute to that percentage of total revenue. If the person select 0.8 as the threshold, the chart will show the products that contribute to 80% of total revenue, and if they select 0.9, it will show the products that contribute to 90% of total revenue, and so on. This way, we can easily identify the most important products that are driving our sales performance and focus our efforts on optimizing those products for maximum impact.</li>
+</ol>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="./home/vasif/Desktop/portfolio_projects/images/products_pareto.png" class="img-fluid figure-img"></p>
+<figcaption>Products Pareto Analysis</figcaption>
+</figure>
+</div>
+<ol start="11" type="1">
+<li><strong>Revenue Bullet Chart:</strong> Bullet chart is a simplier alternative to gauges and meters, which are often used in executive dashboards to show progress towards a target or goal. In our case, we can use a bullet chart to show our revenue performance against a target revenue. The bullet chart consists of a horizontal bar that represents our actual revenue, and a vertical line that represents the target revenue. The color of the bar can indicate whether we are below, at, or above the target. For example, if the bar is red, it indicates that we are below the target; if it is yellow, it indicates that we are at the target; and if it is green, it indicates that we are above the target. This visualization allows executives to quickly assess our revenue performance and understand how close we are to achieving our revenue goals.</li>
+</ol>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="./home/vasif/Desktop/portfolio_projects/images/revenue_bullet_chart.png" class="img-fluid figure-img"></p>
+<figcaption>Revenue Bullet Chart</figcaption>
+</figure>
+</div>
+</section>
+<section id="dashboard" class="level1">
+<h1>Dashboard</h1>
+<p>The first and main part was creating these sheets - visualizations in Tableau. However, it does not end here since we should arrange these visualizations in a dashboard format and make it visually appealing and easy to understand for the executives. We should also add titles, labels, and concise summaries to each visualization to provide context and highlight the key insights. Additionally, we should ensure that the dashboard is organized in a logical flow, with the most important KPIs and insights placed prominently at the top or center of the dashboard.</p>
+<p>To effectively arrange the visuals I used horizontal and vertical containers together with blank objects in Tableau to create a clean and organized layout for the dashboard. I also used consistent colors, fonts, and formatting across all visualizations to create a cohesive and professional look. By using these design principles, we can create an executive dashboard that is not only visually appealing but also effectively communicates the key insights and trends in our sales performance to the executives and stakeholders, enabling them to make informed decisions based on the data.</p>
+<p>I also added some buttons which directs the users - executives to the Github Repository of this project, where they can find the SQL code and the data preparation steps that I have done for this analysis. This way, we can provide transparency and allow the executives to explore the underlying data and code if they are interested in understanding the details of our analysis. By including these buttons, we can enhance the interactivity of the dashboard and provide additional resources for executives who want to dive deeper into the data and analysis behind the insights presented in the dashboard.</p>
+<p>I also added a “Show filter” button which activates a sidebar containing all the filters and parameter selections for the dashboard. Putting these filters and parameters inside the dashboard would lead to a very cluttered and overwhelming dashboard, especially for executives who have limited time and want to quickly understand the key insights. By placing these filters and parameters in an interactive sidebar that can be toggled on and off with a button, we can keep the main dashboard clean and focused on the key insights, while still providing the option for executives to explore the data further if they choose to do so. This approach allows us to strike a balance between providing interactivity and maintaining a clear and concise dashboard that effectively communicates the key insights to our executive audience.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="./home/vasif/Desktop/portfolio_projects/images/dashboard_wo_filter.png" class="img-fluid figure-img"></p>
+<figcaption>Dashboard Filter Button toggled off</figcaption>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="./home/vasif/Desktop/portfolio_projects/images/dashboard_w_filter.png" class="img-fluid figure-img"></p>
+<figcaption>Dashboard Filter Button toggled on</figcaption>
+</figure>
+</div>
+</section>
+<section id="conclusion" class="level1">
+<h1>Conclusion</h1>
+<p>Till here we have built an executive dashboard that summarizes the key insights from our analysis in a visually appealing and easy-to-understand format. The dashboard includes charts, graphs, key performance indicators (KPIs) and concise summaries that highlight the most important findings from our analysis. I organized the visuals in a logical flow, with consistent blue themed colours that will not create eye strain for the executives, and used horizontal and vertical containers together with blank objects in Tableau to create a clean and organized layout for the dashboard. I also added buttons that direct the users to the Github Repository of this project, where they can find the SQL code and the data preparation steps that I have done for this analysis, providing transparency and allowing the executives to explore the underlying data and code if they are interested in understanding the details of our analysis. Additionally, I added a “Show filter” button which activates a sidebar containing all the filters and parameter selections for the dashboard, allowing us to keep the main dashboard clean and focused on the key insights while still providing interactivity for executives who want to explore the data further. Overall, this executive dashboard effectively communicates the key insights and trends in our sales performance to the executives and stakeholders, enabling them to make informed decisions based on the data.</p>
+<p>We can further develop this dashboard by adding more dashboards which explain product domain, spatial domain and customer domain insights deeply. However, as this is an overall executive dashboard, I focused on the most important and impactful insights that can drive business decisions, and kept the dashboard concise and easy to understand for our executive audience. By doing so, we can maximize the impact of our analysis and facilitate data-driven decision-making at the executive level.</p>
+<p>You can reach out the Interactive Tableau Dashboard here: <a href="https://public.tableau.com/authoring/AdventureWorksExecutiveDashboard_17723260919680/Dashboard2#1">AdventureWorks Bike Sales Executive Dashboard</a></p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

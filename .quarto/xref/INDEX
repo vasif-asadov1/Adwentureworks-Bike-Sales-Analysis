@@ -1,0 +1,29 @@
+{
+  "00_problem_description.qmd": {
+    "00_problem_description.html": "e199b8eb"
+  },
+  "07_executive_dashboard.qmd": {
+    "07_executive_dashboard.html": "3f66b5b1"
+  },
+  "06_regional_analysis.qmd": {
+    "06_regional_analysis.html": "7246acdd"
+  },
+  "04_performance_analysis.qmd": {
+    "04_performance_analysis.html": "e38eeaeb"
+  },
+  "01_data_preparation.qmd": {
+    "01_data_preparation.html": "2fb0625e"
+  },
+  "05_sales_reasons.qmd": {
+    "05_sales_reasons.html": "e8288572"
+  },
+  "03_customer_analysis.qmd": {
+    "03_customer_analysis.html": "983edbf6"
+  },
+  "02_macro_performance.qmd": {
+    "02_macro_performance.html": "e6ff05ce"
+  },
+  "index.qmd": {
+    "index.html": "ca94cfbe"
+  }
+}

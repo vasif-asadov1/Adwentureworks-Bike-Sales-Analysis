@@ -1,0 +1,465 @@
+---
+title: "Regional Sales Analysis"
+---
+
+
+# Introduction
+
+In this part of the analysis, we will focus on understanding the regional sales performance of our B2C operations. We will analyze which countries and regions are driving the most revenue, how the Average Order Value (AOV) differs geographically, whether we are meeting our operational Service Level Agreements (SLAs), and how freight and tax costs impact the final landed cost for consumers across different countries. Additionally, we will investigate if there is a regional bias for specific product categories.
+
+
+
+# Regional Sales Performance Analysis
+
+## Geographical Revenue and AOV Analysis
+
+`20. Which countries and regions drive the most B2C revenue, and how does the Average Order Value (AOV) differ geographically?*`
+
+**Solution Method:** To analyze the regional sales performance, we will aggregate the sales data by country and region. We will calculate the total revenue, total number of orders, total number of customers, and the Average Order Value (AOV) for each country and region. This will allow us to identify which regions are driving the most revenue and how AOV differs geographically
+
+
+<details>
+<summary>Show SQL Code</summary>
+
+
+```sql
+select
+	st.SalesTerritoryCountry as country,
+	st.SalesTerritoryRegion as region,
+	coalesce(sum(fis.SalesAmount),0) as total_revenue,
+	coalesce(count(distinct fis.SalesOrderNumber),0) as total_orders,
+	coalesce(count(distinct fis.CustomerKey),0) as total_customers, 
+	cast(
+		sum(fis.SalesAmount) / nullif(count(distinct fis.SalesOrderNumber),0) 
+		as decimal(20,3)
+	) as avg_order_value
+from FactInternetSales fis
+left join SalesTerritory st
+	on st.SalesTerritoryKey = fis.SalesTerritoryKey
+group by
+	st.SalesTerritoryCountry,
+	st.SalesTerritoryRegion
+order by
+	total_revenue desc;
+```
+
+</details>
+
+
+**Results:**
+
+|country|region|total_revenue|total_orders|total_customers|avg_order_value|
+|-------|------|-------------|------------|---------------|---------------|
+|Australia|Australia|9061000.5844|6718|3591|1348.765|
+|United States|Southwest|5718150.8122|5473|4450|1044.793|
+|United States|Northwest|3649866.5512|4058|3341|899.425|
+|United Kingdom|United Kingdom|3391712.2109|3031|1913|1119.008|
+|Germany|Germany|2894312.3382|2484|1780|1165.182|
+|France|France|2644017.7143|2484|1810|1064.419|
+|Canada|Canada|1977844.8621|3375|1571|586.028|
+|United States|Southeast|12238.8496|17|12|719.932|
+|United States|Northeast|6532.4682|10|8|653.247|
+|United States|Central|3000.8296|9|8|333.426|
+
+
+**Insights:** We can derive the following insights from the above results:
+
+- Australia is the top-performing country in terms of total revenue, with a significant contribution from the Australia region. This indicates a strong market presence and customer base in that region.   
+- The United States has a substantial revenue contribution from the Southwest and Northwest regions, suggesting that these areas are key markets for our B2C operations. However, the AOV in these regions is lower compared to Australia, which may indicate different purchasing behaviors or product preferences among customers in the United States.
+- The United Kingdom, Germany, and France also contribute significantly to total revenue, with relatively high AOVs, indicating that customers in these countries may be purchasing higher-priced products or making larger orders.
+- Canada has a moderate total revenue contribution but a lower AOV compared to other countries, which may suggest that customers in Canada are purchasing lower-priced products or making smaller orders on average.
+- The United States regions of Southeast, Northeast, and Central have significantly lower total revenue and AOV compared to other regions, indicating that these areas may not be as strong in terms of market presence or customer engagement, and may require further investigation to understand the underlying reasons for the lower performance in these regions.
+
+
+
+
+## Operational Service Level Agreements (SLAs) Analysis
+
+
+`21. Are we meeting our operational Service Level Agreements (SLAs)? What is the average lead time between Order Date and Ship Date?`
+
+**Solution Method:** To evaluate whether we are meeting our operational Service Level Agreements (SLAs), we will calculate the average lead time between the Order Date and Ship Date for each region and month. We will compare the average lead time against our SLA targets to determine if we are meeting our commitments to customers. Additionally, we will categorize the delivery performance as "late delivery", "early delivery", or "on-time delivery" based on how the average lead time compares to the SLA targets for each region. 
+
+<details>
+<summary>Show SQL Code</summary>
+
+
+```sql
+with shipping_days as (
+	select
+		fis.SalesOrderNumber,
+		fis.OrderDateKey,
+		st.SalesTerritoryRegion as region,
+		min(datediff(day, fis.OrderDate, fis.ShipDate)) as days_to_ship
+	from FactInternetSales fis 
+	left join SalesTerritory st
+		on st.SalesTerritoryKey = fis.SalesTerritoryKey
+	group by
+		fis.SalesOrderNumber,
+		fis.OrderDateKey,
+		st.SalesTerritoryRegion
+)
+
+select
+	c.MonthNumberOfYear as month_number,
+	c.MonthName as month_name,
+	sd.region,
+	coalesce(cast(avg(sd.days_to_ship) as int), 0) as avg_days_to_ship,
+	case 
+		when avg(sd.days_to_ship) > 5 + avg(avg(sd.days_to_ship)) over (partition by sd.region) 
+			then 'late delivery'
+		when avg(sd.days_to_ship) < avg(avg(sd.days_to_ship)) over (partition by sd.region) - 5 
+			then 'early delivery'
+		else 'on-time delivery'
+	end as delivery_performance
+from Calendar c
+left join shipping_days sd
+	on sd.OrderDateKey = c.DateKey
+group by 
+	c.MonthNumberOfYear ,
+	c.MonthName ,
+	sd.region
+order by
+	month_number;
+```
+
+</details>
+
+
+
+**Results:**
+
+|month_number|month_name|region|avg_days_to_ship|delivery_performance|
+|------------|----------|------|----------------|--------------------|
+|1|January|Germany|7|on-time delivery|
+|1|January|United Kingdom|7|on-time delivery|
+|1|January|France|7|on-time delivery|
+|1|January|Southwest|7|on-time delivery|
+|1|January|Australia|7|on-time delivery|
+|1|January||0|on-time delivery|
+|1|January|Southeast|7|on-time delivery|
+|1|January|Canada|7|on-time delivery|
+|1|January|Northwest|7|on-time delivery|
+|2|February|Southwest|7|on-time delivery|
+|2|February|Southeast|7|on-time delivery|
+|2|February|United Kingdom|7|on-time delivery|
+|2|February|Germany|7|on-time delivery|
+|2|February|Canada|7|on-time delivery|
+|2|February|France|7|on-time delivery|
+|2|February||0|on-time delivery|
+|2|February|Northwest|7|on-time delivery|
+|2|February|Northeast|7|on-time delivery|
+|2|February|Australia|7|on-time delivery|
+|3|March|Southwest|7|on-time delivery|
+|3|March|France|7|on-time delivery|
+|3|March|United Kingdom|7|on-time delivery|
+|3|March|Germany|7|on-time delivery|
+|3|March|Canada|7|on-time delivery|
+|3|March|Australia|7|on-time delivery|
+|3|March||0|on-time delivery|
+|3|March|Northwest|7|on-time delivery|
+|4|April|Central|7|on-time delivery|
+|4|April|France|7|on-time delivery|
+|4|April|United Kingdom|7|on-time delivery|
+|4|April|Germany|7|on-time delivery|
+|4|April|Southwest|7|on-time delivery|
+|4|April|Southeast|7|on-time delivery|
+|4|April|Canada|7|on-time delivery|
+|4|April|Australia|7|on-time delivery|
+|4|April||0|on-time delivery|
+|4|April|Northwest|7|on-time delivery|
+|5|May|Central|7|on-time delivery|
+|5|May|Southeast|7|on-time delivery|
+|5|May|United Kingdom|7|on-time delivery|
+|5|May|Germany|7|on-time delivery|
+|5|May|Southwest|7|on-time delivery|
+|5|May|France|7|on-time delivery|
+|5|May||0|on-time delivery|
+|5|May|Northwest|7|on-time delivery|
+|5|May|Canada|7|on-time delivery|
+|5|May|Northeast|7|on-time delivery|
+|5|May|Australia|7|on-time delivery|
+|6|June|Central|7|on-time delivery|
+|6|June|France|7|on-time delivery|
+|6|June|United Kingdom|7|on-time delivery|
+|6|June|Northeast|7|on-time delivery|
+|6|June|Southwest|7|on-time delivery|
+|6|June|Southeast|7|on-time delivery|
+|6|June||0|on-time delivery|
+|6|June|Australia|7|on-time delivery|
+|6|June|Canada|7|on-time delivery|
+|6|June|Germany|7|on-time delivery|
+|6|June|Northwest|7|on-time delivery|
+|7|July|Southwest|7|on-time delivery|
+|7|July|Southeast|7|on-time delivery|
+|7|July|United Kingdom|7|on-time delivery|
+|7|July|Germany|7|on-time delivery|
+|7|July||0|on-time delivery|
+|7|July|France|7|on-time delivery|
+|7|July|Canada|7|on-time delivery|
+|7|July|Northwest|7|on-time delivery|
+|7|July|Australia|7|on-time delivery|
+|8|August|Central|7|on-time delivery|
+|8|August|Southeast|7|on-time delivery|
+|8|August|United Kingdom|7|on-time delivery|
+|8|August|Germany|7|on-time delivery|
+|8|August|Southwest|7|on-time delivery|
+|8|August|France|7|on-time delivery|
+|8|August|Canada|7|on-time delivery|
+|8|August|Australia|7|on-time delivery|
+|8|August||0|on-time delivery|
+|8|August|Northeast|7|on-time delivery|
+|8|August|Northwest|7|on-time delivery|
+|9|September|Southwest|7|on-time delivery|
+|9|September|France|7|on-time delivery|
+|9|September|United Kingdom|7|on-time delivery|
+|9|September|Germany|7|on-time delivery|
+|9|September||0|on-time delivery|
+|9|September|Northwest|7|on-time delivery|
+|9|September|Canada|7|on-time delivery|
+|9|September|Australia|7|on-time delivery|
+|10|October|Southwest|7|on-time delivery|
+|10|October|Southeast|7|on-time delivery|
+|10|October|United Kingdom|7|on-time delivery|
+|10|October|Northeast|7|on-time delivery|
+|10|October|Canada|7|on-time delivery|
+|10|October|France|7|on-time delivery|
+|10|October||0|on-time delivery|
+|10|October|Australia|7|on-time delivery|
+|10|October|Germany|7|on-time delivery|
+|10|October|Northwest|7|on-time delivery|
+|11|November|Central|7|on-time delivery|
+|11|November|Southeast|7|on-time delivery|
+|11|November|United Kingdom|7|on-time delivery|
+|11|November|Northeast|7|on-time delivery|
+|11|November|Southwest|7|on-time delivery|
+|11|November|France|7|on-time delivery|
+|11|November||0|on-time delivery|
+|11|November|Northwest|7|on-time delivery|
+|11|November|Canada|7|on-time delivery|
+|11|November|Germany|7|on-time delivery|
+|11|November|Australia|7|on-time delivery|
+|12|December|Central|7|on-time delivery|
+|12|December|France|7|on-time delivery|
+|12|December|United Kingdom|7|on-time delivery|
+|12|December|Germany|7|on-time delivery|
+|12|December|Southwest|7|on-time delivery|
+|12|December|Southeast|7|on-time delivery|
+|12|December|Canada|7|on-time delivery|
+|12|December|Australia|7|on-time delivery|
+|12|December||0|on-time delivery|
+|12|December|Northeast|7|on-time delivery|
+|12|December|Northwest|7|on-time delivery|
+
+
+**Insights:** We can get the following insights from the above results:
+
+- The average lead time between Order Date and Ship Date is consistently 7 days across all regions and months, indicating that we are meeting our operational Service Level Agreements (SLAs) for on-time delivery.
+- There are no instances of late delivery or early delivery based on the defined SLA targets, suggesting that our logistics and supply chain operations are functioning effectively to meet customer expectations for delivery times.
+- The consistency in average lead time across different regions and months indicates that our operational processes are standardized and reliable, which can contribute to customer satisfaction and loyalty.
+- However, it is important to continue monitoring these metrics over time to ensure that we maintain our performance and identify any potential issues that may arise in the future, such as changes in demand, supply chain disruptions, or other factors that could impact our ability to meet SLAs.  
+
+
+
+## Regional Freight and Tax Cost Analysis
+
+`22. How heavily do freight and tax costs impact the final landed cost for the consumer across different countries?`
+
+**Solution Method:** To analyze the impact of freight and tax costs on the final landed cost for consumers across different countries, we will calculate the total revenue, total tax, total freight, and the percentage of tax and freight costs relative to the total revenue for each country. In order to calculate these, firstly, we will create a Common Table Expression (CTE) to aggregate the sales amount, tax amount, and freight amount by sales order number and country. Then, we will sum these values at the country level and calculate the percentage of tax and freight costs relative to total revenue to understand their impact on the final landed cost for consumers in each country. 
+
+
+<details>
+<summary>Show SQL Code</summary>
+
+```sql
+with country_stats as (
+	select
+		fis.salesordernumber,
+		st.SalesTerritoryCountry as country,
+		sum(fis.SalesAmount) as revenue,
+		sum(fis.TaxAmt) as tax,
+		sum(fis.Freight) as freight
+	from FactInternetSales fis 
+	join SalesTerritory st
+		on st.SalesTerritoryKey = fis.SalesTerritoryKey
+	group by 
+		fis.salesordernumber,
+		st.SalesTerritoryCountry
+)
+select
+	country,
+	cast(sum(revenue) as decimal (20,3)) as total_revenue,
+	cast(sum(tax) as decimal (20,3)) as total_tax,
+	cast(sum(freight) as decimal (20,3)) as total_freight,
+	cast(
+		sum(tax) * 1.0 / nullif(sum(revenue),0) as decimal (10,3)
+	) as tax_pct,
+	cast(
+		sum(freight) * 1.0 / nullif(sum(revenue),0) as decimal (10,3)
+	) as freight_pct,
+	cast(
+		(sum(tax) + sum(freight)) * 1.0 / nullif(sum(revenue),0) as decimal (10,3)
+	) as tax_freight_pct
+from country_stats
+group by
+	country 
+order by
+	total_revenue desc;
+```
+
+</details>
+
+
+
+**Results:**
+
+|country|total_revenue|total_tax|total_freight|tax_pct|freight_pct|tax_freight_pct|
+|-------|-------------|---------|-------------|-------|-----------|---------------|
+|United States|9389789.511|751183.177|234745.663|0.080|0.025|0.105|
+|Australia|9061000.584|724880.067|226525.613|0.080|0.025|0.105|
+|United Kingdom|3391712.211|271336.982|84793.124|0.080|0.025|0.105|
+|Germany|2894312.338|231544.991|72358.065|0.080|0.025|0.105|
+|France|2644017.714|211521.422|66100.697|0.080|0.025|0.105|
+|Canada|1977844.862|158227.592|49446.448|0.080|0.025|0.105|
+
+
+
+**Insights:** We can derive the following insights from the above results:
+
+- The United States has the highest total revenue, followed closely by Australia, with the United Kingdom, Germany, France, and Canada contributing significantly as well. This indicates that these countries are key markets for our B2C operations.
+- The tax and freight costs as a percentage of total revenue are consistent across all countries, with tax costs accounting for approximately 8% of total revenue and freight costs accounting for approximately 2.5% of total revenue. This suggests that the impact of tax and freight costs on the final landed cost for consumers is relatively similar across different countries.
+- The combined tax and freight costs account for approximately 10.5% of total revenue across all countries, indicating that these costs have a significant impact on the final landed cost for consumers. This highlights the importance of managing and optimizing these costs to ensure competitive pricing and profitability in different markets.
+- It is important to continue monitoring these costs and their impact on the final landed cost for consumers, as changes in tax regulations, shipping costs, or other factors could affect the overall cost structure and pricing strategy in different countries. Additionally, exploring opportunities to reduce tax and freight costs, such as negotiating better shipping rates or optimizing tax strategies, could help improve profitability and competitiveness in the market.
+
+
+## Regional Product Preferences
+
+`23. Is there a regional bias for specific Product Categories?`
+
+
+**Solution Method:** To analyze if there is a regional bias for specific product categories, we will aggregate the sales data by country and product category. We will calculate the total revenue for each product category within each country and then calculate the percentage of total revenue that each product category contributes to the overall revenue for that country. This will allow us to identify if certain product categories are more popular in specific regions, indicating a regional bias in consumer preferences for those categories.
+
+<details>
+<summary>Show SQL Code</summary>
+
+```sql
+with product_info as(
+	select
+		pr.ProductKey,
+		cat.ProductCategoryName as product_category,
+		st.SalesTerritoryCountry as country,
+		sum(fis.SalesAmount) as revenue
+	from Products pr
+	join ProductSubcategory sub
+		on sub.ProductSubcategoryKey = pr.ProductSubcategoryKey
+	join ProductCategory cat 
+		on cat.ProductCategoryKey = sub.ProductCategoryKey
+	join FactInternetSales fis
+		on fis.ProductKey = pr.ProductKey
+	join SalesTerritory st
+		on st.SalesTerritoryKey = fis.SalesTerritoryKey
+group by
+	pr.ProductKey,
+	cat.ProductCategoryName,
+	st.SalesTerritoryCountry
+)
+
+select
+		country,
+		product_category,
+		sum(revenue) as total_revenue,
+		cast(
+			sum(revenue) * 100.0 / nullif((sum(sum(revenue)) over(partition by country)),0)
+			as decimal(10,3)
+		) as revenue_pct
+	from product_info
+	group by
+		country,
+		product_category
+	order by 
+		country,
+		revenue_pct desc;
+```
+
+</details>
+
+
+**Results:**
+
+|country|product_category|total_revenue|revenue_pct|
+|-------|----------------|-------------|-----------|
+|Australia|Bikes|8852050.0044|97.694|
+|Australia|Accessories|138690.6300|1.531|
+|Australia|Clothing|70259.9500|0.775|
+|Canada|Bikes|1821302.3921|92.085|
+|Canada|Accessories|103377.8500|5.227|
+|Canada|Clothing|53164.6200|2.688|
+|France|Bikes|2553575.7143|96.579|
+|France|Accessories|63406.7800|2.398|
+|France|Clothing|27035.2200|1.023|
+|Germany|Bikes|2808514.3482|97.036|
+|Germany|Accessories|62232.5900|2.150|
+|Germany|Clothing|23565.4000|0.814|
+|United Kingdom|Bikes|3282842.6609|96.790|
+|United Kingdom|Accessories|76630.0400|2.259|
+|United Kingdom|Clothing|32239.5100|0.951|
+|United States|Bikes|8999859.5308|95.847|
+|United States|Accessories|256422.0700|2.731|
+|United States|Clothing|133507.9100|1.422|
+
+
+**Insights:** We can derive the following insights from the above results:
+
+- Across all countries, the Bikes product category dominates the total revenue, accounting for over 95% of the revenue in each country. This indicates a strong regional bias towards the Bikes category, suggesting that consumers in these regions have a strong preference for purchasing bikes compared to other product categories.
+- The Accessories and Clothing categories contribute a much smaller percentage of total revenue in each country, indicating that there is less consumer interest in these categories compared to Bikes. However, there are still some variations in the revenue contribution of Accessories and Clothing across different countries, which may suggest that there are some regional differences in consumer preferences for these categories, albeit not as pronounced as the bias towards Bikes.
+- The strong regional bias towards the Bikes category may be influenced by factors such as local market trends, cultural preferences, or the availability of products in these regions. It may be beneficial to further investigate the underlying reasons for this bias and explore opportunities to capitalize on the strong demand for bikes in these regions, such as targeted marketing campaigns, product offerings, or partnerships with local retailers to further enhance our presence in the Bikes category in these markets. Additionally, understanding the factors driving consumer preferences for the Accessories and Clothing categories could help identify potential growth opportunities in these categories, even if they currently contribute a smaller percentage of total revenue. 
+
+
+
+
+# Conclusion
+
+In this domain, we analyzed the regional sales performance of our B2C operations by examining geographical revenue and Average Order Value (AOV), evaluating our performance against operational Service Level Agreements (SLAs), and assessing the impact of freight and tax costs on the final landed cost for consumers across different countries. We found that certain countries, such as Australia and the United States, are driving the most revenue, with a strong regional bias towards the Bikes product category. Additionally, we observed that we are consistently meeting our SLAs for on-time delivery across all regions and months. Finally, we determined that freight and tax costs have a significant impact on the final landed cost for consumers, accounting for approximately 10.5% of total revenue across all countries. These insights can help us optimize our regional sales strategies, improve customer satisfaction through reliable delivery performance, and manage costs effectively to enhance profitability in different markets.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

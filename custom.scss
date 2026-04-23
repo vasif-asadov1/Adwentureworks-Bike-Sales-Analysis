@@ -1,0 +1,174 @@
+/*-- scss:defaults --*/
+// Catppuccin Mocha Palette
+$base:      #1e1e2e;
+$mantle:    #181825;
+$crust:     #11111b;
+$text:      #cdd6f4;
+$subtext1:  #bac2de;
+$subtext0:  #a6adc8;
+$overlay0:  #6c7086;
+$surface0:  #313244;
+$surface1:  #45475a;
+$surface2:  #585b70;
+
+$mauve:     #cba6f7;
+$sapphire:  #74c7ec;
+$blue:      #89b4fa;
+$peach:     #fab387;
+$green:     #a6e3a1;
+$red:       #f38ba8;
+$pink:      #f5c2e7;
+$lavender:  #b4befe;
+$yellow:    #f9e2af;
+
+// Readability enhancements
+$text-bright: #f8f9fa; 
+
+// Quarto / Bootstrap overrides
+$body-bg: $base;
+$body-color: $text-bright; 
+$font-size-base: 1.1rem; 
+$line-height-base: 1.7;  
+
+$primary: $mauve;
+$link-color: $sapphire;
+$navbar-bg: $mantle;
+$navbar-fg: $text;
+$sidebar-bg: $crust;
+$sidebar-color: $text;
+
+/*-- scss:rules --*/
+
+// --- GLOBAL RESET ---
+body, html {
+  background-color: $base;
+}
+
+// --- TYPOGRAPHY & NAVIGATION STYLES ---
+#quarto-toc-target {
+  h2#toc-title {
+    color: $mauve;
+    font-size: 0.95rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 1.5rem;
+  }
+  
+  nav[role="doc-toc"] ul li a {
+    color: $subtext1 !important;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+    
+    &:hover, &.active {
+      color: $mauve !important;
+      border-left: 2px solid $mauve;
+      padding-left: 0.8rem;
+      background-color: transparent;
+    }
+  }
+}
+
+.sidebar-item-text, .sidebar-link {
+  font-size: 0.95rem;
+  padding: 0.6rem !important;
+  color: $subtext1;
+  transition: all 0.2s ease;
+  
+  &:hover { 
+    color: $mauve;
+    background-color: $surface0;
+    border-radius: 6px;
+  }
+}
+
+.sidebar-section-active {
+  color: $mauve !important;
+  font-weight: bold;
+}
+
+// --- TABLES (VERTICAL SCROLL & STICKY HEADER) ---
+table {
+  display: block !important;
+  max-width: 100% !important;
+  width: 100% !important;
+  max-height: 500px !important;
+  overflow-x: auto !important;
+  overflow-y: auto !important;
+  white-space: nowrap !important;
+  -webkit-overflow-scrolling: touch;
+  margin-top: 1.5rem !important;
+  margin-bottom: 2.5rem !important;
+  border-radius: 8px;
+  border: 1px solid $surface1;
+}
+
+/* Catppuccin Scrollbar for Tables */
+table::-webkit-scrollbar { width: 8px; height: 8px; }
+table::-webkit-scrollbar-track { background: $mantle; border-radius: 0 0 8px 8px; }
+table::-webkit-scrollbar-thumb { background: $surface2; border-radius: 4px; }
+table::-webkit-scrollbar-thumb:hover { background: $overlay0; }
+
+th, td {
+  padding: 0.85rem 1.2rem;
+  border-bottom: 1px solid $surface0;
+  text-align: left;
+}
+
+th {
+  position: sticky;
+  top: 0;
+  background-color: $mantle;
+  z-index: 10;
+  color: $mauve;
+  font-weight: 700;
+  border-bottom: 2px solid $surface1;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+tr:hover td {
+  background-color: $surface0;
+}
+
+// --- CODE BLOCKS (IDE LOOK) ---
+div.sourceCode, pre {
+  background-color: $mantle !important;
+  border: 1px solid $surface1 !important;
+  border-radius: 10px !important;
+  padding: 1.25rem !important;
+  margin: 1.5rem 0 !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25) !important;
+}
+
+div.sourceCode pre {
+  background-color: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  box-shadow: none !important;
+}
+
+div.sourceCode pre code, pre code, code.sourceCode {
+  color: $text !important; 
+}
+
+code:not(pre code) {
+  background-color: $surface0 !important;
+  color: $pink !important;
+  padding: 0.2rem 0.4rem !important;
+  border-radius: 4px !important;
+  font-weight: 600 !important;
+}
+
+// Syntax Highlighting Tokens
+div.sourceCode pre code span.kw, code span.kw, span.keyword, span.cf { color: $sapphire !important; font-weight: bold; } 
+div.sourceCode pre code span.st, code span.st, span.string, span.vs, span.ss, span.ch { color: $green !important; } 
+div.sourceCode pre code span.co, code span.co, span.comment, span.cv, span.do, span.an { color: $overlay0 !important; font-style: italic; } 
+div.sourceCode pre code span.fu, code span.fu, span.function, span.bu { color: $blue !important; font-weight: bold; } 
+div.sourceCode pre code span.dv, code span.dv, span.fl, span.bn, span.number { color: $peach !important; } 
+div.sourceCode pre code span.op, code span.op, span.operator { color: $pink !important; font-weight: bold; } 
+div.sourceCode pre code span.dt, code span.dt, span.datatype { color: $yellow !important; } 
+div.sourceCode pre code span.va, code span.va, span.variable { color: $lavender !important; } 
+div.sourceCode pre code span.ot, code span.ot, span.attribute, span.at { color: $mauve !important; } 
+div.sourceCode pre code span.cn, code span.cn, span.constant { color: $peach !important; } 
+div.sourceCode pre code span.in, code span.in, span.al, span.error, span.er, span.wa { color: $red !important; font-weight: bold; }

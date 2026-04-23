@@ -1,0 +1,274 @@
+---
+title: "Sales Reasons Analysis"
+---
+
+
+# Introduction
+
+In this section, we will analyze the reasons behind sales performance in the AdventureWorks bike sales dataset. We will explore various factors that may have contributed to the observed sales trends and patterns, such as product pricing, customer demographics, marketing efforts, and seasonal variations. By understanding these factors, we can gain insights into what drives sales and identify opportunities for improvement in our sales strategies.
+
+
+
+# Sales Reasons Analysis
+
+## Sales Drivers 
+
+`16. What are the primary psychological drivers (Sales Reasons) behind our B2C purchases?`
+
+**Solution Method:** To solve this question, we can analyze the sales reasons associated with each transaction in the FactInternetSalesReason table. We can join this table with the SalesReason dimension to get the descriptive names of the sales reasons. Then, we can aggregate the data to calculate the total revenue, total orders, and total units sold for each sales reason. Finally, we can calculate the percentage of total revenue contributed by each sales reason to identify the primary psychological drivers behind our B2C purchases. This analysis will help us understand which factors are most influential in driving sales and allow us to tailor our marketing and sales strategies accordingly.
+
+
+
+<details>
+<summary>Show SQL code</summary>
+
+```sql
+with sales_reason_stats as(
+select
+	fsr.SalesReasonKey,
+	sum(fis.SalesAmount) as total_revenue,
+	count(distinct fsr.SalesOrderNumber) as total_orders,
+	sum(fis.OrderQuantity) as total_units_sold
+from FactInternetSalesReason fsr
+join FactInternetSales fis 
+	on fsr.SalesOrderNumber = fis.SalesOrderNumber
+	and fsr.SalesOrderLineNumber = fis.SalesOrderLineNumber
+
+group by
+	fsr.SalesReasonKey
+)
+
+select
+	sr.SalesReasonName,
+	sr.SalesReasonReasonType,
+	cast(total_revenue as decimal(20,3)) as total_revenue,
+	total_orders,
+	total_units_sold,
+	cast(
+		total_revenue *100.0 / nullif(sum(total_revenue) over(),0)
+		as decimal(10,2)
+	) as revenue_pct
+from sales_reason_stats r
+join SalesReason sr 
+	on r.SalesReasonKey = sr.SalesReasonKey
+
+order by
+	revenue_pct desc;
+```
+</details>
+
+
+**Results:**
+
+|SalesReasonName|SalesReasonReasonType|total_revenue|total_orders|total_units_sold|revenue_pct|
+|---------------|---------------------|-------------|------------|----------------|-----------|
+|Price|Other|10975842.560|17473|47733|35.57|
+|On Promotion|Promotion|6361828.953|3515|7390|20.62|
+|Manufacturer|Other|5998122.100|1746|1818|19.44|
+|Quality|Other|5549896.770|1551|1551|17.99|
+|Review|Other|1694881.982|1245|1640|5.49|
+|Other|Other|248483.340|1395|3653|0.81|
+|Television  Advertisement|Marketing|27475.820|722|730|0.09|
+
+
+**Insights:** We can get the following insights from the above results:
+
+- The most significant driver of sales is "Price," which accounts for 35.57% of total revenue. This indicates that customers are highly sensitive to pricing when making purchasing decisions.
+- "On Promotion" is the second most influential factor, contributing 20.62% of total revenue. This suggests that promotional discounts and offers play a crucial role in driving sales.
+- "Manufacturer" and "Quality" are also important drivers, accounting for 19.44% and 17.99% of total revenue, respectively. This indicates that customers value the brand and the perceived quality of the products when making purchasing decisions.
+- "Review" contributes 5.49% of total revenue, suggesting that customer reviews and feedback can influence purchasing behavior, although to a lesser extent than price and promotions.
+- "Other" and "Television Advertisement" have minimal impact on sales, contributing only 0.81% and 0.09% of total revenue, respectively. This indicates that these factors are not significant drivers of sales in this dataset.
+
+
+
+## Customer Lifetime Value (CLV) Analysis
+
+
+`18. What is our Customer Lifetime Value (CLV) distribution, and how long does it take for a customer to reach their maximum value?`
+
+**Solution Method:** To solve this question, we can calculate the Customer Lifetime Value (CLV) for each customer by summing up their total sales amount over their entire purchasing history. We can also calculate the customer tenure by finding the difference between the first purchase date and the last purchase date for each customer. Then, we can categorize customers into different CLV tiers based on their total lifetime value and analyze the distribution of CLV across these tiers. Finally, we can calculate the average time it takes for customers in each CLV tier to reach their maximum value, which will provide insights into customer behavior and help us identify opportunities for improving customer retention and maximizing CLV.
+
+
+
+
+<details>
+<summary>Show SQL code</summary>
+
+```sql
+with customer_stats as (
+	select
+		fis.CustomerKey, 
+		min(fis.OrderDate) as first_purchase_date,
+		max(fis.OrderDate) as last_purchase_date,
+		sum(fis.SalesAmount) as lifetime_value,
+		cast( 1.0 * datediff(day, min(fis.OrderDate),max(fis.OrderDate)) as float)
+			as customer_tenure
+	from FactInternetSales  fis
+	group by CustomerKey
+)
+
+select
+	case  
+		when lifetime_value <= 100 then '<=100'
+		when lifetime_value between 101 and 500 then '101-500'
+		when lifetime_value between 501 and 1000 then '501-1000'
+		when lifetime_value between 1001 and 2500 then '1001-2500'
+		when lifetime_value between 2501 and 5000 then '2501-5000'
+		when lifetime_value between 5000 and 10000 then '5001-10000'
+		else '>10000'
+	end as clv_tier,
+	count(distinct CustomerKey) as num_customers,
+	cast(avg(lifetime_value) as decimal(10,3)) as avg_lifetime_value,
+	cast(avg(customer_tenure) as int) as avg_customer_tenure
+from customer_stats
+where customer_tenure <> 0  -- we don't consider one-time buyers
+group by
+	case  
+		when lifetime_value <= 100 then '<=100'
+		when lifetime_value between 101 and 500 then '101-500'
+		when lifetime_value between 501 and 1000 then '501-1000'
+		when lifetime_value between 1001 and 2500 then '1001-2500'
+		when lifetime_value between 2501 and 5000 then '2501-5000'
+		when lifetime_value between 5000 and 10000 then '5001-10000'
+		else '>10000'
+	end 
+order by 
+	avg_lifetime_value desc;
+```
+
+</details>
+
+
+**Results:**
+
+|clv_tier|num_customers|avg_lifetime_value|avg_customer_tenure|
+|--------|-------------|------------------|-------------------|
+|>10000|42|8117.617|498|
+|5001-10000|1703|6408.622|645|
+|2501-5000|2586|3828.234|461|
+|1001-2500|702|1736.526|482|
+|501-1000|21|754.271|316|
+|101-500|959|169.339|150|
+|<=100|847|68.796|124|
+
+
+
+**Insights:** We can get the following insights from the above results:
+
+- The majority of customers fall into the lower CLV tiers, with 847 customers in the <=100 tier and 959 customers in the 101-500 tier. This indicates that a significant portion of our customer base consists of low-value customers.
+- The average lifetime value increases significantly as we move up the CLV tiers, with the >10000 tier having an average lifetime value of 8117.617, which is substantially higher than the average lifetime value of the lower tiers. This suggests that a small percentage of high-value customers contribute disproportionately to our overall revenue.
+- The average customer tenure also varies across CLV tiers, with the 5001-10000 tier having the longest average tenure of 645 days, while the <=100 tier has the shortest average tenure of 124 days. This indicates that high-value customers tend to have a longer relationship with the company, while low-value customers may be more likely to make one-time purchases and not return. This insight can help us focus our retention efforts on high-value customers to maximize their lifetime value and improve overall profitability.        
+
+
+
+## Product Category Sales Drivers 
+
+
+`19. Do the primary sales drivers change depending on the Product Category?`
+
+
+
+
+
+<details>
+<summary>Show SQL code</summary>
+
+```sql
+with product_stats as (
+	select
+		fis.SalesOrderNumber,
+		cat.ProductCategoryName as product_category,
+		frs.SalesReasonKey,
+		sr.SalesReasonName as sales_reason
+	from Products pr
+	join ProductSubcategory sub
+		on sub.ProductSubcategoryKey = pr.ProductSubcategoryKey
+	join ProductCategory cat
+		on cat.ProductCategoryKey = sub.ProductCategoryKey
+	left join FactInternetSales fis
+		on fis.ProductKey = pr.ProductKey
+	left join FactInternetSalesReason frs
+		on frs.SalesOrderNumber = fis.SalesOrderNumber
+		and frs.SalesOrderLineNumber = fis.SalesOrderLineNumber
+	left join  SalesReason sr
+		on sr.SalesReasonKey = frs.SalesReasonKey
+
+
+),
+
+sales_reasons as (
+	select
+		product_category,
+		sales_reason,
+		count(distinct SalesOrderNumber) as num_orders
+	from product_stats
+	group by 
+		product_category,
+		sales_reason
+),
+
+ranked_sales as(
+	select
+		product_category,
+		sales_reason,
+		num_orders,
+		ROW_NUMBER() over (partition by product_category 
+			order by num_orders desc) as ranked_orders
+	from sales_reasons
+)
+
+select 
+	product_category,
+	sales_reason,
+	num_orders 
+from ranked_sales
+where ranked_orders = 1;
+```
+
+</details>
+
+
+**Results:**
+
+|product_category|sales_reason|num_orders|
+|----------------|------------|----------|
+|Accessories|Price|15667|
+|Bikes|Price|6351|
+|Clothing|Price|6359|
+|Components|NULL|0|
+
+
+**Insights:** We can get the following insights from the above results:
+
+- For the Accessories, Bikes, and Clothing product categories, "Price" is the primary sales driver, indicating that customers in these categories are highly sensitive to pricing when making purchasing decisions.
+- For the Components category, there are no sales reasons recorded, which suggests that there may be a lack of data or that other factors not captured in the sales reasons are driving sales in this category. This indicates that we may need to investigate further to understand the sales drivers for the Components category, which could involve analyzing other factors such as product features, customer demographics, or marketing efforts to gain insights into what is influencing sales in this category.
+
+
+# Conclusion
+
+In this domain, we analyzed the primary psychological drivers behind our B2C purchases, the distribution of Customer Lifetime Value (CLV), and how sales drivers vary across different product categories. We found that price is the most significant driver of sales across multiple product categories, and that a small percentage of high-value customers contribute disproportionately to our overall revenue. Additionally, we observed that the Components category lacks recorded sales reasons, indicating a need for further investigation to understand the sales drivers in that category. These insights can help us tailor our marketing and sales strategies to better meet customer needs and maximize profitability.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

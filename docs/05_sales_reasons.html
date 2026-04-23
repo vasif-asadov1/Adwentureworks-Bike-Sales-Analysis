@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Sales Reasons Analysis – Vasif Asadov | AdventureWorks Bike Sales Analysis</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./assets/favicon.ico" rel="icon">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark-0cda25dcbb8fe09c7138904322940710.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-095c5612e4422d114998b098e0e10f6c.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="dark">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+</head>
+
+<body class="nav-sidebar docked nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">Vasif Asadov | AdventureWorks Bike Sales Analysis</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="./index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">AdventureWorks Bike Sales</li><li class="breadcrumb-item"><a href="./05_sales_reasons.html">Sales Reasons Analysis</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">AdventureWorks Bike Sales</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+ <span class="menu-text">00_problem_description.qmd</span>
+  </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./01_data_preparation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data Preparation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./02_macro_performance.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Macro Performance Analysis</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./03_customer_analysis.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Customer Segmentation Analysis</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./04_performance_analysis.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Product Profit Analysis</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./05_sales_reasons.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Sales Reasons Analysis</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./06_regional_analysis.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Regional Sales Analysis</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./07_executive_dashboard.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Executive Dashboard</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a></li>
+  <li><a href="#sales-reasons-analysis" id="toc-sales-reasons-analysis" class="nav-link" data-scroll-target="#sales-reasons-analysis">Sales Reasons Analysis</a>
+  <ul class="collapse">
+  <li><a href="#sales-drivers" id="toc-sales-drivers" class="nav-link" data-scroll-target="#sales-drivers">Sales Drivers</a></li>
+  <li><a href="#customer-lifetime-value-clv-analysis" id="toc-customer-lifetime-value-clv-analysis" class="nav-link" data-scroll-target="#customer-lifetime-value-clv-analysis">Customer Lifetime Value (CLV) Analysis</a></li>
+  <li><a href="#product-category-sales-drivers" id="toc-product-category-sales-drivers" class="nav-link" data-scroll-target="#product-category-sales-drivers">Product Category Sales Drivers</a></li>
+  </ul></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">Conclusion</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">AdventureWorks Bike Sales</li><li class="breadcrumb-item"><a href="./05_sales_reasons.html">Sales Reasons Analysis</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Sales Reasons Analysis</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="introduction" class="level1">
+<h1>Introduction</h1>
+<p>In this section, we will analyze the reasons behind sales performance in the AdventureWorks bike sales dataset. We will explore various factors that may have contributed to the observed sales trends and patterns, such as product pricing, customer demographics, marketing efforts, and seasonal variations. By understanding these factors, we can gain insights into what drives sales and identify opportunities for improvement in our sales strategies.</p>
+</section>
+<section id="sales-reasons-analysis" class="level1">
+<h1>Sales Reasons Analysis</h1>
+<section id="sales-drivers" class="level2">
+<h2 class="anchored" data-anchor-id="sales-drivers">Sales Drivers</h2>
+<p><code>16. What are the primary psychological drivers (Sales Reasons) behind our B2C purchases?</code></p>
+<p><strong>Solution Method:</strong> To solve this question, we can analyze the sales reasons associated with each transaction in the FactInternetSalesReason table. We can join this table with the SalesReason dimension to get the descriptive names of the sales reasons. Then, we can aggregate the data to calculate the total revenue, total orders, and total units sold for each sales reason. Finally, we can calculate the percentage of total revenue contributed by each sales reason to identify the primary psychological drivers behind our B2C purchases. This analysis will help us understand which factors are most influential in driving sales and allow us to tailor our marketing and sales strategies accordingly.</p>
+<details>
+<summary>
+Show SQL code
+</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">with</span> sales_reason_stats <span class="kw">as</span>(</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="kw">select</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    fsr.SalesReasonKey,</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sum</span>(fis.SalesAmount) <span class="kw">as</span> total_revenue,</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">count</span>(<span class="kw">distinct</span> fsr.SalesOrderNumber) <span class="kw">as</span> total_orders,</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sum</span>(fis.OrderQuantity) <span class="kw">as</span> total_units_sold</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="kw">from</span> FactInternetSalesReason fsr</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="kw">join</span> FactInternetSales fis </span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">on</span> fsr.SalesOrderNumber <span class="op">=</span> fis.SalesOrderNumber</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="kw">and</span> fsr.SalesOrderLineNumber <span class="op">=</span> fis.SalesOrderLineNumber</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="kw">group</span> <span class="kw">by</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    fsr.SalesReasonKey</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="kw">select</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>    sr.SalesReasonName,</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    sr.SalesReasonReasonType,</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">cast</span>(total_revenue <span class="kw">as</span> <span class="dt">decimal</span>(<span class="dv">20</span>,<span class="dv">3</span>)) <span class="kw">as</span> total_revenue,</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    total_orders,</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>    total_units_sold,</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>    <span class="fu">cast</span>(</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>        total_revenue <span class="op">*</span><span class="fl">100.0</span> <span class="op">/</span> <span class="fu">nullif</span>(<span class="fu">sum</span>(total_revenue) <span class="kw">over</span>(),<span class="dv">0</span>)</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>        <span class="kw">as</span> <span class="dt">decimal</span>(<span class="dv">10</span>,<span class="dv">2</span>)</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>    ) <span class="kw">as</span> revenue_pct</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="kw">from</span> sales_reason_stats r</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="kw">join</span> SalesReason sr </span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>    <span class="kw">on</span> r.SalesReasonKey <span class="op">=</span> sr.SalesReasonKey</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="kw">order</span> <span class="kw">by</span></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>    revenue_pct <span class="kw">desc</span>;</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<p><strong>Results:</strong></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 17%">
+<col style="width: 23%">
+<col style="width: 14%">
+<col style="width: 13%">
+<col style="width: 18%">
+<col style="width: 12%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>SalesReasonName</th>
+<th>SalesReasonReasonType</th>
+<th>total_revenue</th>
+<th>total_orders</th>
+<th>total_units_sold</th>
+<th>revenue_pct</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Price</td>
+<td>Other</td>
+<td>10975842.560</td>
+<td>17473</td>
+<td>47733</td>
+<td>35.57</td>
+</tr>
+<tr class="even">
+<td>On Promotion</td>
+<td>Promotion</td>
+<td>6361828.953</td>
+<td>3515</td>
+<td>7390</td>
+<td>20.62</td>
+</tr>
+<tr class="odd">
+<td>Manufacturer</td>
+<td>Other</td>
+<td>5998122.100</td>
+<td>1746</td>
+<td>1818</td>
+<td>19.44</td>
+</tr>
+<tr class="even">
+<td>Quality</td>
+<td>Other</td>
+<td>5549896.770</td>
+<td>1551</td>
+<td>1551</td>
+<td>17.99</td>
+</tr>
+<tr class="odd">
+<td>Review</td>
+<td>Other</td>
+<td>1694881.982</td>
+<td>1245</td>
+<td>1640</td>
+<td>5.49</td>
+</tr>
+<tr class="even">
+<td>Other</td>
+<td>Other</td>
+<td>248483.340</td>
+<td>1395</td>
+<td>3653</td>
+<td>0.81</td>
+</tr>
+<tr class="odd">
+<td>Television Advertisement</td>
+<td>Marketing</td>
+<td>27475.820</td>
+<td>722</td>
+<td>730</td>
+<td>0.09</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Insights:</strong> We can get the following insights from the above results:</p>
+<ul>
+<li>The most significant driver of sales is “Price,” which accounts for 35.57% of total revenue. This indicates that customers are highly sensitive to pricing when making purchasing decisions.</li>
+<li>“On Promotion” is the second most influential factor, contributing 20.62% of total revenue. This suggests that promotional discounts and offers play a crucial role in driving sales.</li>
+<li>“Manufacturer” and “Quality” are also important drivers, accounting for 19.44% and 17.99% of total revenue, respectively. This indicates that customers value the brand and the perceived quality of the products when making purchasing decisions.</li>
+<li>“Review” contributes 5.49% of total revenue, suggesting that customer reviews and feedback can influence purchasing behavior, although to a lesser extent than price and promotions.</li>
+<li>“Other” and “Television Advertisement” have minimal impact on sales, contributing only 0.81% and 0.09% of total revenue, respectively. This indicates that these factors are not significant drivers of sales in this dataset.</li>
+</ul>
+</section>
+<section id="customer-lifetime-value-clv-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="customer-lifetime-value-clv-analysis">Customer Lifetime Value (CLV) Analysis</h2>
+<p><code>18. What is our Customer Lifetime Value (CLV) distribution, and how long does it take for a customer to reach their maximum value?</code></p>
+<p><strong>Solution Method:</strong> To solve this question, we can calculate the Customer Lifetime Value (CLV) for each customer by summing up their total sales amount over their entire purchasing history. We can also calculate the customer tenure by finding the difference between the first purchase date and the last purchase date for each customer. Then, we can categorize customers into different CLV tiers based on their total lifetime value and analyze the distribution of CLV across these tiers. Finally, we can calculate the average time it takes for customers in each CLV tier to reach their maximum value, which will provide insights into customer behavior and help us identify opportunities for improving customer retention and maximizing CLV.</p>
+<details>
+<summary>
+Show SQL code
+</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">with</span> customer_stats <span class="kw">as</span> (</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">select</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>        fis.CustomerKey, </span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>        <span class="fu">min</span>(fis.OrderDate) <span class="kw">as</span> first_purchase_date,</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>        <span class="fu">max</span>(fis.OrderDate) <span class="kw">as</span> last_purchase_date,</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>        <span class="fu">sum</span>(fis.SalesAmount) <span class="kw">as</span> lifetime_value,</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>        <span class="fu">cast</span>( <span class="fl">1.0</span> <span class="op">*</span> datediff(<span class="dt">day</span>, <span class="fu">min</span>(fis.OrderDate),<span class="fu">max</span>(fis.OrderDate)) <span class="kw">as</span> <span class="dt">float</span>)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>            <span class="kw">as</span> customer_tenure</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">from</span> FactInternetSales  fis</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    <span class="kw">group</span> <span class="kw">by</span> CustomerKey</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="kw">select</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">case</span>  </span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>        <span class="cf">when</span> lifetime_value <span class="op">&lt;=</span> <span class="dv">100</span> <span class="cf">then</span> <span class="st">'&lt;=100'</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>        <span class="cf">when</span> lifetime_value <span class="kw">between</span> <span class="dv">101</span> <span class="kw">and</span> <span class="dv">500</span> <span class="cf">then</span> <span class="st">'101-500'</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>        <span class="cf">when</span> lifetime_value <span class="kw">between</span> <span class="dv">501</span> <span class="kw">and</span> <span class="dv">1000</span> <span class="cf">then</span> <span class="st">'501-1000'</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>        <span class="cf">when</span> lifetime_value <span class="kw">between</span> <span class="dv">1001</span> <span class="kw">and</span> <span class="dv">2500</span> <span class="cf">then</span> <span class="st">'1001-2500'</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>        <span class="cf">when</span> lifetime_value <span class="kw">between</span> <span class="dv">2501</span> <span class="kw">and</span> <span class="dv">5000</span> <span class="cf">then</span> <span class="st">'2501-5000'</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>        <span class="cf">when</span> lifetime_value <span class="kw">between</span> <span class="dv">5000</span> <span class="kw">and</span> <span class="dv">10000</span> <span class="cf">then</span> <span class="st">'5001-10000'</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span> <span class="st">'&gt;10000'</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span> <span class="kw">as</span> clv_tier,</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>    <span class="fu">count</span>(<span class="kw">distinct</span> CustomerKey) <span class="kw">as</span> num_customers,</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>    <span class="fu">cast</span>(<span class="fu">avg</span>(lifetime_value) <span class="kw">as</span> <span class="dt">decimal</span>(<span class="dv">10</span>,<span class="dv">3</span>)) <span class="kw">as</span> avg_lifetime_value,</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>    <span class="fu">cast</span>(<span class="fu">avg</span>(customer_tenure) <span class="kw">as</span> <span class="dt">int</span>) <span class="kw">as</span> avg_customer_tenure</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a><span class="kw">from</span> customer_stats</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a><span class="kw">where</span> customer_tenure <span class="op">&lt;&gt;</span> <span class="dv">0</span>  <span class="co">-- we don't consider one-time buyers</span></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a><span class="kw">group</span> <span class="kw">by</span></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>    <span class="cf">case</span>  </span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>        <span class="cf">when</span> lifetime_value <span class="op">&lt;=</span> <span class="dv">100</span> <span class="cf">then</span> <span class="st">'&lt;=100'</span></span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>        <span class="cf">when</span> lifetime_value <span class="kw">between</span> <span class="dv">101</span> <span class="kw">and</span> <span class="dv">500</span> <span class="cf">then</span> <span class="st">'101-500'</span></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>        <span class="cf">when</span> lifetime_value <span class="kw">between</span> <span class="dv">501</span> <span class="kw">and</span> <span class="dv">1000</span> <span class="cf">then</span> <span class="st">'501-1000'</span></span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>        <span class="cf">when</span> lifetime_value <span class="kw">between</span> <span class="dv">1001</span> <span class="kw">and</span> <span class="dv">2500</span> <span class="cf">then</span> <span class="st">'1001-2500'</span></span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>        <span class="cf">when</span> lifetime_value <span class="kw">between</span> <span class="dv">2501</span> <span class="kw">and</span> <span class="dv">5000</span> <span class="cf">then</span> <span class="st">'2501-5000'</span></span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>        <span class="cf">when</span> lifetime_value <span class="kw">between</span> <span class="dv">5000</span> <span class="kw">and</span> <span class="dv">10000</span> <span class="cf">then</span> <span class="st">'5001-10000'</span></span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span> <span class="st">'&gt;10000'</span></span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span> </span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a><span class="kw">order</span> <span class="kw">by</span> </span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>    avg_lifetime_value <span class="kw">desc</span>;</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<p><strong>Results:</strong></p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>clv_tier</th>
+<th>num_customers</th>
+<th>avg_lifetime_value</th>
+<th>avg_customer_tenure</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>&gt;10000</td>
+<td>42</td>
+<td>8117.617</td>
+<td>498</td>
+</tr>
+<tr class="even">
+<td>5001-10000</td>
+<td>1703</td>
+<td>6408.622</td>
+<td>645</td>
+</tr>
+<tr class="odd">
+<td>2501-5000</td>
+<td>2586</td>
+<td>3828.234</td>
+<td>461</td>
+</tr>
+<tr class="even">
+<td>1001-2500</td>
+<td>702</td>
+<td>1736.526</td>
+<td>482</td>
+</tr>
+<tr class="odd">
+<td>501-1000</td>
+<td>21</td>
+<td>754.271</td>
+<td>316</td>
+</tr>
+<tr class="even">
+<td>101-500</td>
+<td>959</td>
+<td>169.339</td>
+<td>150</td>
+</tr>
+<tr class="odd">
+<td>&lt;=100</td>
+<td>847</td>
+<td>68.796</td>
+<td>124</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Insights:</strong> We can get the following insights from the above results:</p>
+<ul>
+<li>The majority of customers fall into the lower CLV tiers, with 847 customers in the &lt;=100 tier and 959 customers in the 101-500 tier. This indicates that a significant portion of our customer base consists of low-value customers.</li>
+<li>The average lifetime value increases significantly as we move up the CLV tiers, with the &gt;10000 tier having an average lifetime value of 8117.617, which is substantially higher than the average lifetime value of the lower tiers. This suggests that a small percentage of high-value customers contribute disproportionately to our overall revenue.</li>
+<li>The average customer tenure also varies across CLV tiers, with the 5001-10000 tier having the longest average tenure of 645 days, while the &lt;=100 tier has the shortest average tenure of 124 days. This indicates that high-value customers tend to have a longer relationship with the company, while low-value customers may be more likely to make one-time purchases and not return. This insight can help us focus our retention efforts on high-value customers to maximize their lifetime value and improve overall profitability.</li>
+</ul>
+</section>
+<section id="product-category-sales-drivers" class="level2">
+<h2 class="anchored" data-anchor-id="product-category-sales-drivers">Product Category Sales Drivers</h2>
+<p><code>19. Do the primary sales drivers change depending on the Product Category?</code></p>
+<details>
+<summary>
+Show SQL code
+</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">with</span> product_stats <span class="kw">as</span> (</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">select</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>        fis.SalesOrderNumber,</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>        cat.ProductCategoryName <span class="kw">as</span> product_category,</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>        frs.SalesReasonKey,</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>        sr.SalesReasonName <span class="kw">as</span> sales_reason</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">from</span> Products pr</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">join</span> ProductSubcategory sub</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>        <span class="kw">on</span> sub.ProductSubcategoryKey <span class="op">=</span> pr.ProductSubcategoryKey</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    <span class="kw">join</span> ProductCategory cat</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>        <span class="kw">on</span> cat.ProductCategoryKey <span class="op">=</span> sub.ProductCategoryKey</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    <span class="kw">left</span> <span class="kw">join</span> FactInternetSales fis</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>        <span class="kw">on</span> fis.ProductKey <span class="op">=</span> pr.ProductKey</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>    <span class="kw">left</span> <span class="kw">join</span> FactInternetSalesReason frs</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>        <span class="kw">on</span> frs.SalesOrderNumber <span class="op">=</span> fis.SalesOrderNumber</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>        <span class="kw">and</span> frs.SalesOrderLineNumber <span class="op">=</span> fis.SalesOrderLineNumber</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>    <span class="kw">left</span> <span class="kw">join</span>  SalesReason sr</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>        <span class="kw">on</span> sr.SalesReasonKey <span class="op">=</span> frs.SalesReasonKey</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>),</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>sales_reasons <span class="kw">as</span> (</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>    <span class="kw">select</span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>        product_category,</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>        sales_reason,</span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>        <span class="fu">count</span>(<span class="kw">distinct</span> SalesOrderNumber) <span class="kw">as</span> num_orders</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>    <span class="kw">from</span> product_stats</span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>    <span class="kw">group</span> <span class="kw">by</span> </span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>        product_category,</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>        sales_reason</span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>),</span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>ranked_sales <span class="kw">as</span>(</span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>    <span class="kw">select</span></span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>        product_category,</span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>        sales_reason,</span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>        num_orders,</span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>        <span class="fu">ROW_NUMBER</span>() <span class="kw">over</span> (<span class="kw">partition</span> <span class="kw">by</span> product_category </span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>            <span class="kw">order</span> <span class="kw">by</span> num_orders <span class="kw">desc</span>) <span class="kw">as</span> ranked_orders</span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>    <span class="kw">from</span> sales_reasons</span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a><span class="kw">select</span> </span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>    product_category,</span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a>    sales_reason,</span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a>    num_orders </span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a><span class="kw">from</span> ranked_sales</span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a><span class="kw">where</span> ranked_orders <span class="op">=</span> <span class="dv">1</span>;</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<p><strong>Results:</strong></p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>product_category</th>
+<th>sales_reason</th>
+<th>num_orders</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Accessories</td>
+<td>Price</td>
+<td>15667</td>
+</tr>
+<tr class="even">
+<td>Bikes</td>
+<td>Price</td>
+<td>6351</td>
+</tr>
+<tr class="odd">
+<td>Clothing</td>
+<td>Price</td>
+<td>6359</td>
+</tr>
+<tr class="even">
+<td>Components</td>
+<td>NULL</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Insights:</strong> We can get the following insights from the above results:</p>
+<ul>
+<li>For the Accessories, Bikes, and Clothing product categories, “Price” is the primary sales driver, indicating that customers in these categories are highly sensitive to pricing when making purchasing decisions.</li>
+<li>For the Components category, there are no sales reasons recorded, which suggests that there may be a lack of data or that other factors not captured in the sales reasons are driving sales in this category. This indicates that we may need to investigate further to understand the sales drivers for the Components category, which could involve analyzing other factors such as product features, customer demographics, or marketing efforts to gain insights into what is influencing sales in this category.</li>
+</ul>
+</section>
+</section>
+<section id="conclusion" class="level1">
+<h1>Conclusion</h1>
+<p>In this domain, we analyzed the primary psychological drivers behind our B2C purchases, the distribution of Customer Lifetime Value (CLV), and how sales drivers vary across different product categories. We found that price is the most significant driver of sales across multiple product categories, and that a small percentage of high-value customers contribute disproportionately to our overall revenue. Additionally, we observed that the Components category lacks recorded sales reasons, indicating a need for further investigation to understand the sales drivers in that category. These insights can help us tailor our marketing and sales strategies to better meet customer needs and maximize profitability.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

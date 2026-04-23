@@ -1,0 +1,2454 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Customer Segmentation Analysis – Vasif Asadov | AdventureWorks Bike Sales Analysis</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./assets/favicon.ico" rel="icon">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark-0cda25dcbb8fe09c7138904322940710.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-095c5612e4422d114998b098e0e10f6c.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="dark">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+</head>
+
+<body class="nav-sidebar docked nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">Vasif Asadov | AdventureWorks Bike Sales Analysis</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="./index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">AdventureWorks Bike Sales</li><li class="breadcrumb-item"><a href="./03_customer_analysis.html">Customer Segmentation Analysis</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">AdventureWorks Bike Sales</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+ <span class="menu-text">00_problem_description.qmd</span>
+  </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./01_data_preparation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data Preparation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./02_macro_performance.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Macro Performance Analysis</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./03_customer_analysis.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Customer Segmentation Analysis</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./04_performance_analysis.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Product Profit Analysis</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./05_sales_reasons.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Sales Reasons Analysis</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./06_regional_analysis.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Regional Sales Analysis</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./07_executive_dashboard.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Executive Dashboard</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a></li>
+  <li><a href="#customer-segmentation-analysis" id="toc-customer-segmentation-analysis" class="nav-link" data-scroll-target="#customer-segmentation-analysis">Customer Segmentation Analysis</a>
+  <ul class="collapse">
+  <li><a href="#income-and-education-segmentation" id="toc-income-and-education-segmentation" class="nav-link" data-scroll-target="#income-and-education-segmentation">Income and Education Segmentation</a></li>
+  <li><a href="#commute-distance-and-vehicle-ownership-effect" id="toc-commute-distance-and-vehicle-ownership-effect" class="nav-link" data-scroll-target="#commute-distance-and-vehicle-ownership-effect">Commute Distance and Vehicle Ownership Effect</a></li>
+  <li><a href="#whale-customers" id="toc-whale-customers" class="nav-link" data-scroll-target="#whale-customers">“Whale” Customers</a></li>
+  <li><a href="#age-groups-and-spend-analysis" id="toc-age-groups-and-spend-analysis" class="nav-link" data-scroll-target="#age-groups-and-spend-analysis">Age Groups and Spend Analysis</a></li>
+  <li><a href="#customer-retention-rate-analysis" id="toc-customer-retention-rate-analysis" class="nav-link" data-scroll-target="#customer-retention-rate-analysis">Customer Retention Rate Analysis</a></li>
+  </ul></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">Conclusion</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">AdventureWorks Bike Sales</li><li class="breadcrumb-item"><a href="./03_customer_analysis.html">Customer Segmentation Analysis</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Customer Segmentation Analysis</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="introduction" class="level1">
+<h1>Introduction</h1>
+<p>In this section, we will analyze the customers of AdventureWorks Bike Sales to identify different customer segments based on their purchasing behavior, demographics, and other relevant factors. For example, the demographic segments that drive the highest sales will reveal the importance of customer education and income levels in our sales performance. Additionally, we will analyze customer commute preferences, financial situation, age groups and spend patterns, as well as the one-done and repeat customer segments. These all will reveal the insights about the potential customers in the future to target and the marketing strategies to adopt for each segment. By understanding our customers better, we can tailor our marketing efforts, improve customer satisfaction, and ultimately increase sales and profitability.</p>
+</section>
+<section id="customer-segmentation-analysis" class="level1">
+<h1>Customer Segmentation Analysis</h1>
+<section id="income-and-education-segmentation" class="level2">
+<h2 class="anchored" data-anchor-id="income-and-education-segmentation">Income and Education Segmentation</h2>
+<p><code>6. Which demographic segments (based on Income and Education) drive the highest overall revenue?</code></p>
+<p><strong>Solution Method:</strong> To answer this question, we will first calculate the minimum, average, maximum, standard deviation, and median of the YearlyIncome column from the Customers table. Then, we will use these statistics to segment customers into three groups: low-budget customers, mid-budget customers, and high-budget customers. Finally, we will analyze the revenue generated by each segment based on their education level to identify which demographic segments drive the highest overall revenue. This will allow us to group the customers based on dynamic thresholds derived from the data itself, rather than using arbitrary cutoffs, providing a more accurate and meaningful segmentation of our customer base.</p>
+<details>
+<summary>
+Show SQL Code
+</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- define the thresholds for low, mid, and high budget customers based on the median and standard deviation of YearlyIncome</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="kw">with</span> median_cte <span class="kw">as</span> (</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">select</span> YearlyIncome,</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>           <span class="fu">percentile_cont</span>(<span class="fl">0.5</span>) within <span class="kw">group</span> (<span class="kw">order</span> <span class="kw">by</span> YearlyIncome) </span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>               <span class="kw">over</span> () <span class="kw">as</span> median_income</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">from</span> Customers</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="kw">select</span> </span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">min</span>(YearlyIncome) <span class="kw">as</span> min_income,</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">avg</span>(YearlyIncome) <span class="kw">as</span> avg_income,</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">max</span>(YearlyIncome) <span class="kw">as</span> max_income,</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    stdev(YearlyIncome) <span class="kw">as</span> std_income,</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">max</span>(median_income) <span class="kw">as</span> median_income</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="kw">from</span> median_cte;</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="co">-- MIN INCOME : 10,000</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="co">-- MAX INCOME : 170,000</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="co">-- AVG INCOME : 57,305</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="co">-- MEDIAN INCOME : 60,000</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="co">-- STD INCOME : 32,285</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="co">/* RULES IF-THEN:</span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="co">- INCOME &lt;= (MEDIAN - STD) -&gt; LOW BUDGET</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="co">- INCOME BETWEEN (MEDIAN - STD) AND (MEDIAN + STD) -&gt; MID BUDGET</span></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="co">- INCOME &gt;= (MEDIAN + STD) -&gt; HIGH BUDGET</span></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="co">*/</span></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="kw">with</span> customer_info <span class="kw">as</span> </span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>(</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>    <span class="kw">select</span> </span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>        c.CustomerKey <span class="kw">as</span> customer_key,</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>        c.YearlyIncome <span class="kw">as</span> yearly_income,</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>        c.education,</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>        <span class="fu">sum</span>(fis.SalesAmount) <span class="kw">as</span> revenue,</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>        <span class="fu">count</span>(<span class="kw">distinct</span> fis.SalesOrderNumber) <span class="kw">as</span> num_orders</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>    <span class="kw">from</span> Customers c</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>    <span class="kw">left</span> <span class="kw">join</span> FactInternetSales fis</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>        <span class="kw">on</span> c.CustomerKey <span class="op">=</span> fis.CustomerKey</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>    <span class="kw">group</span> <span class="kw">by</span></span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>        c.CustomerKey,</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>        c.YearlyIncome,</span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>        c.education</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>),</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>customer_stats <span class="kw">as</span> (</span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>    <span class="kw">select</span> </span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>        <span class="fu">cast</span>(<span class="fu">avg</span>(YearlyIncome) <span class="kw">as</span> <span class="dt">float</span>) <span class="kw">as</span> avg_income,</span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>        <span class="fu">cast</span>(STDEV(YearlyIncome) <span class="kw">as</span> <span class="dt">float</span>) <span class="kw">as</span> std_income</span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>    <span class="kw">from</span> Customers</span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a><span class="kw">select</span></span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>    <span class="cf">case</span> </span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>        <span class="cf">when</span> yearly_income <span class="op">&lt;=</span> (avg_income <span class="op">-</span> <span class="fl">0.7</span> <span class="op">*</span> std_income) </span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>            <span class="cf">then</span> <span class="st">'low_budget customer'</span></span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>        <span class="cf">when</span> yearly_income <span class="op">&gt;=</span> (avg_income <span class="op">+</span> <span class="fl">0.8</span> <span class="op">*</span> std_income) </span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>            <span class="cf">then</span> <span class="st">'high_budget customer'</span></span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span> <span class="st">'mid-budget customer'</span></span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span> <span class="kw">as</span> customer_budget_segmentation, </span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a>    education, </span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a>    <span class="fu">count</span>(<span class="kw">distinct</span> customer_key) <span class="kw">as</span> num_customers,</span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a>    <span class="fu">cast</span>(<span class="fu">sum</span>(revenue) <span class="kw">as</span> <span class="dt">float</span>) <span class="kw">as</span> total_revenue, </span>
+<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a>    <span class="fu">cast</span>(<span class="fu">sum</span>(num_orders) <span class="kw">as</span> <span class="dt">float</span>) <span class="kw">as</span> total_orders</span>
+<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a><span class="kw">from</span> customer_info </span>
+<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a><span class="kw">cross</span> <span class="kw">join</span> customer_stats</span>
+<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a><span class="kw">group</span> <span class="kw">by</span></span>
+<span id="cb1-70"><a href="#cb1-70" aria-hidden="true" tabindex="-1"></a>    <span class="cf">case</span> </span>
+<span id="cb1-71"><a href="#cb1-71" aria-hidden="true" tabindex="-1"></a>        <span class="cf">when</span> yearly_income <span class="op">&lt;=</span> (avg_income <span class="op">-</span> <span class="fl">0.7</span> <span class="op">*</span> std_income) </span>
+<span id="cb1-72"><a href="#cb1-72" aria-hidden="true" tabindex="-1"></a>            <span class="cf">then</span> <span class="st">'low_budget customer'</span></span>
+<span id="cb1-73"><a href="#cb1-73" aria-hidden="true" tabindex="-1"></a>        <span class="cf">when</span> yearly_income <span class="op">&gt;=</span> (avg_income <span class="op">+</span> <span class="fl">0.8</span> <span class="op">*</span> std_income) </span>
+<span id="cb1-74"><a href="#cb1-74" aria-hidden="true" tabindex="-1"></a>            <span class="cf">then</span> <span class="st">'high_budget customer'</span></span>
+<span id="cb1-75"><a href="#cb1-75" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span> <span class="st">'mid-budget customer'</span></span>
+<span id="cb1-76"><a href="#cb1-76" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span>,</span>
+<span id="cb1-77"><a href="#cb1-77" aria-hidden="true" tabindex="-1"></a>    education</span>
+<span id="cb1-78"><a href="#cb1-78" aria-hidden="true" tabindex="-1"></a><span class="kw">order</span> <span class="kw">by</span> </span>
+<span id="cb1-79"><a href="#cb1-79" aria-hidden="true" tabindex="-1"></a>    total_revenue <span class="kw">desc</span>;</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<p><strong>Results:</strong></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 37%">
+<col style="width: 12%">
+<col style="width: 17%">
+<col style="width: 17%">
+<col style="width: 16%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>customer_budget_segmentation</th>
+<th>education</th>
+<th>num_customers</th>
+<th>total_revenue</th>
+<th>total_orders</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>mid-budget customer</td>
+<td>Bachelors</td>
+<td>3486</td>
+<td>6018294.6094</td>
+<td>5427.0</td>
+</tr>
+<tr class="even">
+<td>mid-budget customer</td>
+<td>Partial College</td>
+<td>2774</td>
+<td>4108704.5055</td>
+<td>4151.0</td>
+</tr>
+<tr class="odd">
+<td>mid-budget customer</td>
+<td>Graduate Degree</td>
+<td>2376</td>
+<td>3833801.3398</td>
+<td>3515.0</td>
+</tr>
+<tr class="even">
+<td>high_budget customer</td>
+<td>Bachelors</td>
+<td>1056</td>
+<td>2427726.4932</td>
+<td>1758.0</td>
+</tr>
+<tr class="odd">
+<td>low_budget customer</td>
+<td>Partial College</td>
+<td>1526</td>
+<td>2050975.3804</td>
+<td>2120.0</td>
+</tr>
+<tr class="even">
+<td>mid-budget customer</td>
+<td>High School</td>
+<td>1210</td>
+<td>1768160.6359</td>
+<td>1776.0</td>
+</tr>
+<tr class="odd">
+<td>low_budget customer</td>
+<td>High School</td>
+<td>1513</td>
+<td>1617237.6002</td>
+<td>2043.0</td>
+</tr>
+<tr class="even">
+<td>high_budget customer</td>
+<td>Partial College</td>
+<td>764</td>
+<td>1563862.9989</td>
+<td>1237.0</td>
+</tr>
+<tr class="odd">
+<td>low_budget customer</td>
+<td>Bachelors</td>
+<td>814</td>
+<td>1454121.6545</td>
+<td>1223.0</td>
+</tr>
+<tr class="even">
+<td>high_budget customer</td>
+<td>High School</td>
+<td>571</td>
+<td>1252627.8325</td>
+<td>952.0</td>
+</tr>
+<tr class="odd">
+<td>high_budget customer</td>
+<td>Graduate Degree</td>
+<td>471</td>
+<td>1176592.8865</td>
+<td>835.0</td>
+</tr>
+<tr class="even">
+<td>low_budget customer</td>
+<td>Partial High School</td>
+<td>1014</td>
+<td>756784.115</td>
+<td>1289.0</td>
+</tr>
+<tr class="odd">
+<td>high_budget customer</td>
+<td>Partial High School</td>
+<td>178</td>
+<td>470206.8625</td>
+<td>322.0</td>
+</tr>
+<tr class="even">
+<td>low_budget customer</td>
+<td>Graduate Degree</td>
+<td>342</td>
+<td>450166.025</td>
+<td>486.0</td>
+</tr>
+<tr class="odd">
+<td>mid-budget customer</td>
+<td>Partial High School</td>
+<td>389</td>
+<td>409414.2814</td>
+<td>525.0</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Insights:</strong> - The mid-budget customers with a Bachelor’s degree contribute the highest overall revenue, followed by mid-budget customers with Partial College education and mid-budget customers with a Graduate Degree. This indicates that customers in the mid-budget segment with higher education levels are driving significant revenue for the company. - High-budget customers with a Bachelor’s degree also contribute a substantial amount of revenue, indicating that there is a strong correlation between higher income levels and revenue generation, especially among those with a Bachelor’s degree. - Low-budget customers with Partial College education and High School education also contribute a significant amount of revenue, suggesting that there is a sizable customer base in the lower income segment that is generating revenue for the company, particularly those with some level of college education. - Overall, the analysis reveals that both income and education levels play a crucial role in driving revenue for the company, with mid-budget customers with higher education levels being the most significant contributors to overall revenue. This insight can help the company tailor its marketing strategies and product offerings to target these high-value customer segments more effectively.</p>
+</section>
+<section id="commute-distance-and-vehicle-ownership-effect" class="level2">
+<h2 class="anchored" data-anchor-id="commute-distance-and-vehicle-ownership-effect">Commute Distance and Vehicle Ownership Effect</h2>
+<p><code>7. Does the customer's commute distance and vehicle ownership impact their lifetime value?</code></p>
+<p><strong>Solution Method:</strong> To answer this question, we will analyze the relationship between customers’ commute distance, vehicle ownership, and their lifetime value (LTV). We will segment customers based on their commute distance (e.g., 0-1 Miles, 1-2 Miles, 2-5 Miles, 5-10 Miles, 10+ Miles) and vehicle ownership status (e.g., no car, 1 car, &gt;1 car). We will then calculate the total revenue generated by each segment and the average revenue per customer to determine if there is a significant impact of commute distance and vehicle ownership on customer lifetime value.</p>
+<details>
+<summary>
+Show SQL Code
+</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">with</span> customer_info <span class="kw">as</span> (</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">select</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>        cus.CustomerKey,</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>        cus.CommuteDistance <span class="kw">as</span> commute_distance,</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>        cus.NumberCarsOwned <span class="kw">as</span> num_cars,</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>        <span class="fu">coalesce</span>(<span class="fu">sum</span>(fis.SalesAmount),<span class="dv">0</span>) <span class="kw">as</span> revenue, </span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>        <span class="fu">coalesce</span>(<span class="fu">count</span>(<span class="kw">distinct</span> fis.SalesOrderNumber),<span class="dv">0</span>) <span class="kw">as</span> num_orders</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">from</span> Customer cus</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">left</span> <span class="kw">join</span> FactInternetSales fis</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>        <span class="kw">on</span> fis.CustomerKey <span class="op">=</span> cus.CustomerKey</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    <span class="kw">group</span> <span class="kw">by</span> </span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>        cus.CustomerKey,</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>        cus.CommuteDistance,</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>        cus.NumberCarsOwned</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="kw">select</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">case</span>  </span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>        <span class="cf">when</span> num_cars <span class="op">=</span> <span class="dv">1</span> <span class="cf">then</span> <span class="st">'1 car'</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>        <span class="cf">when</span> num_cars <span class="op">&gt;</span> <span class="dv">1</span> <span class="cf">then</span> <span class="st">'&gt;1 car'</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span> <span class="st">'no car'</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span> <span class="kw">as</span> <span class="st">'car_ownership'</span>,</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>    commute_distance,</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>    <span class="fu">count</span>(<span class="kw">distinct</span> customerkey) <span class="kw">as</span> num_customers,</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>    <span class="fu">cast</span>(<span class="fu">sum</span>(revenue) <span class="kw">as</span> <span class="dt">decimal</span>(<span class="dv">20</span>,<span class="dv">3</span>)) <span class="kw">as</span> total_revenue,</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sum</span>(num_orders) <span class="kw">as</span> total_orders,</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>    <span class="fu">cast</span>(<span class="fu">sum</span>(revenue) <span class="op">/</span> <span class="fu">nullif</span>(<span class="fu">count</span>(<span class="kw">distinct</span> customerkey),<span class="dv">0</span>) <span class="kw">as</span> <span class="dt">decimal</span>(<span class="dv">10</span>,<span class="dv">3</span>)) </span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>        <span class="kw">as</span> avg_revenue_per_customer</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a><span class="kw">from</span> customer_info</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a><span class="kw">group</span> <span class="kw">by</span> </span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>    <span class="cf">case</span>  </span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>        <span class="cf">when</span> num_cars <span class="op">=</span> <span class="dv">1</span> <span class="cf">then</span> <span class="st">'1 car'</span></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>        <span class="cf">when</span> num_cars <span class="op">&gt;</span> <span class="dv">1</span> <span class="cf">then</span> <span class="st">'&gt;1 car'</span></span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span> <span class="st">'no car'</span></span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span>,</span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>    commute_distance</span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a><span class="kw">order</span> <span class="kw">by</span></span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>    total_revenue <span class="kw">desc</span>,</span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>    car_ownership;</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<p><strong>Results:</strong></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 14%">
+<col style="width: 17%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 13%">
+<col style="width: 26%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>car_ownership</th>
+<th>commute_distance</th>
+<th>num_customers</th>
+<th>total_revenue</th>
+<th>total_orders</th>
+<th>avg_revenue_per_customer</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>no car</td>
+<td>0-1 Miles</td>
+<td>2708</td>
+<td>5197358.990</td>
+<td>4173</td>
+<td>1919.261</td>
+</tr>
+<tr class="even">
+<td>&gt;1 car</td>
+<td>5-10 Miles</td>
+<td>2390</td>
+<td>3553012.641</td>
+<td>3619</td>
+<td>1486.616</td>
+</tr>
+<tr class="odd">
+<td>&gt;1 car</td>
+<td>10+ Miles</td>
+<td>2175</td>
+<td>3439578.624</td>
+<td>3387</td>
+<td>1581.415</td>
+</tr>
+<tr class="even">
+<td>1 car</td>
+<td>0-1 Miles</td>
+<td>1541</td>
+<td>3202421.394</td>
+<td>2465</td>
+<td>2078.145</td>
+</tr>
+<tr class="odd">
+<td>&gt;1 car</td>
+<td>0-1 Miles</td>
+<td>2061</td>
+<td>2807811.841</td>
+<td>3030</td>
+<td>1362.354</td>
+</tr>
+<tr class="even">
+<td>&gt;1 car</td>
+<td>1-2 Miles</td>
+<td>1794</td>
+<td>2206559.472</td>
+<td>2516</td>
+<td>1229.966</td>
+</tr>
+<tr class="odd">
+<td>1 car</td>
+<td>2-5 Miles</td>
+<td>1593</td>
+<td>2154224.305</td>
+<td>2188</td>
+<td>1352.307</td>
+</tr>
+<tr class="even">
+<td>&gt;1 car</td>
+<td>2-5 Miles</td>
+<td>943</td>
+<td>1494274.803</td>
+<td>1402</td>
+<td>1584.597</td>
+</tr>
+<tr class="odd">
+<td>no car</td>
+<td>2-5 Miles</td>
+<td>698</td>
+<td>1317015.329</td>
+<td>1030</td>
+<td>1886.841</td>
+</tr>
+<tr class="even">
+<td>1 car</td>
+<td>5-10 Miles</td>
+<td>725</td>
+<td>1199003.362</td>
+<td>1156</td>
+<td>1653.798</td>
+</tr>
+<tr class="odd">
+<td>no car</td>
+<td>1-2 Miles</td>
+<td>684</td>
+<td>1191139.352</td>
+<td>1053</td>
+<td>1741.432</td>
+</tr>
+<tr class="even">
+<td>1 car</td>
+<td>1-2 Miles</td>
+<td>754</td>
+<td>1143909.326</td>
+<td>1097</td>
+<td>1517.121</td>
+</tr>
+<tr class="odd">
+<td>1 car</td>
+<td>10+ Miles</td>
+<td>270</td>
+<td>270236.227</td>
+<td>354</td>
+<td>1000.875</td>
+</tr>
+<tr class="even">
+<td>no car</td>
+<td>5-10 Miles</td>
+<td>99</td>
+<td>141132.039</td>
+<td>128</td>
+<td>1425.576</td>
+</tr>
+<tr class="odd">
+<td>no car</td>
+<td>10+ Miles</td>
+<td>49</td>
+<td>40999.518</td>
+<td>61</td>
+<td>836.725</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Insights:</strong></p>
+<ul>
+<li>Customers with no car and a commute distance of 0-1 Miles generate the highest total revenue and have the highest average revenue per customer, indicating that this segment has a strong lifetime value. It is maybe due to the fact that the customers with short distance and no car will likely purchase our bikes for commuting purposes, which may lead to higher frequency of purchases and higher overall spending on bike-related products and services.</li>
+<li>Customers with more than 1 car and a commute distance of 5-10 Miles also generate significant revenue, but their average revenue per customer is lower than the no car segment, suggesting that while they contribute to overall revenue, their individual lifetime value may be lower.</li>
+<li>Customers with 1 car and a commute distance of 0-1 Miles also have a high average revenue per customer, indicating that they are a valuable segment, although their total revenue is lower than the no car segment.</li>
+<li>Customers with longer commute distances (10+ Miles) tend to have lower average revenue per customer, regardless of car ownership, suggesting that longer commute distances may negatively impact customer lifetime value.</li>
+<li>Overall, the analysis indicates that customers with no car and shorter commute distances tend to have higher lifetime value, while those with longer commute distances and more cars may have lower lifetime value. This insight can help the company target marketing efforts towards segments with higher lifetime value and develop strategies to engage customers with longer commute distances to increase their lifetime value.</li>
+</ul>
+</section>
+<section id="whale-customers" class="level2">
+<h2 class="anchored" data-anchor-id="whale-customers">“Whale” Customers</h2>
+<p><code>8. Who are our "Whales" (Top 100 Most Valuable Customers), and what is their purchasing frequency?</code></p>
+<p>**Solution Method:* Solving this question is straightforward since we just need to calculate the total revenue generated by each customer and their purchasing frequency, then rank them based on their total revenue and identify the top 100 customers. We will also calculate the average number of orders per month for these top customers to understand their purchasing frequency. The Fact Internet Sales table contains the necessary information to perform this analysis, as it includes details about each customer’s purchases, including the sales amount and order dates. Therefore, calculating the financials and then grouping by customer id will allow us to identify the top 100 most valuable customers and analyze their purchasing frequency effectively.</p>
+<details>
+<summary>
+Show SQL Code
+</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">select</span> top <span class="dv">100</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    cus.CustomerKey,</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    cus.FirstName,</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    cus.LastName,</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sum</span>(fis.salesamount) <span class="kw">as</span> revenue, </span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">count</span>(<span class="kw">distinct</span> fis.salesordernumber) <span class="kw">as</span> num_orders,</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">count</span>(<span class="kw">distinct</span> <span class="fu">cast</span>(format(fis.orderdate, <span class="st">'yyyy-MM'</span>) <span class="kw">as</span> <span class="dt">varchar</span>(<span class="dv">20</span>)) ) <span class="kw">as</span> <span class="st">'num_months_purchased'</span>,</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">cast</span>(<span class="fu">count</span>(<span class="kw">distinct</span> fis.salesordernumber) <span class="op">*</span> <span class="fl">1.0</span> <span class="op">/</span> </span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>        <span class="fu">nullif</span>(<span class="fu">count</span>(<span class="kw">distinct</span> format(fis.orderdate, <span class="st">'yyyy-MM'</span>)),<span class="dv">0</span>) <span class="kw">as</span> <span class="dt">decimal</span>(<span class="dv">10</span>,<span class="dv">3</span>))</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>        <span class="kw">as</span> avg_orders_per_month</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="kw">from</span> Customer cus</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>    <span class="kw">left</span> <span class="kw">join</span> FactInternetSales fis </span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>        <span class="kw">on</span> fis.customerkey <span class="op">=</span> cus.customerkey</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="kw">group</span> <span class="kw">by</span> </span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>    cus.CustomerKey,</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>    cus.FirstName,</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>    cus.LastName</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="kw">order</span> <span class="kw">by</span> </span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>    revenue <span class="kw">desc</span>;</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<p><strong>Results:</strong></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 12%">
+<col style="width: 10%">
+<col style="width: 9%">
+<col style="width: 8%">
+<col style="width: 11%">
+<col style="width: 23%">
+<col style="width: 23%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>CustomerKey</th>
+<th>FirstName</th>
+<th>LastName</th>
+<th>revenue</th>
+<th>num_orders</th>
+<th>num_months_purchased</th>
+<th>avg_orders_per_month</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>12301</td>
+<td>Nichole</td>
+<td>Nara</td>
+<td>13295.3800</td>
+<td>5</td>
+<td>5</td>
+<td>1.000</td>
+</tr>
+<tr class="even">
+<td>12132</td>
+<td>Kaitlyn</td>
+<td>Henderson</td>
+<td>13294.2700</td>
+<td>5</td>
+<td>5</td>
+<td>1.000</td>
+</tr>
+<tr class="odd">
+<td>12308</td>
+<td>Margaret</td>
+<td>He</td>
+<td>13269.2700</td>
+<td>5</td>
+<td>5</td>
+<td>1.000</td>
+</tr>
+<tr class="even">
+<td>12131</td>
+<td>Randall</td>
+<td>Dominguez</td>
+<td>13265.9900</td>
+<td>5</td>
+<td>4</td>
+<td>1.250</td>
+</tr>
+<tr class="odd">
+<td>12300</td>
+<td>Adriana</td>
+<td>Gonzalez</td>
+<td>13242.7000</td>
+<td>5</td>
+<td>5</td>
+<td>1.000</td>
+</tr>
+<tr class="even">
+<td>12321</td>
+<td>Rosa</td>
+<td>Hu</td>
+<td>13215.6500</td>
+<td>5</td>
+<td>4</td>
+<td>1.250</td>
+</tr>
+<tr class="odd">
+<td>12124</td>
+<td>Brandi</td>
+<td>Gill</td>
+<td>13195.6400</td>
+<td>5</td>
+<td>5</td>
+<td>1.000</td>
+</tr>
+<tr class="even">
+<td>12307</td>
+<td>Brad</td>
+<td>She</td>
+<td>13173.1900</td>
+<td>5</td>
+<td>5</td>
+<td>1.000</td>
+</tr>
+<tr class="odd">
+<td>12296</td>
+<td>Francisco</td>
+<td>Sara</td>
+<td>13164.6400</td>
+<td>5</td>
+<td>5</td>
+<td>1.000</td>
+</tr>
+<tr class="even">
+<td>11433</td>
+<td>Maurice</td>
+<td>Shan</td>
+<td>12909.6682</td>
+<td>6</td>
+<td>5</td>
+<td>1.200</td>
+</tr>
+<tr class="odd">
+<td>11439</td>
+<td>Janet</td>
+<td>Munoz</td>
+<td>12489.1696</td>
+<td>6</td>
+<td>4</td>
+<td>1.500</td>
+</tr>
+<tr class="even">
+<td>11241</td>
+<td>Lisa</td>
+<td>Cai</td>
+<td>11469.1882</td>
+<td>7</td>
+<td>7</td>
+<td>1.000</td>
+</tr>
+<tr class="odd">
+<td>11417</td>
+<td>Lacey</td>
+<td>Zheng</td>
+<td>11248.4582</td>
+<td>7</td>
+<td>7</td>
+<td>1.000</td>
+</tr>
+<tr class="even">
+<td>11420</td>
+<td>Jordan</td>
+<td>Turner</td>
+<td>11200.7696</td>
+<td>7</td>
+<td>6</td>
+<td>1.167</td>
+</tr>
+<tr class="odd">
+<td>11242</td>
+<td>Larry</td>
+<td>Munoz</td>
+<td>11068.0082</td>
+<td>7</td>
+<td>7</td>
+<td>1.000</td>
+</tr>
+<tr class="even">
+<td>12655</td>
+<td>Larry</td>
+<td>Vazquez</td>
+<td>10899.6200</td>
+<td>4</td>
+<td>2</td>
+<td>2.000</td>
+</tr>
+<tr class="odd">
+<td>13263</td>
+<td>Kate</td>
+<td>Anand</td>
+<td>10872.0600</td>
+<td>4</td>
+<td>3</td>
+<td>1.333</td>
+</tr>
+<tr class="even">
+<td>12323</td>
+<td>Lawrence</td>
+<td>Alonso</td>
+<td>10836.9000</td>
+<td>4</td>
+<td>3</td>
+<td>1.333</td>
+</tr>
+<tr class="odd">
+<td>12333</td>
+<td>Terrance</td>
+<td>Rodriguez</td>
+<td>10829.2200</td>
+<td>4</td>
+<td>4</td>
+<td>1.000</td>
+</tr>
+<tr class="even">
+<td>12650</td>
+<td>Aaron</td>
+<td>Wright</td>
+<td>10813.6300</td>
+<td>4</td>
+<td>2</td>
+<td>2.000</td>
+</tr>
+<tr class="odd">
+<td>12631</td>
+<td>Clarence</td>
+<td>Gao</td>
+<td>10799.5200</td>
+<td>4</td>
+<td>3</td>
+<td>1.333</td>
+</tr>
+<tr class="even">
+<td>12632</td>
+<td>Bonnie</td>
+<td>Nath</td>
+<td>10793.2700</td>
+<td>4</td>
+<td>3</td>
+<td>1.333</td>
+</tr>
+<tr class="odd">
+<td>12332</td>
+<td>Andres</td>
+<td>Nara</td>
+<td>10789.5300</td>
+<td>4</td>
+<td>4</td>
+<td>1.000</td>
+</tr>
+<tr class="even">
+<td>13405</td>
+<td>Ethan</td>
+<td>Bryant</td>
+<td>10778.6100</td>
+<td>4</td>
+<td>3</td>
+<td>1.333</td>
+</tr>
+<tr class="odd">
+<td>11245</td>
+<td>Ricky</td>
+<td>Vazquez</td>
+<td>10580.3500</td>
+<td>4</td>
+<td>4</td>
+<td>1.000</td>
+</tr>
+<tr class="even">
+<td>11246</td>
+<td>Latasha</td>
+<td>Rubio</td>
+<td>10575.3300</td>
+<td>4</td>
+<td>4</td>
+<td>1.000</td>
+</tr>
+<tr class="odd">
+<td>11237</td>
+<td>Clarence</td>
+<td>Anand</td>
+<td>10566.3800</td>
+<td>4</td>
+<td>4</td>
+<td>1.000</td>
+</tr>
+<tr class="even">
+<td>11425</td>
+<td>Ariana</td>
+<td>Gray</td>
+<td>10528.6282</td>
+<td>6</td>
+<td>6</td>
+<td>1.000</td>
+</tr>
+<tr class="odd">
+<td>11429</td>
+<td>Marco</td>
+<td>Lopez</td>
+<td>10468.3796</td>
+<td>6</td>
+<td>4</td>
+<td>1.500</td>
+</tr>
+<tr class="even">
+<td>11428</td>
+<td>Deanna</td>
+<td>Perez</td>
+<td>9954.2600</td>
+<td>4</td>
+<td>4</td>
+<td>1.000</td>
+</tr>
+<tr class="odd">
+<td>11427</td>
+<td>Desiree</td>
+<td>Dominguez</td>
+<td>9917.9900</td>
+<td>4</td>
+<td>4</td>
+<td>1.000</td>
+</tr>
+<tr class="even">
+<td>11431</td>
+<td>Bryant</td>
+<td>Garcia</td>
+<td>9912.9800</td>
+<td>4</td>
+<td>3</td>
+<td>1.333</td>
+</tr>
+<tr class="odd">
+<td>11423</td>
+<td>Jasmine</td>
+<td>Stewart</td>
+<td>9904.9700</td>
+<td>4</td>
+<td>4</td>
+<td>1.000</td>
+</tr>
+<tr class="even">
+<td>11249</td>
+<td>Cindy</td>
+<td>Patel</td>
+<td>9890.2700</td>
+<td>4</td>
+<td>4</td>
+<td>1.000</td>
+</tr>
+<tr class="odd">
+<td>11412</td>
+<td>Sydney</td>
+<td>Bryant</td>
+<td>9879.9600</td>
+<td>4</td>
+<td>4</td>
+<td>1.000</td>
+</tr>
+<tr class="even">
+<td>14186</td>
+<td>Katrina</td>
+<td>Tang</td>
+<td>9796.3200</td>
+<td>4</td>
+<td>4</td>
+<td>1.000</td>
+</tr>
+<tr class="odd">
+<td>11421</td>
+<td>Amy</td>
+<td>Sun</td>
+<td>9780.0400</td>
+<td>4</td>
+<td>4</td>
+<td>1.000</td>
+</tr>
+<tr class="even">
+<td>13592</td>
+<td>Gabriella</td>
+<td>Collins</td>
+<td>9695.7300</td>
+<td>4</td>
+<td>3</td>
+<td>1.333</td>
+</tr>
+<tr class="odd">
+<td>13605</td>
+<td>Gerrit</td>
+<td>Straatsma</td>
+<td>9614.7300</td>
+<td>4</td>
+<td>4</td>
+<td>1.000</td>
+</tr>
+<tr class="even">
+<td>14185</td>
+<td>Frank</td>
+<td>Vazquez</td>
+<td>9523.0025</td>
+<td>4</td>
+<td>3</td>
+<td>1.333</td>
+</tr>
+<tr class="odd">
+<td>13575</td>
+<td>Alicia</td>
+<td>Shen</td>
+<td>9458.1825</td>
+<td>4</td>
+<td>3</td>
+<td>1.333</td>
+</tr>
+<tr class="even">
+<td>14192</td>
+<td>Ronald</td>
+<td>Kapoor</td>
+<td>9451.9125</td>
+<td>4</td>
+<td>4</td>
+<td>1.000</td>
+</tr>
+<tr class="odd">
+<td>13577</td>
+<td>Theodore</td>
+<td>Torres</td>
+<td>9450.3225</td>
+<td>4</td>
+<td>3</td>
+<td>1.333</td>
+</tr>
+<tr class="even">
+<td>14200</td>
+<td>Colleen</td>
+<td>Goel</td>
+<td>9421.9125</td>
+<td>4</td>
+<td>4</td>
+<td>1.000</td>
+</tr>
+<tr class="odd">
+<td>13595</td>
+<td>Cole</td>
+<td>Stewart</td>
+<td>9390.5325</td>
+<td>4</td>
+<td>4</td>
+<td>1.000</td>
+</tr>
+<tr class="even">
+<td>11432</td>
+<td>Dominique</td>
+<td>Prasad</td>
+<td>9330.1996</td>
+<td>6</td>
+<td>6</td>
+<td>1.000</td>
+</tr>
+<tr class="odd">
+<td>13257</td>
+<td>Jon</td>
+<td>Chander</td>
+<td>8941.2800</td>
+<td>4</td>
+<td>4</td>
+<td>1.000</td>
+</tr>
+<tr class="even">
+<td>13258</td>
+<td>Anne</td>
+<td>Dominguez</td>
+<td>8886.5300</td>
+<td>4</td>
+<td>4</td>
+<td>1.000</td>
+</tr>
+<tr class="odd">
+<td>12128</td>
+<td>Kristy</td>
+<td>Munoz</td>
+<td>8681.1082</td>
+<td>4</td>
+<td>4</td>
+<td>1.000</td>
+</tr>
+<tr class="even">
+<td>12125</td>
+<td>Diana</td>
+<td>Ortega</td>
+<td>8595.4096</td>
+<td>4</td>
+<td>3</td>
+<td>1.333</td>
+</tr>
+<tr class="odd">
+<td>12129</td>
+<td>Wendy</td>
+<td>Alvarez</td>
+<td>8557.4096</td>
+<td>4</td>
+<td>4</td>
+<td>1.000</td>
+</tr>
+<tr class="even">
+<td>13600</td>
+<td>Marie</td>
+<td>Sanz</td>
+<td>8460.2500</td>
+<td>3</td>
+<td>3</td>
+<td>1.000</td>
+</tr>
+<tr class="odd">
+<td>14427</td>
+<td>Emmanuel</td>
+<td>Patel</td>
+<td>8451.2600</td>
+<td>3</td>
+<td>3</td>
+<td>1.000</td>
+</tr>
+<tr class="even">
+<td>15106</td>
+<td>Shannon</td>
+<td>Navarro</td>
+<td>8421.2800</td>
+<td>3</td>
+<td>3</td>
+<td>1.000</td>
+</tr>
+<tr class="odd">
+<td>14775</td>
+<td>Bonnie</td>
+<td>Xie</td>
+<td>8404.2800</td>
+<td>3</td>
+<td>3</td>
+<td>1.000</td>
+</tr>
+<tr class="even">
+<td>14429</td>
+<td>Lacey</td>
+<td>He</td>
+<td>8394.2900</td>
+<td>3</td>
+<td>3</td>
+<td>1.000</td>
+</tr>
+<tr class="odd">
+<td>15692</td>
+<td>Ryan</td>
+<td>Garcia</td>
+<td>8392.3000</td>
+<td>3</td>
+<td>2</td>
+<td>1.500</td>
+</tr>
+<tr class="even">
+<td>15097</td>
+<td>Morgan</td>
+<td>Bennett</td>
+<td>8377.0900</td>
+<td>3</td>
+<td>3</td>
+<td>1.000</td>
+</tr>
+<tr class="odd">
+<td>13602</td>
+<td>Virginia</td>
+<td>Mehta</td>
+<td>8376.2800</td>
+<td>3</td>
+<td>2</td>
+<td>1.500</td>
+</tr>
+<tr class="even">
+<td>13583</td>
+<td>Blake</td>
+<td>Butler</td>
+<td>8375.2900</td>
+<td>3</td>
+<td>3</td>
+<td>1.000</td>
+</tr>
+<tr class="odd">
+<td>13581</td>
+<td>Albert</td>
+<td>Blanco</td>
+<td>8374.7900</td>
+<td>3</td>
+<td>3</td>
+<td>1.000</td>
+</tr>
+<tr class="even">
+<td>13585</td>
+<td>Savannah</td>
+<td>Morris</td>
+<td>8368.2900</td>
+<td>3</td>
+<td>3</td>
+<td>1.000</td>
+</tr>
+<tr class="odd">
+<td>14940</td>
+<td>Carmen</td>
+<td>Rana</td>
+<td>8367.5500</td>
+<td>3</td>
+<td>3</td>
+<td>1.000</td>
+</tr>
+<tr class="even">
+<td>14939</td>
+<td>Cory</td>
+<td>Kapoor</td>
+<td>8367.3000</td>
+<td>3</td>
+<td>3</td>
+<td>1.000</td>
+</tr>
+<tr class="odd">
+<td>14207</td>
+<td>José</td>
+<td>Saraiva</td>
+<td>8361.3000</td>
+<td>3</td>
+<td>3</td>
+<td>1.000</td>
+</tr>
+<tr class="even">
+<td>13584</td>
+<td>Isaiah</td>
+<td>Cox</td>
+<td>8361.2900</td>
+<td>3</td>
+<td>3</td>
+<td>1.000</td>
+</tr>
+<tr class="odd">
+<td>13591</td>
+<td>Latasha</td>
+<td>Alonso</td>
+<td>8355.2700</td>
+<td>3</td>
+<td>3</td>
+<td>1.000</td>
+</tr>
+<tr class="even">
+<td>14830</td>
+<td>Isabella</td>
+<td>Ward</td>
+<td>8346.2800</td>
+<td>3</td>
+<td>3</td>
+<td>1.000</td>
+</tr>
+<tr class="odd">
+<td>15691</td>
+<td>Julian</td>
+<td>Henderson</td>
+<td>8341.2900</td>
+<td>3</td>
+<td>3</td>
+<td>1.000</td>
+</tr>
+<tr class="even">
+<td>14425</td>
+<td>Victor</td>
+<td>Carlson</td>
+<td>8332.3000</td>
+<td>3</td>
+<td>3</td>
+<td>1.000</td>
+</tr>
+<tr class="odd">
+<td>13576</td>
+<td>Tamara</td>
+<td>Lal</td>
+<td>8330.7900</td>
+<td>3</td>
+<td>3</td>
+<td>1.000</td>
+</tr>
+<tr class="even">
+<td>14181</td>
+<td>Adriana</td>
+<td>Chandra</td>
+<td>8326.3100</td>
+<td>3</td>
+<td>3</td>
+<td>1.000</td>
+</tr>
+<tr class="odd">
+<td>15695</td>
+<td>Bruce</td>
+<td>Gomez</td>
+<td>8324.2400</td>
+<td>3</td>
+<td>3</td>
+<td>1.000</td>
+</tr>
+<tr class="even">
+<td>14428</td>
+<td>Cassie</td>
+<td>Andersen</td>
+<td>8321.3100</td>
+<td>3</td>
+<td>3</td>
+<td>1.000</td>
+</tr>
+<tr class="odd">
+<td>14183</td>
+<td>Robyn</td>
+<td>Carlson</td>
+<td>8321.3100</td>
+<td>3</td>
+<td>3</td>
+<td>1.000</td>
+</tr>
+<tr class="even">
+<td>11767</td>
+<td>Meagan</td>
+<td>Madan</td>
+<td>8319.5100</td>
+<td>3</td>
+<td>3</td>
+<td>1.000</td>
+</tr>
+<tr class="odd">
+<td>14426</td>
+<td>Madison</td>
+<td>Hughes</td>
+<td>8319.3000</td>
+<td>3</td>
+<td>3</td>
+<td>1.000</td>
+</tr>
+<tr class="even">
+<td>14189</td>
+<td>Krista</td>
+<td>Martin</td>
+<td>8317.3200</td>
+<td>3</td>
+<td>3</td>
+<td>1.000</td>
+</tr>
+<tr class="odd">
+<td>14195</td>
+<td>Clinton</td>
+<td>Blanco</td>
+<td>8316.2900</td>
+<td>3</td>
+<td>3</td>
+<td>1.000</td>
+</tr>
+<tr class="even">
+<td>14198</td>
+<td>Daisy</td>
+<td>Romero</td>
+<td>8308.5900</td>
+<td>3</td>
+<td>3</td>
+<td>1.000</td>
+</tr>
+<tr class="odd">
+<td>13590</td>
+<td>Louis</td>
+<td>Xie</td>
+<td>8306.3000</td>
+<td>3</td>
+<td>3</td>
+<td>1.000</td>
+</tr>
+<tr class="even">
+<td>15080</td>
+<td>Evelyn</td>
+<td>Chandra</td>
+<td>8305.3000</td>
+<td>3</td>
+<td>3</td>
+<td>1.000</td>
+</tr>
+<tr class="odd">
+<td>15118</td>
+<td>Nelson</td>
+<td>Ortega</td>
+<td>8301.3100</td>
+<td>3</td>
+<td>3</td>
+<td>1.000</td>
+</tr>
+<tr class="even">
+<td>14191</td>
+<td>Derrick</td>
+<td>Martin</td>
+<td>8301.3100</td>
+<td>3</td>
+<td>3</td>
+<td>1.000</td>
+</tr>
+<tr class="odd">
+<td>15354</td>
+<td>Corey</td>
+<td>Kumar</td>
+<td>8297.2900</td>
+<td>3</td>
+<td>3</td>
+<td>1.000</td>
+</tr>
+<tr class="even">
+<td>11112</td>
+<td>Crystal</td>
+<td>Wang</td>
+<td>8295.0200</td>
+<td>3</td>
+<td>3</td>
+<td>1.000</td>
+</tr>
+<tr class="odd">
+<td>11766</td>
+<td>Candace</td>
+<td>Raman</td>
+<td>8280.4800</td>
+<td>3</td>
+<td>3</td>
+<td>1.000</td>
+</tr>
+<tr class="even">
+<td>12338</td>
+<td>Monica</td>
+<td>Vance</td>
+<td>8265.0000</td>
+<td>3</td>
+<td>3</td>
+<td>1.000</td>
+</tr>
+<tr class="odd">
+<td>11101</td>
+<td>Abby</td>
+<td>Sai</td>
+<td>8262.5200</td>
+<td>3</td>
+<td>3</td>
+<td>1.000</td>
+</tr>
+<tr class="even">
+<td>11900</td>
+<td>Byron</td>
+<td>Carlson</td>
+<td>8257.0100</td>
+<td>3</td>
+<td>3</td>
+<td>1.000</td>
+</tr>
+<tr class="odd">
+<td>12003</td>
+<td>Audrey</td>
+<td>Munoz</td>
+<td>8256.5000</td>
+<td>3</td>
+<td>3</td>
+<td>1.000</td>
+</tr>
+<tr class="even">
+<td>11451</td>
+<td>Ruben</td>
+<td>Muñoz</td>
+<td>8249.4900</td>
+<td>3</td>
+<td>3</td>
+<td>1.000</td>
+</tr>
+<tr class="odd">
+<td>11995</td>
+<td>Kelvin</td>
+<td>Carson</td>
+<td>8249.0100</td>
+<td>3</td>
+<td>3</td>
+<td>1.000</td>
+</tr>
+<tr class="even">
+<td>11000</td>
+<td>Jon</td>
+<td>Yang</td>
+<td>8248.9900</td>
+<td>3</td>
+<td>3</td>
+<td>1.000</td>
+</tr>
+<tr class="odd">
+<td>11058</td>
+<td>Marc</td>
+<td>Diaz</td>
+<td>8248.0200</td>
+<td>3</td>
+<td>3</td>
+<td>1.000</td>
+</tr>
+<tr class="even">
+<td>11901</td>
+<td>Stacy</td>
+<td>Alvarez</td>
+<td>8248.0100</td>
+<td>3</td>
+<td>3</td>
+<td>1.000</td>
+</tr>
+<tr class="odd">
+<td>11986</td>
+<td>Max</td>
+<td>Alvarez</td>
+<td>8245.2300</td>
+<td>3</td>
+<td>3</td>
+<td>1.000</td>
+</tr>
+<tr class="even">
+<td>11109</td>
+<td>Ruben</td>
+<td>Kapoor</td>
+<td>8245.0100</td>
+<td>3</td>
+<td>3</td>
+<td>1.000</td>
+</tr>
+<tr class="odd">
+<td>11120</td>
+<td>Beth</td>
+<td>Jiménez</td>
+<td>8242.4900</td>
+<td>3</td>
+<td>3</td>
+<td>1.000</td>
+</tr>
+<tr class="even">
+<td>11446</td>
+<td>Bethany</td>
+<td>Chander</td>
+<td>8237.0100</td>
+<td>3</td>
+<td>3</td>
+<td>1.000</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Insights:</strong></p>
+<ul>
+<li>The top 100 most valuable customers, or “Whales,” generate a significant amount of revenue for the company, with the highest revenue being <code>$13,295.38</code> and the lowest being <code>$8,237.01</code> among the top 100 customers. This indicates that these customers are highly valuable to the company and contribute significantly to its overall revenue.</li>
+<li>The purchasing frequency of these top customers varies, with some customers making purchases consistently over several months, while others have a more sporadic purchasing pattern. For example, some customers have an average of 1 order per month, while others have an average of 1.5 or more orders per month. This suggests that while all of these customers are valuable, their purchasing behavior may differ, and the company may need to tailor its marketing strategies to engage with these customers effectively based on their purchasing frequency.</li>
+<li>The majority of the top 100 customers have a consistent purchasing pattern, with many of them making purchases in multiple months, indicating that they are likely loyal customers who have a strong affinity for the company’s products. If we are somehow able to make these customers even more loyal, we will be able to increase their lifetime value and further boost the company’s revenue.</li>
+</ul>
+</section>
+<section id="age-groups-and-spend-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="age-groups-and-spend-analysis">Age Groups and Spend Analysis</h2>
+<p><code>9. What is our generational spend distribution (Age Brackets)?</code></p>
+<p><strong>Solution Method:</strong> To do accurate analysis I did not consider only the age groups but also the gender and marital status of the customers since the age groups alone will not give us the complete picture of the generational spend distribution. By segmenting customers based on their age, gender and marital status will allow us to understand the purchasing patterns of each group. This is a crucial step as the 30 years old single man will definitely have different purchasing behavior than the 30 years old married man.</p>
+<p>To calculate the age of the customers, I have taken the last order date in the sales table as the reference point and then calculated the age of the customers using the DATEDIFF() function which find the difference in years between the birth date and the reference date. This approach allows us to determine the age of the customers at the time of their most recent purchase, which is more relevant for analyzing their spending behavior. Then, I have segmented the customers into different age groups (e.g., &lt;25, 25-35, 36-45, etc.), gender and marital status groups and calculated the total revenue, total orders, and total products purchased for each segment. Segmentation based on the age groups, gender and marital status require just simple, straightforward CASE-WHEN sQL statements, and then we can group by these segments to get the desired results. This analysis will provide insights into which generational segments are driving the most revenue and how their purchasing behavior</p>
+<details>
+<summary>
+Show SQL Code
+</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">with</span> get_max_date <span class="kw">as</span> (</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">select</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>        <span class="fu">max</span>(OrderDate) <span class="kw">as</span> reference_day</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">from</span> FactInternetSales</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>),</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>customer_info <span class="kw">as</span> (</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">select</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>        cus.CustomerKey,</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>        <span class="co">-- we should find age using datediff() function</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>        DATEDIFF(<span class="dt">year</span>, cus.BirthDate, reference_day) <span class="kw">as</span> customer_age,</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>        cus.Gender <span class="kw">as</span> customer_gender,</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>        cus.MaritalStatus <span class="kw">as</span> customer_marital_status,</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>        <span class="fu">sum</span>(fis.SalesAmount) <span class="kw">as</span> customer_revenue,</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>        <span class="fu">count</span>(<span class="kw">distinct</span> fis.SalesOrderNumber) <span class="kw">as</span> customer_total_orders,</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>        <span class="fu">sum</span>(fis.OrderQuantity) <span class="kw">as</span> customer_total_products</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>    <span class="kw">from</span> Customer cus</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>    <span class="kw">left</span> <span class="kw">join</span> FactInternetSales fis</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>        <span class="kw">on</span> cus.CustomerKey <span class="op">=</span> fis.CustomerKey</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>    <span class="kw">cross</span>  <span class="kw">join</span> get_max_date</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>    <span class="kw">group</span> <span class="kw">by</span> </span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>        cus.CustomerKey,</span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>        DATEDIFF(<span class="dt">year</span>, cus.BirthDate, reference_day),</span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>        cus.Gender,</span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>        cus.MaritalStatus</span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a><span class="kw">select</span></span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>    <span class="co">-- segment the customers into ages</span></span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>    <span class="cf">case</span>  </span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>        <span class="cf">when</span> customer_age <span class="op">&lt;</span> <span class="dv">25</span> <span class="cf">then</span> <span class="st">'&lt;25'</span></span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>        <span class="cf">when</span> Customer_age <span class="kw">between</span> <span class="dv">25</span> <span class="kw">and</span> <span class="dv">35</span>  <span class="cf">then</span> <span class="st">'25-35'</span></span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>        <span class="cf">when</span> customer_age <span class="kw">between</span> <span class="dv">36</span> <span class="kw">and</span> <span class="dv">45</span> <span class="cf">then</span> <span class="st">'36-45'</span></span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>        <span class="cf">when</span> customer_age <span class="kw">between</span> <span class="dv">46</span> <span class="kw">and</span> <span class="dv">55</span> <span class="cf">then</span> <span class="st">'46-55'</span></span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>        <span class="cf">when</span> customer_age <span class="kw">between</span> <span class="dv">56</span> <span class="kw">and</span> <span class="dv">65</span> <span class="cf">then</span> <span class="st">'56-65'</span></span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span> <span class="st">'66+'</span></span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span> <span class="kw">as</span> age_group,</span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a>    <span class="cf">case</span> </span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a>        <span class="cf">when</span> customer_gender <span class="op">=</span> <span class="st">'F'</span> <span class="cf">then</span> <span class="st">'Female'</span></span>
+<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a>        <span class="cf">when</span> customer_gender <span class="op">=</span> <span class="st">'M'</span> <span class="cf">then</span> <span class="st">'Male'</span></span>
+<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span> <span class="st">'Other'</span></span>
+<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span> <span class="kw">as</span> gender,</span>
+<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a>    <span class="cf">case</span>    </span>
+<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a>        <span class="cf">when</span> customer_marital_status <span class="op">=</span> <span class="st">'S'</span> <span class="cf">then</span> <span class="st">'Single'</span> </span>
+<span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a>        <span class="cf">when</span> customer_marital_status <span class="op">=</span> <span class="st">'M'</span> <span class="cf">then</span> <span class="st">'Married'</span></span>
+<span id="cb4-46"><a href="#cb4-46" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span> <span class="st">'Other'</span></span>
+<span id="cb4-47"><a href="#cb4-47" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span> <span class="kw">as</span> marital_status,</span>
+<span id="cb4-48"><a href="#cb4-48" aria-hidden="true" tabindex="-1"></a>    <span class="fu">count</span>(<span class="kw">distinct</span> CustomerKey) <span class="kw">as</span> num_customers,</span>
+<span id="cb4-49"><a href="#cb4-49" aria-hidden="true" tabindex="-1"></a>    <span class="fu">coalesce</span>(<span class="fu">sum</span>(customer_revenue),<span class="dv">0</span>) <span class="kw">as</span> total_revenue,</span>
+<span id="cb4-50"><a href="#cb4-50" aria-hidden="true" tabindex="-1"></a>    <span class="fu">coalesce</span>(<span class="fu">sum</span>(customer_total_orders),<span class="dv">0</span>) <span class="kw">as</span> total_orders,</span>
+<span id="cb4-51"><a href="#cb4-51" aria-hidden="true" tabindex="-1"></a>    <span class="fu">coalesce</span>(<span class="fu">sum</span>(customer_total_products),<span class="dv">0</span>) <span class="kw">as</span> total_products</span>
+<span id="cb4-52"><a href="#cb4-52" aria-hidden="true" tabindex="-1"></a><span class="kw">from</span> customer_info</span>
+<span id="cb4-53"><a href="#cb4-53" aria-hidden="true" tabindex="-1"></a><span class="kw">group</span> <span class="kw">by</span> </span>
+<span id="cb4-54"><a href="#cb4-54" aria-hidden="true" tabindex="-1"></a>    <span class="cf">case</span>  </span>
+<span id="cb4-55"><a href="#cb4-55" aria-hidden="true" tabindex="-1"></a>        <span class="cf">when</span> customer_age <span class="op">&lt;</span> <span class="dv">25</span> <span class="cf">then</span> <span class="st">'&lt;25'</span></span>
+<span id="cb4-56"><a href="#cb4-56" aria-hidden="true" tabindex="-1"></a>        <span class="cf">when</span> Customer_age <span class="kw">between</span> <span class="dv">25</span> <span class="kw">and</span> <span class="dv">35</span>  <span class="cf">then</span> <span class="st">'25-35'</span></span>
+<span id="cb4-57"><a href="#cb4-57" aria-hidden="true" tabindex="-1"></a>        <span class="cf">when</span> customer_age <span class="kw">between</span> <span class="dv">36</span> <span class="kw">and</span> <span class="dv">45</span> <span class="cf">then</span> <span class="st">'36-45'</span></span>
+<span id="cb4-58"><a href="#cb4-58" aria-hidden="true" tabindex="-1"></a>        <span class="cf">when</span> customer_age <span class="kw">between</span> <span class="dv">46</span> <span class="kw">and</span> <span class="dv">55</span> <span class="cf">then</span> <span class="st">'46-55'</span></span>
+<span id="cb4-59"><a href="#cb4-59" aria-hidden="true" tabindex="-1"></a>        <span class="cf">when</span> customer_age <span class="kw">between</span> <span class="dv">56</span> <span class="kw">and</span> <span class="dv">65</span> <span class="cf">then</span> <span class="st">'56-65'</span></span>
+<span id="cb4-60"><a href="#cb4-60" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span> <span class="st">'66+'</span></span>
+<span id="cb4-61"><a href="#cb4-61" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span>,</span>
+<span id="cb4-62"><a href="#cb4-62" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-63"><a href="#cb4-63" aria-hidden="true" tabindex="-1"></a>    <span class="cf">case</span> </span>
+<span id="cb4-64"><a href="#cb4-64" aria-hidden="true" tabindex="-1"></a>        <span class="cf">when</span> customer_gender <span class="op">=</span> <span class="st">'F'</span> <span class="cf">then</span> <span class="st">'Female'</span></span>
+<span id="cb4-65"><a href="#cb4-65" aria-hidden="true" tabindex="-1"></a>        <span class="cf">when</span> customer_gender <span class="op">=</span> <span class="st">'M'</span> <span class="cf">then</span> <span class="st">'Male'</span></span>
+<span id="cb4-66"><a href="#cb4-66" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span> <span class="st">'Other'</span></span>
+<span id="cb4-67"><a href="#cb4-67" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span>,</span>
+<span id="cb4-68"><a href="#cb4-68" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-69"><a href="#cb4-69" aria-hidden="true" tabindex="-1"></a>    customer_marital_status,</span>
+<span id="cb4-70"><a href="#cb4-70" aria-hidden="true" tabindex="-1"></a>    <span class="cf">case</span>    </span>
+<span id="cb4-71"><a href="#cb4-71" aria-hidden="true" tabindex="-1"></a>        <span class="cf">when</span> customer_marital_status <span class="op">=</span> <span class="st">'S'</span> <span class="cf">then</span> <span class="st">'Single'</span> </span>
+<span id="cb4-72"><a href="#cb4-72" aria-hidden="true" tabindex="-1"></a>        <span class="cf">when</span> customer_marital_status <span class="op">=</span> <span class="st">'M'</span> <span class="cf">then</span> <span class="st">'Married'</span></span>
+<span id="cb4-73"><a href="#cb4-73" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span> <span class="st">'Other'</span></span>
+<span id="cb4-74"><a href="#cb4-74" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb4-75"><a href="#cb4-75" aria-hidden="true" tabindex="-1"></a><span class="kw">order</span> <span class="kw">by</span></span>
+<span id="cb4-76"><a href="#cb4-76" aria-hidden="true" tabindex="-1"></a>    total_revenue <span class="kw">desc</span>;</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<p>**Results:*</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 11%">
+<col style="width: 7%">
+<col style="width: 17%">
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 14%">
+<col style="width: 17%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>age_group</th>
+<th>gender</th>
+<th>marital_status</th>
+<th>num_customers</th>
+<th>total_revenue</th>
+<th>total_orders</th>
+<th>total_products</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>36-45</td>
+<td>Female</td>
+<td>Single</td>
+<td>1570</td>
+<td>3220642.3561</td>
+<td>2450</td>
+<td>5214</td>
+</tr>
+<tr class="even">
+<td>36-45</td>
+<td>Male</td>
+<td>Married</td>
+<td>1653</td>
+<td>2690691.2759</td>
+<td>2479</td>
+<td>5369</td>
+</tr>
+<tr class="odd">
+<td>36-45</td>
+<td>Male</td>
+<td>Single</td>
+<td>1496</td>
+<td>2636742.2451</td>
+<td>2197</td>
+<td>4850</td>
+</tr>
+<tr class="even">
+<td>36-45</td>
+<td>Female</td>
+<td>Married</td>
+<td>1519</td>
+<td>2540527.0699</td>
+<td>2400</td>
+<td>5302</td>
+</tr>
+<tr class="odd">
+<td>46-55</td>
+<td>Male</td>
+<td>Married</td>
+<td>1431</td>
+<td>2177651.6181</td>
+<td>2254</td>
+<td>4992</td>
+</tr>
+<tr class="even">
+<td>46-55</td>
+<td>Female</td>
+<td>Married</td>
+<td>1222</td>
+<td>2031548.5099</td>
+<td>1866</td>
+<td>4071</td>
+</tr>
+<tr class="odd">
+<td>25-35</td>
+<td>Female</td>
+<td>Single</td>
+<td>1341</td>
+<td>1868358.5366</td>
+<td>1960</td>
+<td>4257</td>
+</tr>
+<tr class="even">
+<td>25-35</td>
+<td>Male</td>
+<td>Single</td>
+<td>1267</td>
+<td>1853233.8674</td>
+<td>1880</td>
+<td>4036</td>
+</tr>
+<tr class="odd">
+<td>46-55</td>
+<td>Female</td>
+<td>Single</td>
+<td>841</td>
+<td>1663352.2746</td>
+<td>1265</td>
+<td>2773</td>
+</tr>
+<tr class="even">
+<td>25-35</td>
+<td>Male</td>
+<td>Married</td>
+<td>946</td>
+<td>1478339.5669</td>
+<td>1436</td>
+<td>3060</td>
+</tr>
+<tr class="odd">
+<td>46-55</td>
+<td>Male</td>
+<td>Single</td>
+<td>785</td>
+<td>1423610.6286</td>
+<td>1120</td>
+<td>2375</td>
+</tr>
+<tr class="even">
+<td>25-35</td>
+<td>Female</td>
+<td>Married</td>
+<td>834</td>
+<td>1300527.9517</td>
+<td>1260</td>
+<td>2705</td>
+</tr>
+<tr class="odd">
+<td>56-65</td>
+<td>Male</td>
+<td>Married</td>
+<td>838</td>
+<td>1181146.1335</td>
+<td>1238</td>
+<td>2740</td>
+</tr>
+<tr class="even">
+<td>56-65</td>
+<td>Female</td>
+<td>Married</td>
+<td>790</td>
+<td>1052145.0857</td>
+<td>1152</td>
+<td>2569</td>
+</tr>
+<tr class="odd">
+<td>56-65</td>
+<td>Female</td>
+<td>Single</td>
+<td>446</td>
+<td>569557.8937</td>
+<td>651</td>
+<td>1462</td>
+</tr>
+<tr class="even">
+<td>56-65</td>
+<td>Male</td>
+<td>Single</td>
+<td>353</td>
+<td>495231.9280</td>
+<td>489</td>
+<td>1089</td>
+</tr>
+<tr class="odd">
+<td>66+</td>
+<td>Male</td>
+<td>Married</td>
+<td>398</td>
+<td>392528.7789</td>
+<td>582</td>
+<td>1342</td>
+</tr>
+<tr class="even">
+<td>66+</td>
+<td>Female</td>
+<td>Married</td>
+<td>380</td>
+<td>342269.7483</td>
+<td>491</td>
+<td>1123</td>
+</tr>
+<tr class="odd">
+<td>66+</td>
+<td>Female</td>
+<td>Single</td>
+<td>190</td>
+<td>224689.2487</td>
+<td>247</td>
+<td>541</td>
+</tr>
+<tr class="even">
+<td>66+</td>
+<td>Male</td>
+<td>Single</td>
+<td>184</td>
+<td>215882.5031</td>
+<td>242</td>
+<td>528</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Insights:</strong></p>
+<ul>
+<li>The age group of 36-45 years old contributes the highest total revenue, with both single and married customers leading in terms of spending. This suggests that this age group is a key demographic for the company, and marketing efforts should be focused on targeting both single and married customers within this age range.<br>
+</li>
+<li>The 46-55 age group also contributes significantly to total revenue, with married customers leading in terms of spending. This indicates that married customers in this age group are an important segment for the company, and marketing strategies should be tailored to appeal to their preferences and needs.</li>
+<li>The 25-35 age group shows a strong presence of single customers contributing to total revenue, indicating that this segment may have different purchasing behavior compared to married customers. Marketing efforts targeting single customers in this age group may be effective in driving sales.</li>
+<li>The 56-65 and 66+ age groups contribute less to total revenue compared to the younger age groups, but married customers in these age groups still show a significant contribution. This suggests that while these age groups may not be the primary target for the company, there is still potential for growth by targeting married customers within these age ranges.</li>
+<li>Overall, the analysis reveals that the 36-45 age group, particularly single and married customers, is a key demographic for the company in terms of revenue generation. Marketing strategies should be tailored to target this age group effectively, while also considering the preferences and needs of other age groups to maximize overall revenue.</li>
+</ul>
+</section>
+<section id="customer-retention-rate-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="customer-retention-rate-analysis">Customer Retention Rate Analysis</h2>
+<p><code>10. What is our Customer Retention Rate (One-and-Done vs. Repeat Buyers)?</code></p>
+<p><strong>Solution Method:</strong> To calculate the customer retention rate, we will first categorize customers into two groups based on their purchasing behavior: “One-and-Done” customers who have made only one purchase and “Repeat Buyers” who have made more than one purchase. We will then calculate the total number of customers in each group and the total revenue generated by each group. Finally, we will calculate the retention rate for each group by dividing the number of customers in that group by the total number of customers and multiplying by 100 to get a percentage. This analysis will provide insights into the proportion of customers who are repeat buyers versus those who are one-and-done, which can help the company understand its customer retention dynamics and identify opportunities for improving customer loyalty. There is an important consideration in the calculation of retention rate, which is to ensure that we are not dividing by zero when calculating the retention rate percentage. To address this, we will use the NULLIF function in SQL to handle cases where the total number of customers is zero, preventing any division by zero errors and ensuring that our retention rate calculation is accurate and robust.</p>
+<details>
+<summary>
+Show SQL Code
+</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">with</span> customer_info <span class="kw">as</span> </span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>(</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">select</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>        cus.CustomerKey,</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>        <span class="fu">coalesce</span>(<span class="fu">count</span>(<span class="kw">distinct</span> fis.SalesOrderNumber),<span class="dv">0</span>) <span class="kw">as</span> num_orders,</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>        <span class="fu">sum</span>(fis.SalesAmount) <span class="kw">as</span> revenue</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">from</span> customer cus</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">left</span> <span class="kw">join</span> FactInternetSales fis </span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>        <span class="kw">on</span> fis.CustomerKey <span class="op">=</span> cus.CustomerKey</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    <span class="kw">group</span> <span class="kw">by</span> cus.CustomerKey</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>),</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>retention_groups <span class="kw">as</span> (</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>    <span class="kw">select</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>        <span class="cf">case</span> </span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>            <span class="cf">when</span> num_orders <span class="op">&gt;</span> <span class="dv">1</span> <span class="cf">then</span> <span class="st">'repeat-buyers'</span> </span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>            <span class="cf">when</span> num_orders <span class="op">=</span> <span class="dv">1</span> <span class="cf">then</span> <span class="st">'one-and-done'</span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>            <span class="cf">else</span> <span class="st">'no order'</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>        <span class="cf">end</span> <span class="kw">as</span> retention_group,</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>        <span class="fu">count</span>(<span class="kw">distinct</span> CustomerKey) <span class="kw">as</span> num_customers ,</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>        <span class="fu">sum</span>(revenue) <span class="kw">as</span> total_revenue</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>    <span class="kw">from</span> customer_info</span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>    <span class="kw">group</span> <span class="kw">by</span> </span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>        <span class="cf">case</span> </span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>            <span class="cf">when</span> num_orders <span class="op">&gt;</span> <span class="dv">1</span> <span class="cf">then</span> <span class="st">'repeat-buyers'</span> </span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>            <span class="cf">when</span> num_orders <span class="op">=</span> <span class="dv">1</span> <span class="cf">then</span> <span class="st">'one-and-done'</span></span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>            <span class="cf">else</span> <span class="st">'no order'</span></span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>        <span class="cf">end</span></span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a><span class="kw">select</span></span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>    retention_group,</span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>    num_customers,</span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>    total_revenue,</span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>    <span class="fu">cast</span>(num_customers <span class="op">*</span> <span class="fl">1.0</span> <span class="op">/</span> <span class="fu">nullif</span>(<span class="fu">sum</span>(num_customers) <span class="kw">over</span> (),<span class="dv">0</span>) <span class="kw">as</span> <span class="dt">decimal</span>(<span class="dv">10</span>,<span class="dv">3</span>)) </span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a>        <span class="kw">as</span> retention_rate_pct</span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a><span class="kw">from</span> retention_groups</span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a><span class="kw">order</span> <span class="kw">by</span></span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>    total_revenue <span class="kw">desc</span>;</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<p><strong>Results:</strong></p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>retention_group</th>
+<th>num_customers</th>
+<th>total_revenue</th>
+<th>retention_rate_pct</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>repeat-buyers</td>
+<td>6865</td>
+<td>22610711.7164</td>
+<td>0.371</td>
+</tr>
+<tr class="even">
+<td>one-and-done</td>
+<td>11619</td>
+<td>6747965.5043</td>
+<td>0.629</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Insights:</strong></p>
+<ul>
+<li>The majority of customers (62.9%) are “One-and-Done” buyers, meaning they have made only one purchase, while 37.1% of customers are “Repeat Buyers” who have made more than one purchase. This indicates that a significant portion of the customer base consists of customers who do not return for additional purchases, which may suggest that there are opportunities to improve customer retention and encourage repeat business.</li>
+<li>Despite being a smaller percentage of the customer base, “Repeat Buyers” contribute a significantly higher total revenue compared to “One-and-Done” buyers. This suggests that “Repeat Buyers” are more valuable to the company in terms of revenue generation, and efforts to increase the retention rate and convert “One-and-Done” buyers into “Repeat Buyers” could have a substantial impact on overall revenue.</li>
+<li>The retention rate percentage indicates that there is room for improvement in customer retention, as a large portion of customers are not returning for additional purchases. The company may want to consider implementing strategies such as loyalty programs, personalized marketing, or improved customer service to encourage repeat purchases and increase the retention rate, ultimately driving more revenue from the existing customer base.</li>
+</ul>
+</section>
+</section>
+<section id="conclusion" class="level1">
+<h1>Conclusion</h1>
+<p>In this domain we obtained the following key insights:</p>
+<ul>
+<li>Initially, we analyzed the purchasing behavior of customers segmented by education and income. We have found out that customers with mid-level income and higher education levels (Bachelor’s and Graduate Degrees) contribute the most to the overall revenue, indicating that this segment is a key demographic for the company.</li>
+<li>Then, we considered the effect of commmute distance and vehicle ownerships on the purchasing behavior of customers. We have clearly found out that the customers with short distance and no car are our main revenue drivers. That’s completely logical as they need bikes for commuting short distances, so they prefer purchasing bikes from our company.</li>
+<li>Moreover, we analyzed the order volume, lifetime value and retention rate of the <em>whale</em> customers - the customers that are in the top 100 based on the money spent for our products. We have found out that there is not a straight pattern among these as some of them purchase frequently but some purchase less. We should aim to make them more loyal and hence our main targeted customers are those in this case.</li>
+<li>Next, we analyzed the generational spend distribution by segmenting customers based on their age, gender and marital status. We have found out that the 36-45 age group, particularly single and married customers, is a key demographic for the company in terms of revenue generation. Marketing strategies should be tailored to target this age group effectively, while also considering the preferences and needs of other age groups to maximize overall revenue.</li>
+<li>Finally, we analyzed the customer retention rate by categorizing customers into “One-and-Done” and “Repeat Buyers”. We have found out that the majority of customers are “One-and-Done” buyers, but “Repeat Buyers” contribute significantly higher total revenue. This indicates that there are opportunities to improve customer retention and encourage repeat business, which could have a substantial impact on overall revenue.</li>
+</ul>
+<p>In the next section, we will analyze our products and determine which products are the best sellers, which products have the highest profit margins, and how product performance varies across different customer segments. This analysis will help us optimize our product offerings and marketing strategies to maximize revenue and profitability.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

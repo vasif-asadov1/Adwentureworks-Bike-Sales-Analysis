@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Data Preparation – Vasif Asadov | AdventureWorks Bike Sales Analysis</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./assets/favicon.ico" rel="icon">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark-0cda25dcbb8fe09c7138904322940710.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-095c5612e4422d114998b098e0e10f6c.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="dark">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+</head>
+
+<body class="nav-sidebar docked nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">Vasif Asadov | AdventureWorks Bike Sales Analysis</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="./index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">AdventureWorks Bike Sales</li><li class="breadcrumb-item"><a href="./01_data_preparation.html">Data Preparation</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">AdventureWorks Bike Sales</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+ <span class="menu-text">00_problem_description.qmd</span>
+  </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./01_data_preparation.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Data Preparation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./02_macro_performance.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Macro Performance Analysis</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./03_customer_analysis.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Customer Segmentation Analysis</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./04_performance_analysis.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Product Profit Analysis</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./05_sales_reasons.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Sales Reasons Analysis</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./06_regional_analysis.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Regional Sales Analysis</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./07_executive_dashboard.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Executive Dashboard</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#data-ingestion" id="toc-data-ingestion" class="nav-link active" data-scroll-target="#data-ingestion">Data Ingestion</a></li>
+  <li><a href="#data-cleaning" id="toc-data-cleaning" class="nav-link" data-scroll-target="#data-cleaning">Data Cleaning</a>
+  <ul class="collapse">
+  <li><a href="#customer-dimension-table" id="toc-customer-dimension-table" class="nav-link" data-scroll-target="#customer-dimension-table">Customer Dimension Table</a></li>
+  <li><a href="#geography-dimension-table" id="toc-geography-dimension-table" class="nav-link" data-scroll-target="#geography-dimension-table">Geography Dimension Table</a></li>
+  <li><a href="#product-dimension-table" id="toc-product-dimension-table" class="nav-link" data-scroll-target="#product-dimension-table">Product Dimension Table</a></li>
+  <li><a href="#other-tables" id="toc-other-tables" class="nav-link" data-scroll-target="#other-tables">Other Tables</a></li>
+  </ul></li>
+  <li><a href="#data-modelling" id="toc-data-modelling" class="nav-link" data-scroll-target="#data-modelling">Data Modelling</a></li>
+  <li><a href="#business-questions" id="toc-business-questions" class="nav-link" data-scroll-target="#business-questions">Business Questions</a></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">Conclusion</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">AdventureWorks Bike Sales</li><li class="breadcrumb-item"><a href="./01_data_preparation.html">Data Preparation</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Data Preparation</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="data-ingestion" class="level1">
+<h1>Data Ingestion</h1>
+<p>The first step in our analysis process is data ingestion, where we will load the sales data into our analysis environment. The sales data for Adventureworks is provided in a .bak file, which is a backup file format used by SQL Server. We will restore this .bak file to our SQL Server instance running through Docker, and then connect to the database using Dbeaver to access the sales data for analysis.</p>
+<p>Firstly, as I am using Docker to run SQL Server, I should activate the Docker container of SQL Server using the following commands in the terminal:</p>
+<p>Note: I am running Docker on a Linux system - Fedora Linux, so I need to use <code>sudo</code> to run the Docker commands. If you are using Docker on Windows or Mac, you will not need to use <code>sudo</code>.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> systemctl start docker <span class="co"># Start the Docker service</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> docker start sqlserver <span class="co"># Start the SQL Server container</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> docker ps <span class="co"># Check if the container is running</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>After starting the Docker container, we will restore the .bak file to the SQL Server instance. After downloading the .bak file from the provided link, we should place it in a directory that is accessible to the Docker container.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> cp AdventureWorksDW2022.bak 80ac0912ffb9:/var/opt/mssql/data/AdventureWorksDW2022.bak <span class="co"># Copy the .bak file to the Docker container</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> exec <span class="at">-it</span> 80ac0912ffb9 ls <span class="at">-lh</span> /var/opt/mssql/data/AdventureWorksDW2022.bak <span class="co"># Verify that the file has been copied successfully</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Now we are ready to restore the .bak file to the SQL Server instance. We can do this using Dbeaver by connecting to the SQL Server instance and running the following SQL command:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>RESTORE FILELISTONLY </span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> DISK <span class="op">=</span> <span class="st">'/var/opt/mssql/data/AdventureWorksDW2022.bak'</span>;</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>This will give us the logical file names of the data and log files contained in the .bak file. We will use these logical file names to restore the database to our SQL Server instance.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>RESTORE <span class="kw">DATABASE</span> [AdventureWorksDW2022]</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> DISK <span class="op">=</span> <span class="st">'/var/opt/mssql/data/AdventureWorksDW2022.bak'</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="kw">WITH</span> </span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">MOVE</span> <span class="st">'AdventureWorksDW2022'</span> <span class="kw">TO</span> <span class="st">'/var/opt/mssql/data/AdventureWorksDW2022.mdf'</span>,</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">MOVE</span> <span class="st">'AdventureWorksDW2022_log'</span> <span class="kw">TO</span> <span class="st">'/var/opt/mssql/data/AdventureWorksDW2022_log.ldf'</span>,</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">RECOVERY</span>, </span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">REPLACE</span>;</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Finally, we will see the restored database in Dbeaver and we can start analyzing the sales data using SQL queries. We will connect to the AdventureWorksDW2022 database in Dbeaver and explore the tables and data to understand the structure of the sales data and prepare it for analysis.</p>
+</section>
+<section id="data-cleaning" class="level1">
+<h1>Data Cleaning</h1>
+<p>After successfully restoring the sales data to our SQL Server instance, the next step in our analysis process is data cleaning. Data cleaning is a crucial step in any data analysis project, as it ensures that the data we are working with is accurate, consistent, and ready for analysis.</p>
+<p>Firstly, we should define the database and schema we will be working with in our SQL queries. In this case, we will be working with the <code>AdventureWorksDW2022</code> database and the <code>dbo</code> schema, which contains the sales data we need for our analysis.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">use</span> AdventureWorksDW2022; <span class="co">-- Set the database context to AdventureWorksDW2022</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Restored AdventureWorksDW2022 database contains a lot of tables, representing both Business to Customer (B2C) and Business to Business (B2B) sales data. B2C sales data shows the sales made directly to individual customers, while B2B sales data shows the sales made to other markets-sellers. For our analysis, we will focus on the B2C sales data, which is more relevant for understanding customer behavior and preferences. Therefore, we should identify the tables that contain B2C sales data and focus our cleaning efforts on those tables.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">drop</span> <span class="kw">table</span> <span class="cf">if</span> <span class="kw">exists</span> AdventureWorksDWBuildVersion,DatabaseLog,DimAccount,DimOrganization,</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>DimScenario,FactAdditionalInternationalProductDescription,FactCallCenter,FactCurrencyRate,</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>FactFinance,FactSalesQuota,FactSurveyResponse,NewFactCurrencyRate,ProspectiveBuyer; FactResellerSales,FactResellerSalesReason,FactResellerSalesSummary</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>go</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>After running the above SQL command, we will encounter the error message which indicates that the tables can not be dropped because they are referenced by foreign key constraints. This is because there are relationships between the tables in the database, and dropping one table may affect the integrity of the data in other tables. To resolve this issue, we should disable/remove all the foreign key constraints in the database before dropping the tables. After dropping the unnecessary tables, we can re-enable the foreign key constraints to maintain data integrity.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- Disable all foreign key constraints in the database</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="kw">DECLARE</span> @sql <span class="dt">NVARCHAR</span>(<span class="fu">MAX</span>) <span class="op">=</span> <span class="st">''</span>; <span class="co">-- Initialize an empty string to hold the SQL commands to disable all foreign key constraints</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> @sql <span class="op">+=</span> </span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="st">'ALTER TABLE ['</span> <span class="op">+</span> OBJECT_SCHEMA_NAME(parent_object_id) <span class="op">+</span> <span class="st">'].['</span> </span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="op">+</span> OBJECT_NAME(parent_object_id) <span class="op">+</span> <span class="st">'] DROP CONSTRAINT ['</span> </span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="op">+</span> name <span class="op">+</span> <span class="st">'];'</span> <span class="op">+</span> <span class="dt">CHAR</span>(<span class="dv">13</span>) <span class="co">-- Append the SQL command to disable the foreign key constraint to the @sql variable</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> sys.foreign_keys; <span class="co">-- Query the sys.foreign_keys system catalog view to get the names of all foreign key constraints in the database and append the SQL command to disable each constraint to the @sql variable</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="kw">EXEC</span> sp_executesql @sql; <span class="co">-- Execute the SQL commands to disable all foreign key constraints in the database</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Now if you run the previous SQL command to drop the unnecessary tables, you will see that the tables are dropped successfully without any errors. After dropping the unnecessary tables, we can now analyze each table individually to identify the necessary columns for our analysis and remove any unnecessary columns that are not relevant to our analysis. This will help us to focus on the relevant data and make our analysis more efficient.</p>
+<section id="customer-dimension-table" class="level2">
+<h2 class="anchored" data-anchor-id="customer-dimension-table">Customer Dimension Table</h2>
+<p>Firstly, analyze the first table, which is the <code>DimCustomer</code> table. This table contains information about the customers, such as their demographics and contact information. We will identify the necessary columns for our analysis and remove any unnecessary columns that are not relevant to our analysis.</p>
+<p>Firstly, we will look at the structure of the <code>DimCustomer</code> table to understand the columns it contains and their data types. We can do this by running the following SQL command:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">select</span> top <span class="dv">10</span> <span class="op">*</span> <span class="kw">from</span> dimcustomer; <span class="co">-- View the first 10 rows of the DimCustomer table to understand its structure and the columns it contains</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The raw tables will not be given here visually, since they are not cleaned yet, and will make the webpage look messy. I will clean the tables in the next step and show the cleaned tables in the next section. You can see the raw - original, uncleaned tables by following the Google Spreadsheet link given in the sources section of this project.</p>
+<p>After analyzing the first 10 rows of the <code>DimCustomer</code> table, we can identify the necessary columns for our analysis and remove any unnecessary columns that are not relevant to our analysis. I dropped the following columns from the <code>DimCustomer</code> table:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">alter</span> <span class="kw">table</span> dimcustomer </span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="kw">drop</span> <span class="kw">column</span> title, middlename,namestyle, suffix, emailaddress, </span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>spanisheducation, frencheducation, spanishoccupation, frenchoccupation,</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>addressline1, addressline2, phone;</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>After running the above SQL command, we will have a cleaned <code>DimCustomer</code> table that contains only the necessary columns for our analysis.</p>
+</section>
+<section id="geography-dimension-table" class="level2">
+<h2 class="anchored" data-anchor-id="geography-dimension-table">Geography Dimension Table</h2>
+<p>Next, we will analyze the <code>DimGeography</code> table, which contains information about the geographical locations of the customers, such as their city, state, and country. We will identify the necessary columns for our analysis and remove any unnecessary columns that are not relevant to our analysis.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">alter</span> <span class="kw">table</span> dimgeography</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="kw">drop</span> <span class="kw">column</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>spanishcountryregionname, frenchcountryregionname;</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="product-dimension-table" class="level2">
+<h2 class="anchored" data-anchor-id="product-dimension-table">Product Dimension Table</h2>
+<p>Next, we will analyze the <code>DimProduct</code> table, which contains information about the products that were sold, such as their names, categories, and prices. We will identify the necessary columns for our analysis and remove any unnecessary columns that are not relevant to our analysis.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">alter</span> <span class="kw">table</span> dimproduct</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="kw">drop</span> <span class="kw">column</span> </span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>englishdescription, spanishproductname, frenchproductname, color, safetystocklevel,</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>reorderpoint, largephoto, frenchdescription, chinesedescription, arabicdescription,</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>hebrewdescription, thaidescription, germandescription, japanesedescription, turkishdescription;</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="other-tables" class="level2">
+<h2 class="anchored" data-anchor-id="other-tables">Other Tables</h2>
+<p>We will also take all other tables into consideration and analyze them individually to identify the necessary columns for our analysis and remove any unnecessary columns that are not relevant to our analysis. I am giving the full SQL command to clean all those tables here.</p>
+<details>
+<summary>
+Show SQL Code
+</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- DATE DIMENSION</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="kw">alter</span> <span class="kw">table</span> dimdate</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="kw">drop</span> <span class="kw">column</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>spanishdaynameofweek, frenchdaynameofweek, spanishmonthname, frenchmonthname;</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="co">-- EMPLOYEES</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="kw">alter</span> <span class="kw">table</span> DimEmployee</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="kw">drop</span> <span class="kw">column</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>parentemployeenationalidalternatekey,</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>middlename, namestyle, loginid, emailaddress, phone, </span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>emergencycontactname, emergencycontactphone, employeephoto;</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a><span class="co">-- PRODUCT CATEGORY</span></span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a><span class="kw">alter</span> <span class="kw">table</span> dimproductcategory </span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a><span class="kw">drop</span> <span class="kw">column</span></span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>spanishproductcategoryname, frenchproductcategoryname;</span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a><span class="co">-- PRODUCT SUBCATEGORY</span></span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a><span class="kw">alter</span> <span class="kw">table</span> DimProductSubcategory </span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a><span class="kw">drop</span> <span class="kw">column</span></span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>spanishproductsubcategoryname, frenchproductsubcategoryname;</span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a><span class="co">-- SALES TERRITORY</span></span>
+<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a><span class="kw">alter</span> <span class="kw">table</span> DimSalesTerritory </span>
+<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a><span class="kw">drop</span> <span class="kw">column</span></span>
+<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a>salesterritoryimage;</span>
+<span id="cb12-27"><a href="#cb12-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-28"><a href="#cb12-28" aria-hidden="true" tabindex="-1"></a><span class="co">-- FACT INTERNET SALES</span></span>
+<span id="cb12-29"><a href="#cb12-29" aria-hidden="true" tabindex="-1"></a><span class="kw">alter</span> <span class="kw">table</span> FactInternetSales </span>
+<span id="cb12-30"><a href="#cb12-30" aria-hidden="true" tabindex="-1"></a><span class="kw">drop</span> <span class="kw">column</span></span>
+<span id="cb12-31"><a href="#cb12-31" aria-hidden="true" tabindex="-1"></a>promotionkey, carriertrackingnumber, customerponumber;</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<p>After running the above SQL commands, we will have cleaned tables that contain only the necessary columns for our analysis. This will help us to focus on the relevant data and make our analysis more efficient. We can now proceed to the next step of our analysis process, which is data modelling, where we will create foreign key relationships between the tables to create a star schema for our analysis.</p>
+</section>
+</section>
+<section id="data-modelling" class="level1">
+<h1>Data Modelling</h1>
+<p>Now we should create foreign key relationships between the tables to create a star schema for our analysis. A star schema is a type of database schema that is commonly used in data warehousing and business intelligence applications. It consists of a central fact table that contains the measures of interest, and several dimension tables that contain the attributes related to those measures.</p>
+<p>In our database, the <code>FactInternetSales</code> table will serve as our central fact table, which contains the measures of interest such as sales amount, quantity, and discount. The dimension tables that we will use in our star schema include <code>DimCustomer</code>, <code>DimGeography</code>, <code>DimProduct</code>, <code>DimDate</code>, <code>DimEmployee</code>, <code>DimProductCategory</code>, <code>DimProductSubcategory</code>, and <code>DimSalesTerritory</code>.</p>
+<p>Creating a foreign key relationship between the fact table and the dimension tables will allow us to join the tables together and perform analysis on the sales data based on the attributes in the dimension tables. It allows us to efficient ly query the data and perform aggregations and calculations based on the measures in the fact table and the attributes in the dimension tables. Creationg a foreign key is simply done by running the following SQL command:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="kw">alter</span> <span class="kw">table</span> factinternetsales</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="kw">add</span> <span class="kw">constraint</span> FK_InternetSales_Products</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="kw">foreign</span> <span class="kw">key</span> (ProductKey)</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="kw">references</span> dimproduct(ProductKey);</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>With the above code, we have created a foreign key called <code>FK_InternetSales_Products</code> that references the <code>ProductKey</code> column in the <code>dimproduct</code> table from the <code>ProductKey</code> column in the <code>factinternetsales</code> table. We will repeat this process to create foreign key relationships between the fact table and all the dimension tables to complete our star schema for analysis.</p>
+<p>For simplicity, I am giving the full SQL command to create all the necessary foreign key relationships between the fact table and the dimension tables here, as it is a straightforward process and does not require any complex logic.</p>
+<details>
+<summary>
+Show SQL Code
+</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- internetsales and calendar (orderdate, duedate, shipdate)</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="kw">alter</span> <span class="kw">table</span> factinternetsales</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="kw">add</span> <span class="kw">constraint</span> FK_InternetSales_Date_Orderdate</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="kw">foreign</span> <span class="kw">key</span> (orderdatekey)</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="kw">references</span> dimdate(datekey);</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>go</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="kw">alter</span> <span class="kw">table</span> factinternetsales</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="kw">add</span> <span class="kw">constraint</span> FK_InternetSales_Date_Duedate</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a><span class="kw">foreign</span> <span class="kw">key</span> (duedatekey)</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a><span class="kw">references</span> dimdate(datekey);</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>go</span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a><span class="kw">alter</span> <span class="kw">table</span> factinternetsales</span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a><span class="kw">add</span> <span class="kw">constraint</span> FK_InternetSales_Date_Shipdate</span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a><span class="kw">foreign</span> <span class="kw">key</span> (shipdatekey)</span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a><span class="kw">references</span> dimdate(datekey);</span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>go</span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a><span class="co">-- internetsales and customers</span></span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a><span class="kw">alter</span> <span class="kw">table</span> factinternetsales</span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a><span class="kw">add</span> <span class="kw">constraint</span> FK_InternetSales_Customers</span>
+<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a><span class="kw">foreign</span> <span class="kw">key</span> (customerkey)</span>
+<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a><span class="kw">references</span> dimcustomer(customerkey);</span>
+<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a>go</span>
+<span id="cb14-26"><a href="#cb14-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-27"><a href="#cb14-27" aria-hidden="true" tabindex="-1"></a><span class="co">-- internetsales and currency</span></span>
+<span id="cb14-28"><a href="#cb14-28" aria-hidden="true" tabindex="-1"></a><span class="kw">alter</span> <span class="kw">table</span> factinternetsales</span>
+<span id="cb14-29"><a href="#cb14-29" aria-hidden="true" tabindex="-1"></a><span class="kw">add</span> <span class="kw">constraint</span> FK_InternetSales_Currency</span>
+<span id="cb14-30"><a href="#cb14-30" aria-hidden="true" tabindex="-1"></a><span class="kw">foreign</span> <span class="kw">key</span> (currencykey)</span>
+<span id="cb14-31"><a href="#cb14-31" aria-hidden="true" tabindex="-1"></a><span class="kw">references</span> dimcurrency(currencykey);</span>
+<span id="cb14-32"><a href="#cb14-32" aria-hidden="true" tabindex="-1"></a>go</span>
+<span id="cb14-33"><a href="#cb14-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-34"><a href="#cb14-34" aria-hidden="true" tabindex="-1"></a><span class="co">-- internetsales and salesterritory</span></span>
+<span id="cb14-35"><a href="#cb14-35" aria-hidden="true" tabindex="-1"></a><span class="kw">alter</span> <span class="kw">table</span> factinternetsales</span>
+<span id="cb14-36"><a href="#cb14-36" aria-hidden="true" tabindex="-1"></a><span class="kw">add</span> <span class="kw">constraint</span> FK_InternetSales_SalesTerritory</span>
+<span id="cb14-37"><a href="#cb14-37" aria-hidden="true" tabindex="-1"></a><span class="kw">foreign</span> <span class="kw">key</span> (salesterritorykey)</span>
+<span id="cb14-38"><a href="#cb14-38" aria-hidden="true" tabindex="-1"></a><span class="kw">references</span> dimsalesterritory(salesterritorykey);</span>
+<span id="cb14-39"><a href="#cb14-39" aria-hidden="true" tabindex="-1"></a>go</span>
+<span id="cb14-40"><a href="#cb14-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-41"><a href="#cb14-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-42"><a href="#cb14-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-43"><a href="#cb14-43" aria-hidden="true" tabindex="-1"></a><span class="co">-- dimcustomer and dimgeography</span></span>
+<span id="cb14-44"><a href="#cb14-44" aria-hidden="true" tabindex="-1"></a><span class="kw">alter</span> <span class="kw">table</span> dimcustomer</span>
+<span id="cb14-45"><a href="#cb14-45" aria-hidden="true" tabindex="-1"></a><span class="kw">add</span> <span class="kw">constraint</span> FK_Customer_Geography</span>
+<span id="cb14-46"><a href="#cb14-46" aria-hidden="true" tabindex="-1"></a><span class="kw">foreign</span> <span class="kw">key</span> (geographykey)</span>
+<span id="cb14-47"><a href="#cb14-47" aria-hidden="true" tabindex="-1"></a><span class="kw">references</span> dimgeography(geographykey);</span>
+<span id="cb14-48"><a href="#cb14-48" aria-hidden="true" tabindex="-1"></a>go</span>
+<span id="cb14-49"><a href="#cb14-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-50"><a href="#cb14-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-51"><a href="#cb14-51" aria-hidden="true" tabindex="-1"></a><span class="co">-- dimemployee and dimsalesterritory</span></span>
+<span id="cb14-52"><a href="#cb14-52" aria-hidden="true" tabindex="-1"></a><span class="kw">alter</span> <span class="kw">table</span> dimemployee</span>
+<span id="cb14-53"><a href="#cb14-53" aria-hidden="true" tabindex="-1"></a><span class="kw">add</span> <span class="kw">constraint</span> FK_Employee_SalesTerritory</span>
+<span id="cb14-54"><a href="#cb14-54" aria-hidden="true" tabindex="-1"></a><span class="kw">foreign</span> <span class="kw">key</span> (salesterritorykey)</span>
+<span id="cb14-55"><a href="#cb14-55" aria-hidden="true" tabindex="-1"></a><span class="kw">references</span> dimsalesterritory(salesterritorykey);</span>
+<span id="cb14-56"><a href="#cb14-56" aria-hidden="true" tabindex="-1"></a>go</span>
+<span id="cb14-57"><a href="#cb14-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-58"><a href="#cb14-58" aria-hidden="true" tabindex="-1"></a><span class="co">-- dimgeography and dimsalesterritory</span></span>
+<span id="cb14-59"><a href="#cb14-59" aria-hidden="true" tabindex="-1"></a><span class="kw">alter</span> <span class="kw">table</span> dimgeography</span>
+<span id="cb14-60"><a href="#cb14-60" aria-hidden="true" tabindex="-1"></a><span class="kw">add</span> <span class="kw">constraint</span> FK_Geography_SalesTerritory</span>
+<span id="cb14-61"><a href="#cb14-61" aria-hidden="true" tabindex="-1"></a><span class="kw">foreign</span> <span class="kw">key</span> (salesterritorykey)</span>
+<span id="cb14-62"><a href="#cb14-62" aria-hidden="true" tabindex="-1"></a><span class="kw">references</span> dimsalesterritory(salesterritorykey);</span>
+<span id="cb14-63"><a href="#cb14-63" aria-hidden="true" tabindex="-1"></a>go</span>
+<span id="cb14-64"><a href="#cb14-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-65"><a href="#cb14-65" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-66"><a href="#cb14-66" aria-hidden="true" tabindex="-1"></a><span class="co">-- dimproduct and dimproductsubcategory</span></span>
+<span id="cb14-67"><a href="#cb14-67" aria-hidden="true" tabindex="-1"></a><span class="kw">alter</span> <span class="kw">table</span> dimproduct</span>
+<span id="cb14-68"><a href="#cb14-68" aria-hidden="true" tabindex="-1"></a><span class="kw">add</span> <span class="kw">constraint</span> FK_Product_ProductSubcategory</span>
+<span id="cb14-69"><a href="#cb14-69" aria-hidden="true" tabindex="-1"></a><span class="kw">foreign</span> <span class="kw">key</span> (productsubcategorykey)</span>
+<span id="cb14-70"><a href="#cb14-70" aria-hidden="true" tabindex="-1"></a><span class="kw">references</span> dimproductsubcategory(productsubcategorykey);</span>
+<span id="cb14-71"><a href="#cb14-71" aria-hidden="true" tabindex="-1"></a>go</span>
+<span id="cb14-72"><a href="#cb14-72" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-73"><a href="#cb14-73" aria-hidden="true" tabindex="-1"></a><span class="co">-- dimproductsubcategory and dimproductcategory</span></span>
+<span id="cb14-74"><a href="#cb14-74" aria-hidden="true" tabindex="-1"></a><span class="kw">alter</span> <span class="kw">table</span> dimproductsubcategory</span>
+<span id="cb14-75"><a href="#cb14-75" aria-hidden="true" tabindex="-1"></a><span class="kw">add</span> <span class="kw">constraint</span> FK_ProductSubcategory_ProductCategory</span>
+<span id="cb14-76"><a href="#cb14-76" aria-hidden="true" tabindex="-1"></a><span class="kw">foreign</span> <span class="kw">key</span> (productcategorykey)</span>
+<span id="cb14-77"><a href="#cb14-77" aria-hidden="true" tabindex="-1"></a><span class="kw">references</span> dimproductcategory(productcategorykey);</span>
+<span id="cb14-78"><a href="#cb14-78" aria-hidden="true" tabindex="-1"></a>go</span>
+<span id="cb14-79"><a href="#cb14-79" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-80"><a href="#cb14-80" aria-hidden="true" tabindex="-1"></a><span class="co">-- factinternetsalesreason and salesreason</span></span>
+<span id="cb14-81"><a href="#cb14-81" aria-hidden="true" tabindex="-1"></a><span class="kw">alter</span> <span class="kw">table</span> factinternetsalesreason</span>
+<span id="cb14-82"><a href="#cb14-82" aria-hidden="true" tabindex="-1"></a><span class="kw">add</span> <span class="kw">constraint</span> FK_InternetSalesReason_SalesReason</span>
+<span id="cb14-83"><a href="#cb14-83" aria-hidden="true" tabindex="-1"></a><span class="kw">foreign</span> <span class="kw">key</span> (salesreasonkey)</span>
+<span id="cb14-84"><a href="#cb14-84" aria-hidden="true" tabindex="-1"></a><span class="kw">references</span> salesreason(salesreasonkey);</span>
+<span id="cb14-85"><a href="#cb14-85" aria-hidden="true" tabindex="-1"></a>go</span>
+<span id="cb14-86"><a href="#cb14-86" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-87"><a href="#cb14-87" aria-hidden="true" tabindex="-1"></a><span class="co">-- FACTPRODUCTINVENTORY - another fact table that contains inventory data, which can be used for analysis related to inventory levels and stock management. We will create foreign key relationships between the `factproductinventory` table and the relevant dimension tables to integrate the inventory data into our star schema for analysis.</span></span>
+<span id="cb14-88"><a href="#cb14-88" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-89"><a href="#cb14-89" aria-hidden="true" tabindex="-1"></a><span class="co">-- factproductinventory and dimproduct</span></span>
+<span id="cb14-90"><a href="#cb14-90" aria-hidden="true" tabindex="-1"></a><span class="kw">alter</span> <span class="kw">table</span> factproductinventory</span>
+<span id="cb14-91"><a href="#cb14-91" aria-hidden="true" tabindex="-1"></a><span class="kw">add</span> <span class="kw">constraint</span> FK_ProductInventory_Products</span>
+<span id="cb14-92"><a href="#cb14-92" aria-hidden="true" tabindex="-1"></a><span class="kw">foreign</span> <span class="kw">key</span> (productkey)</span>
+<span id="cb14-93"><a href="#cb14-93" aria-hidden="true" tabindex="-1"></a><span class="kw">references</span> dimproduct(productkey);</span>
+<span id="cb14-94"><a href="#cb14-94" aria-hidden="true" tabindex="-1"></a>go</span>
+<span id="cb14-95"><a href="#cb14-95" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-96"><a href="#cb14-96" aria-hidden="true" tabindex="-1"></a><span class="co">-- factproductinventory and dimdate</span></span>
+<span id="cb14-97"><a href="#cb14-97" aria-hidden="true" tabindex="-1"></a><span class="kw">alter</span> <span class="kw">table</span> factproductinventory</span>
+<span id="cb14-98"><a href="#cb14-98" aria-hidden="true" tabindex="-1"></a><span class="kw">add</span> <span class="kw">constraint</span> FK_ProductInventory_Date</span>
+<span id="cb14-99"><a href="#cb14-99" aria-hidden="true" tabindex="-1"></a><span class="kw">foreign</span> <span class="kw">key</span> (datekey)</span>
+<span id="cb14-100"><a href="#cb14-100" aria-hidden="true" tabindex="-1"></a><span class="kw">references</span> DimDate(datekey);</span>
+<span id="cb14-101"><a href="#cb14-101" aria-hidden="true" tabindex="-1"></a>go</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<p>With the above SQL commands, we have created all the necessary foreign key relationships between the fact table and the dimension tables to complete our star schema for analysis. This will allow us to efficiently query the data and perform aggregations and calculations based on the measures in the fact table and the attributes in the dimension tables.</p>
+<p>For simplicity and readilibity, I have changed the names of the tables and columns to more user-friendly names. For example, I have changed the name of the <code>DimCustomer</code> table to <code>Customers</code>, <code>DimProduct</code> table to <code>Products</code>, and <code>DimDate</code> table to <code>Calendar</code>. I have also changed the names of the columns in the tables to more user-friendly names. This will make it easier for us to write SQL queries and understand the data when we perform our analysis in the next step.</p>
+<p>By writing the following SQL commands, we can rename the tables and columns to more user-friendly names:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- Rename tables</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="kw">exec</span> sp_rename <span class="st">'DimCustomer'</span>, <span class="st">'Customers'</span>;</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="kw">exec</span> sp_rename <span class="st">'DimProduct'</span>, <span class="st">'Products'</span>;</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="kw">exec</span> sp_rename <span class="st">'DimDate'</span>, <span class="st">'Calendar'</span>;</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="kw">exec</span> sp_rename <span class="st">'DimEmployee'</span>, <span class="st">'Employees'</span>;</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="kw">exec</span> sp_rename <span class="st">'DimProductCategory'</span>, <span class="st">'ProductCategory'</span>;</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="kw">exec</span> sp_rename <span class="st">'DimProductSubcategory'</span>, <span class="st">'ProductSubcategory'</span>;</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="kw">exec</span> sp_rename <span class="st">'DimSalesTerritory'</span>, <span class="st">'SalesTerritory'</span>;</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="business-questions" class="level1">
+<h1>Business Questions</h1>
+<p>To perform our deep analysis, we need to define some business questions that will guide our analysis and help us to focus on the relevant data. Business questions are specific questions that we want to answer through our analysis, and they should be based on the goals and objectives of the business. I used LLM and AI tools to help me generate real world business questions that are relevant to the sales data we have in our database. These business questions will help us to understand customer behavior, identify trends and patterns in the sales data, and make informed business decisions based on our analysis.</p>
+<p>I will note all questions here and then in the next pages, I will answer each question one by one using SQL queries and data analysis techniques.</p>
+<p><code>1.  What is the overall Gross Profit and Gross Margin for the B2C channel, and how has it trended year over year?</code></p>
+<p><em>Business Insight</em>: This question helps us to understand the profitability of the B2C channel and how it has changed over time. <strong>Gross Profit</strong> and <strong>Gross Margin</strong> are key financial metrics that indicate the profitability of sales, and analyzing their trends can provide insights into the performance of the B2C channel and help identify areas for improvement.</p>
+<p><code>2. What is the Year-over-Year (YoY) revenue growth rate for each month?</code></p>
+<p><em>Business Insight</em>: This question helps us to understand the growth rate of revenue for each month and identify any seasonal trends or patterns in the sales data. Analyzing YoY revenue growth can provide insights into the performance of the business and help identify opportunities for growth and improvement.</p>
+<p><code>3. What is the monthly seasonality of our sales, and which quarter  drives the most revenue historically?</code></p>
+<p><em>Business Insight</em>: This question helps us to understand the seasonal patterns in our sales data and identify which quarter drives the most revenue historically. Analyzing seasonality can provide insights into customer behavior and help us to optimize our marketing and sales strategies to capitalize on peak sales periods.</p>
+<p><code>4. What are the top 10 products by revenue, and how has their performance changed over time?</code></p>
+<p><em>Business Insight</em>: This question helps us to identify the top-performing products in terms of revenue and analyze how their performance has changed over time. Understanding which products are driving the most revenue can help us to focus our marketing and sales efforts on those products and identify opportunities for growth and improvement.</p>
+<p><code>5. What is the Year-to-Date (YTD) cumulative revenue for the most recent fully completed year?</code></p>
+<p><em>Business Insight</em>: This question helps us to understand the cumulative revenue for the most recent fully completed year and compare it to previous years. Analyzing YTD cumulative revenue can provide insights into the overall performance of the business and help us to identify trends and patterns in our sales data.</p>
+<p><code>6. Which demographic segments (based on Income and Education) drive the highest overall revenue?</code></p>
+<p><em>Business Insight</em>: This question helps us to understand which demographic segments, based on income and education, are driving the highest overall revenue. Analyzing demographic segments can provide insights into customer behavior and preferences, and help us to tailor our marketing and sales strategies to target the most profitable customer segments.</p>
+<p><code>7. Does the customer's commute distance and vehicle ownership impact their lifetime value?</code></p>
+<p><em>Business Insight</em>: This question helps us to understand if the customer’s commute distance and vehicle ownership impact their lifetime value. Analyzing the relationship between commute distance and vehicle ownership with customer lifetime value can provide insights into customer behavior and preferences, and help us to identify opportunities for improving customer retention and increasing customer lifetime value.</p>
+<p><code>8. Who are our "Whales" (Top 100 Most Valuable Customers), and what is their purchasing frequency?</code></p>
+<p><em>Business Insight</em>: This question helps us to identify our “Whales”, which are the top 100 most valuable customers, and analyze their purchasing frequency. Understanding who our most valuable customers are and how frequently they make purchases can provide us with insights which may be helpful to tailor our marketing and sales strategies to retain these customers and encourage repeat purchases, ultimately increasing customer lifetime value and driving revenue growth.</p>
+<p><code>9. What is our generational spend distribution (Age Brackets)?</code></p>
+<p><em>Business Insight</em>: This question helps us to understand our generational spend distribution based on age brackets. Age can be an important factor in customer behavior and preferences, and analyzing our generational spend distribution can provide insights into which age groups are driving the most revenue. As a result, we can create targeted marketing and sales strategies for each age group to optimize our revenue and improve customer engagement.</p>
+<p><code>10. What is our Customer Retention Rate (One-and-Done vs. Repeat Buyers)?</code></p>
+<p>Customers are one-and-done if they made only one purchase and never returned, while repeat buyers are customers who made multiple purchases over time. Defining one-and-done customers and repeat buyers can help us to understand our customer retention rate and identify opportunities for improving customer retention. This will allow us why some customers are not returning and what we can do to encourage them to make repeat purchases, ultimately increasing customer lifetime value and driving revenue growth.</p>
+<p><code>11. Which product categories and subcategories drive the highest profit margins, and which are drag on profitability?</code></p>
+<p><em>Business Insight</em>: This question asks us to analyze profit margins which is a key financial metric that indicates the profitability of products. Profit margin is calculated as (Revenue - Cost) / Revenue, and it helps us to understand how much profit we are making on each product. By analyzing which product categories and subcategories drive the highest profit margins, we can identify which products are the most profitable and focus our marketing and sales efforts on those products. Conversely, by identifying which product categories and subcategories are a drag on profitability, we can identify opportunities for improvement, such as reducing costs or increasing prices, or putting promotions for those products to improve our overall profitability.</p>
+<p><code>12. What is the disparity between our "High Volume" products and our "High Value" products?</code></p>
+<p><em>Business Insight</em>: This question helps us to understand the disparity between our “High Volume” products, which are products that sell in large quantities but may have lower profit margins, and our “High Value” products, which are products that sell in smaller quantities but have higher profit margins. Analyzing the disparity between high volume and high value products can provide insights into our product mix and help us to optimize our inventory and marketing strategies to maximize revenue and profitability.</p>
+<p><code>13. What is our basket size distribution, and how frequently do customers buy multiple items in a single transaction?</code></p>
+<p><em>Business Insight</em>: Basket size distribution refers to the number of items that customers purchase in a single transaction. Analyzing our basket size distribution can provide insights into customer purchasing behavior and help us to identify opportunities for increasing our average order value. By understanding how frequently customers buy multiple items in a single transaction, we can create targeted marketing and sales strategies to encourage customers to add more items to their baskets, ultimately increasing revenue and profitability.</p>
+<p><code>14. Are there any "Dead Weight" products in our active catalog that have negligible sales in the most recent year?</code></p>
+<p><em>Business Insight</em>: “Dead Weight” products refer to products that are still active in our catalog but have negligible sales in the most recent year. Analyzing our product catalog to identify any dead weight products can help us to optimize our inventory and focus our marketing and sales efforts on products that are driving revenue. By identifying and potentially discontinuing dead weight products, we can reduce costs associated with inventory management and improve our overall profitability.</p>
+<p><code>15. How does product pricing tier affect consumer purchasing behavior?</code></p>
+<p><em>Business Insight</em>: Product pricing tiers mean that we have different price points for our products, such as low, medium, and high price tiers. Price tier is the price point at which a product is sold, and it can have a significant impact on consumer purchasing behavior. It shows directly how price-sensitive our customers are and how they respond to different price points. By analyzing how product pricing tier affects consumer purchasing behavior, we can gain insights into our customers’ price sensitivity and optimize our pricing strategy to maximize revenue and profitability. For example, if we find that customers are more likely to purchase products in the medium price tier, we can focus our marketing efforts on promoting those products and potentially adjust our pricing strategy to encourage more purchases in that tier.</p>
+<p><code>16. What are the primary psychological drivers (Sales Reasons) behind our B2C purchases?</code></p>
+<p><em>Business Insight</em>: Sales reasons refer to the primary psychological drivers that influence customers’ purchasing decisions. Analyzing the sales reasons behind our B2C purchases can provide insights into customer behavior and preferences, and help us to tailor our marketing and sales strategies to better meet the needs and desires of our customers. By understanding the primary psychological drivers behind our B2C purchases, we can create targeted marketing campaigns that resonate with our customers and encourage them to make purchases, ultimately increasing revenue and profitability.</p>
+<p><code>17. What percentage of our total B2C volume is driven by promotional discounts versus standard pricing?</code></p>
+<p><em>Business Insight</em>: This question helps us to understand the impact of promotional discounts on our B2C sales volume. By analyzing the percentage of our total B2C volume that is driven by promotional discounts versus standard pricing, we can gain insights into the effectiveness of our promotional strategies and how they influence customer purchasing behavior. This information can help us to optimize our promotional campaigns and pricing strategy to maximize revenue and profitability. For example, if we find that a significant portion of our sales volume is driven by promotional discounts, we may want to consider adjusting our pricing strategy or creating more targeted promotions to encourage customers to purchase at standard pricing, ultimately improving our profit margins.</p>
+<p><code>18. What is our Customer Lifetime Value (CLV) distribution, and how long does it take for a customer to reach their maximum value?</code></p>
+<p><em>Business Insight</em>: Customer Lifetime Value (CLV) is a key metric that estimates the total revenue a business can expect from a single customer over the course of their relationship. Analyzing our CLV distribution can provide insights into the value of our customers and help us to identify opportunities for improving customer retention and increasing customer lifetime value. By understanding how long it takes for a customer to reach their maximum value, we can create targeted marketing and sales strategies to encourage customers to make repeat purchases and increase their lifetime value, ultimately driving revenue growth and profitability.</p>
+<p><code>19. Do the primary sales drivers change depending on the Product Category?</code></p>
+<p><em>Business Insight</em>: This question helps us to understand if the primary sales drivers, which are the factors that influence customers’ purchasing decisions, change depending on the product category. Analyzing the primary sales drivers for different product categories can provide insights into customer behavior and preferences, and help us to tailor our marketing and sales strategies for each product category to better meet the needs and desires of our customers. By understanding if the primary sales drivers change depending on the product category, we can create more targeted marketing campaigns that resonate with our customers and encourage them to make purchases, ultimately increasing revenue and profitability.</p>
+<p><code>20. Which countries and regions drive the most B2C revenue, and how does the Average Order Value (AOV) differ geographically?*</code></p>
+<p><em>Business Insight</em>: This question helps us to understand which countries and regions are driving the most B2C revenue, and how the Average Order Value (AOV) differs geographically. Analyzing our sales data by geography can provide insights into customer behavior and preferences in different regions, and help us to tailor our marketing and sales strategies to better meet the needs of customers in those regions. By understanding which countries and regions drive the most B2C revenue, we can focus our marketing efforts on those areas to maximize revenue. Additionally, by analyzing how AOV differs geographically, we can identify opportunities for optimizing our pricing strategy and product offerings in different regions to increase revenue and profitability.</p>
+<p><code>21. Are we meeting our operational Service Level Agreements (SLAs)? What is the average lead time between Order Date and Ship Date?</code></p>
+<p><em>Business Insight</em>: Service Level Agreements (SLAs) will show us the operational performance of our business in terms of order fulfillment. Analyzing the average lead time between Order Date and Ship Date can provide insights into our operational efficiency and help us to identify areas for improvement in our order fulfillment process. By understanding if we are meeting our SLAs and analyzing the lead time between Order Date and Ship Date, we can optimize our operations to improve customer satisfaction and retention, ultimately driving revenue growth and profitability.</p>
+<p><code>22. How heavily do freight and tax costs impact the final landed cost for the consumer across different countries?</code></p>
+<p><em>Business Insight</em>: This question helps us to understand the impact of freight and tax costs on the final landed cost for the consumer across different countries. Analyzing the impact of freight and tax costs can provide insights about the tax and logistics landscape in different regions, and help us to optimize our pricing strategy and supply chain management to minimize costs for our customers. By understanding how heavily freight and tax costs impact the final landed cost for the consumer across different countries, we can identify opportunities for reducing costs and improving our competitiveness in those markets, ultimately increasing revenue and profitability.</p>
+<p><code>23. Is there a regional bias for specific Product Categories?</code></p>
+<p><em>Business Insight</em>: Regional bias for specific product categories refers to the tendency for certain product categories to perform better in specific regions. For example, customers in the rural areas may purchase largely from the “Mountain Bikes” category, while customers in urban areas may purchase more from the “Road Bikes” category. Analyzing regional bias for specific product categories can provide insights into customer behavior and preferences in different regions, and help us to tailor our marketing and sales strategies to better meet the needs of customers in those regions. By understanding if there is a regional bias for specific product categories, we can create more targeted marketing campaigns that resonate with our customers and encourage them to make purchases, ultimately increasing revenue and profitability.</p>
+</section>
+<section id="conclusion" class="level1">
+<h1>Conclusion</h1>
+<p>In this section, we have prepared our sales data for analysis by restoring the .bak file to our SQL Server instance, cleaning the data by removing unnecessary columns and tables, and creating a star schema by establishing foreign key relationships between the fact table and dimension tables. We have also defined 23 business questions that will guide our analysis and help us to focus on the relevant data to gain insights into customer behavior, identify trends and patterns in the sales data, and make informed business decisions based on our analysis. In the next sections, we will answer each of these business questions one by one using SQL queries and data analysis techniques.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

@@ -1,0 +1,2027 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Regional Sales Analysis – Vasif Asadov | AdventureWorks Bike Sales Analysis</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./assets/favicon.ico" rel="icon">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark-0cda25dcbb8fe09c7138904322940710.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-095c5612e4422d114998b098e0e10f6c.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="dark">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+</head>
+
+<body class="nav-sidebar docked nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">Vasif Asadov | AdventureWorks Bike Sales Analysis</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="./index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">AdventureWorks Bike Sales</li><li class="breadcrumb-item"><a href="./06_regional_analysis.html">Regional Sales Analysis</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">AdventureWorks Bike Sales</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+ <span class="menu-text">00_problem_description.qmd</span>
+  </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./01_data_preparation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data Preparation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./02_macro_performance.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Macro Performance Analysis</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./03_customer_analysis.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Customer Segmentation Analysis</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./04_performance_analysis.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Product Profit Analysis</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./05_sales_reasons.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Sales Reasons Analysis</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./06_regional_analysis.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Regional Sales Analysis</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./07_executive_dashboard.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Executive Dashboard</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a></li>
+  <li><a href="#regional-sales-performance-analysis" id="toc-regional-sales-performance-analysis" class="nav-link" data-scroll-target="#regional-sales-performance-analysis">Regional Sales Performance Analysis</a>
+  <ul class="collapse">
+  <li><a href="#geographical-revenue-and-aov-analysis" id="toc-geographical-revenue-and-aov-analysis" class="nav-link" data-scroll-target="#geographical-revenue-and-aov-analysis">Geographical Revenue and AOV Analysis</a></li>
+  <li><a href="#operational-service-level-agreements-slas-analysis" id="toc-operational-service-level-agreements-slas-analysis" class="nav-link" data-scroll-target="#operational-service-level-agreements-slas-analysis">Operational Service Level Agreements (SLAs) Analysis</a></li>
+  <li><a href="#regional-freight-and-tax-cost-analysis" id="toc-regional-freight-and-tax-cost-analysis" class="nav-link" data-scroll-target="#regional-freight-and-tax-cost-analysis">Regional Freight and Tax Cost Analysis</a></li>
+  <li><a href="#regional-product-preferences" id="toc-regional-product-preferences" class="nav-link" data-scroll-target="#regional-product-preferences">Regional Product Preferences</a></li>
+  </ul></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">Conclusion</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">AdventureWorks Bike Sales</li><li class="breadcrumb-item"><a href="./06_regional_analysis.html">Regional Sales Analysis</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Regional Sales Analysis</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="introduction" class="level1">
+<h1>Introduction</h1>
+<p>In this part of the analysis, we will focus on understanding the regional sales performance of our B2C operations. We will analyze which countries and regions are driving the most revenue, how the Average Order Value (AOV) differs geographically, whether we are meeting our operational Service Level Agreements (SLAs), and how freight and tax costs impact the final landed cost for consumers across different countries. Additionally, we will investigate if there is a regional bias for specific product categories.</p>
+</section>
+<section id="regional-sales-performance-analysis" class="level1">
+<h1>Regional Sales Performance Analysis</h1>
+<section id="geographical-revenue-and-aov-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="geographical-revenue-and-aov-analysis">Geographical Revenue and AOV Analysis</h2>
+<p><code>20. Which countries and regions drive the most B2C revenue, and how does the Average Order Value (AOV) differ geographically?*</code></p>
+<p><strong>Solution Method:</strong> To analyze the regional sales performance, we will aggregate the sales data by country and region. We will calculate the total revenue, total number of orders, total number of customers, and the Average Order Value (AOV) for each country and region. This will allow us to identify which regions are driving the most revenue and how AOV differs geographically</p>
+<details>
+<summary>
+Show SQL Code
+</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">select</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    st.SalesTerritoryCountry <span class="kw">as</span> country,</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    st.SalesTerritoryRegion <span class="kw">as</span> region,</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">coalesce</span>(<span class="fu">sum</span>(fis.SalesAmount),<span class="dv">0</span>) <span class="kw">as</span> total_revenue,</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">coalesce</span>(<span class="fu">count</span>(<span class="kw">distinct</span> fis.SalesOrderNumber),<span class="dv">0</span>) <span class="kw">as</span> total_orders,</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">coalesce</span>(<span class="fu">count</span>(<span class="kw">distinct</span> fis.CustomerKey),<span class="dv">0</span>) <span class="kw">as</span> total_customers, </span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">cast</span>(</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>        <span class="fu">sum</span>(fis.SalesAmount) <span class="op">/</span> <span class="fu">nullif</span>(<span class="fu">count</span>(<span class="kw">distinct</span> fis.SalesOrderNumber),<span class="dv">0</span>) </span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>        <span class="kw">as</span> <span class="dt">decimal</span>(<span class="dv">20</span>,<span class="dv">3</span>)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    ) <span class="kw">as</span> avg_order_value</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="kw">from</span> FactInternetSales fis</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="kw">left</span> <span class="kw">join</span> SalesTerritory st</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    <span class="kw">on</span> st.SalesTerritoryKey <span class="op">=</span> fis.SalesTerritoryKey</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="kw">group</span> <span class="kw">by</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    st.SalesTerritoryCountry,</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    st.SalesTerritoryRegion</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="kw">order</span> <span class="kw">by</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    total_revenue <span class="kw">desc</span>;</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<p><strong>Results:</strong></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 10%">
+<col style="width: 8%">
+<col style="width: 19%">
+<col style="width: 17%">
+<col style="width: 22%">
+<col style="width: 22%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>country</th>
+<th>region</th>
+<th>total_revenue</th>
+<th>total_orders</th>
+<th>total_customers</th>
+<th>avg_order_value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Australia</td>
+<td>Australia</td>
+<td>9061000.5844</td>
+<td>6718</td>
+<td>3591</td>
+<td>1348.765</td>
+</tr>
+<tr class="even">
+<td>United States</td>
+<td>Southwest</td>
+<td>5718150.8122</td>
+<td>5473</td>
+<td>4450</td>
+<td>1044.793</td>
+</tr>
+<tr class="odd">
+<td>United States</td>
+<td>Northwest</td>
+<td>3649866.5512</td>
+<td>4058</td>
+<td>3341</td>
+<td>899.425</td>
+</tr>
+<tr class="even">
+<td>United Kingdom</td>
+<td>United Kingdom</td>
+<td>3391712.2109</td>
+<td>3031</td>
+<td>1913</td>
+<td>1119.008</td>
+</tr>
+<tr class="odd">
+<td>Germany</td>
+<td>Germany</td>
+<td>2894312.3382</td>
+<td>2484</td>
+<td>1780</td>
+<td>1165.182</td>
+</tr>
+<tr class="even">
+<td>France</td>
+<td>France</td>
+<td>2644017.7143</td>
+<td>2484</td>
+<td>1810</td>
+<td>1064.419</td>
+</tr>
+<tr class="odd">
+<td>Canada</td>
+<td>Canada</td>
+<td>1977844.8621</td>
+<td>3375</td>
+<td>1571</td>
+<td>586.028</td>
+</tr>
+<tr class="even">
+<td>United States</td>
+<td>Southeast</td>
+<td>12238.8496</td>
+<td>17</td>
+<td>12</td>
+<td>719.932</td>
+</tr>
+<tr class="odd">
+<td>United States</td>
+<td>Northeast</td>
+<td>6532.4682</td>
+<td>10</td>
+<td>8</td>
+<td>653.247</td>
+</tr>
+<tr class="even">
+<td>United States</td>
+<td>Central</td>
+<td>3000.8296</td>
+<td>9</td>
+<td>8</td>
+<td>333.426</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Insights:</strong> We can derive the following insights from the above results:</p>
+<ul>
+<li>Australia is the top-performing country in terms of total revenue, with a significant contribution from the Australia region. This indicates a strong market presence and customer base in that region.<br>
+</li>
+<li>The United States has a substantial revenue contribution from the Southwest and Northwest regions, suggesting that these areas are key markets for our B2C operations. However, the AOV in these regions is lower compared to Australia, which may indicate different purchasing behaviors or product preferences among customers in the United States.</li>
+<li>The United Kingdom, Germany, and France also contribute significantly to total revenue, with relatively high AOVs, indicating that customers in these countries may be purchasing higher-priced products or making larger orders.</li>
+<li>Canada has a moderate total revenue contribution but a lower AOV compared to other countries, which may suggest that customers in Canada are purchasing lower-priced products or making smaller orders on average.</li>
+<li>The United States regions of Southeast, Northeast, and Central have significantly lower total revenue and AOV compared to other regions, indicating that these areas may not be as strong in terms of market presence or customer engagement, and may require further investigation to understand the underlying reasons for the lower performance in these regions.</li>
+</ul>
+</section>
+<section id="operational-service-level-agreements-slas-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="operational-service-level-agreements-slas-analysis">Operational Service Level Agreements (SLAs) Analysis</h2>
+<p><code>21. Are we meeting our operational Service Level Agreements (SLAs)? What is the average lead time between Order Date and Ship Date?</code></p>
+<p><strong>Solution Method:</strong> To evaluate whether we are meeting our operational Service Level Agreements (SLAs), we will calculate the average lead time between the Order Date and Ship Date for each region and month. We will compare the average lead time against our SLA targets to determine if we are meeting our commitments to customers. Additionally, we will categorize the delivery performance as “late delivery”, “early delivery”, or “on-time delivery” based on how the average lead time compares to the SLA targets for each region.</p>
+<details>
+<summary>
+Show SQL Code
+</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">with</span> shipping_days <span class="kw">as</span> (</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">select</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>        fis.SalesOrderNumber,</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>        fis.OrderDateKey,</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>        st.SalesTerritoryRegion <span class="kw">as</span> region,</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>        <span class="fu">min</span>(datediff(<span class="dt">day</span>, fis.OrderDate, fis.ShipDate)) <span class="kw">as</span> days_to_ship</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">from</span> FactInternetSales fis </span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">left</span> <span class="kw">join</span> SalesTerritory st</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>        <span class="kw">on</span> st.SalesTerritoryKey <span class="op">=</span> fis.SalesTerritoryKey</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    <span class="kw">group</span> <span class="kw">by</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>        fis.SalesOrderNumber,</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>        fis.OrderDateKey,</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>        st.SalesTerritoryRegion</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="kw">select</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    c.MonthNumberOfYear <span class="kw">as</span> month_number,</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    c.MonthName <span class="kw">as</span> month_name,</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>    sd.region,</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">coalesce</span>(<span class="fu">cast</span>(<span class="fu">avg</span>(sd.days_to_ship) <span class="kw">as</span> <span class="dt">int</span>), <span class="dv">0</span>) <span class="kw">as</span> avg_days_to_ship,</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>    <span class="cf">case</span> </span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>        <span class="cf">when</span> <span class="fu">avg</span>(sd.days_to_ship) <span class="op">&gt;</span> <span class="dv">5</span> <span class="op">+</span> <span class="fu">avg</span>(<span class="fu">avg</span>(sd.days_to_ship)) <span class="kw">over</span> (<span class="kw">partition</span> <span class="kw">by</span> sd.region) </span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>            <span class="cf">then</span> <span class="st">'late delivery'</span></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>        <span class="cf">when</span> <span class="fu">avg</span>(sd.days_to_ship) <span class="op">&lt;</span> <span class="fu">avg</span>(<span class="fu">avg</span>(sd.days_to_ship)) <span class="kw">over</span> (<span class="kw">partition</span> <span class="kw">by</span> sd.region) <span class="op">-</span> <span class="dv">5</span> </span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>            <span class="cf">then</span> <span class="st">'early delivery'</span></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span> <span class="st">'on-time delivery'</span></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span> <span class="kw">as</span> delivery_performance</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a><span class="kw">from</span> Calendar c</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a><span class="kw">left</span> <span class="kw">join</span> shipping_days sd</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>    <span class="kw">on</span> sd.OrderDateKey <span class="op">=</span> c.DateKey</span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a><span class="kw">group</span> <span class="kw">by</span> </span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>    c.MonthNumberOfYear ,</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>    c.MonthName ,</span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>    sd.region</span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a><span class="kw">order</span> <span class="kw">by</span></span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>    month_number;</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<p><strong>Results:</strong></p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>month_number</th>
+<th>month_name</th>
+<th>region</th>
+<th>avg_days_to_ship</th>
+<th>delivery_performance</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>January</td>
+<td>Germany</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>January</td>
+<td>United Kingdom</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>January</td>
+<td>France</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>January</td>
+<td>Southwest</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>January</td>
+<td>Australia</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>January</td>
+<td></td>
+<td>0</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>January</td>
+<td>Southeast</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>January</td>
+<td>Canada</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>January</td>
+<td>Northwest</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>February</td>
+<td>Southwest</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>February</td>
+<td>Southeast</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>February</td>
+<td>United Kingdom</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>February</td>
+<td>Germany</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>February</td>
+<td>Canada</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>February</td>
+<td>France</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>February</td>
+<td></td>
+<td>0</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>February</td>
+<td>Northwest</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>February</td>
+<td>Northeast</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>February</td>
+<td>Australia</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="even">
+<td>3</td>
+<td>March</td>
+<td>Southwest</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>March</td>
+<td>France</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="even">
+<td>3</td>
+<td>March</td>
+<td>United Kingdom</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>March</td>
+<td>Germany</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="even">
+<td>3</td>
+<td>March</td>
+<td>Canada</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>March</td>
+<td>Australia</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="even">
+<td>3</td>
+<td>March</td>
+<td></td>
+<td>0</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>March</td>
+<td>Northwest</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>April</td>
+<td>Central</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="odd">
+<td>4</td>
+<td>April</td>
+<td>France</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>April</td>
+<td>United Kingdom</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="odd">
+<td>4</td>
+<td>April</td>
+<td>Germany</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>April</td>
+<td>Southwest</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="odd">
+<td>4</td>
+<td>April</td>
+<td>Southeast</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>April</td>
+<td>Canada</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="odd">
+<td>4</td>
+<td>April</td>
+<td>Australia</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>April</td>
+<td></td>
+<td>0</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="odd">
+<td>4</td>
+<td>April</td>
+<td>Northwest</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="even">
+<td>5</td>
+<td>May</td>
+<td>Central</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td>May</td>
+<td>Southeast</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="even">
+<td>5</td>
+<td>May</td>
+<td>United Kingdom</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td>May</td>
+<td>Germany</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="even">
+<td>5</td>
+<td>May</td>
+<td>Southwest</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td>May</td>
+<td>France</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="even">
+<td>5</td>
+<td>May</td>
+<td></td>
+<td>0</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td>May</td>
+<td>Northwest</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="even">
+<td>5</td>
+<td>May</td>
+<td>Canada</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td>May</td>
+<td>Northeast</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="even">
+<td>5</td>
+<td>May</td>
+<td>Australia</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="odd">
+<td>6</td>
+<td>June</td>
+<td>Central</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="even">
+<td>6</td>
+<td>June</td>
+<td>France</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="odd">
+<td>6</td>
+<td>June</td>
+<td>United Kingdom</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="even">
+<td>6</td>
+<td>June</td>
+<td>Northeast</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="odd">
+<td>6</td>
+<td>June</td>
+<td>Southwest</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="even">
+<td>6</td>
+<td>June</td>
+<td>Southeast</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="odd">
+<td>6</td>
+<td>June</td>
+<td></td>
+<td>0</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="even">
+<td>6</td>
+<td>June</td>
+<td>Australia</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="odd">
+<td>6</td>
+<td>June</td>
+<td>Canada</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="even">
+<td>6</td>
+<td>June</td>
+<td>Germany</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="odd">
+<td>6</td>
+<td>June</td>
+<td>Northwest</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="even">
+<td>7</td>
+<td>July</td>
+<td>Southwest</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="odd">
+<td>7</td>
+<td>July</td>
+<td>Southeast</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="even">
+<td>7</td>
+<td>July</td>
+<td>United Kingdom</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="odd">
+<td>7</td>
+<td>July</td>
+<td>Germany</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="even">
+<td>7</td>
+<td>July</td>
+<td></td>
+<td>0</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="odd">
+<td>7</td>
+<td>July</td>
+<td>France</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="even">
+<td>7</td>
+<td>July</td>
+<td>Canada</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="odd">
+<td>7</td>
+<td>July</td>
+<td>Northwest</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="even">
+<td>7</td>
+<td>July</td>
+<td>Australia</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="odd">
+<td>8</td>
+<td>August</td>
+<td>Central</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="even">
+<td>8</td>
+<td>August</td>
+<td>Southeast</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="odd">
+<td>8</td>
+<td>August</td>
+<td>United Kingdom</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="even">
+<td>8</td>
+<td>August</td>
+<td>Germany</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="odd">
+<td>8</td>
+<td>August</td>
+<td>Southwest</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="even">
+<td>8</td>
+<td>August</td>
+<td>France</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="odd">
+<td>8</td>
+<td>August</td>
+<td>Canada</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="even">
+<td>8</td>
+<td>August</td>
+<td>Australia</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="odd">
+<td>8</td>
+<td>August</td>
+<td></td>
+<td>0</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="even">
+<td>8</td>
+<td>August</td>
+<td>Northeast</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="odd">
+<td>8</td>
+<td>August</td>
+<td>Northwest</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="even">
+<td>9</td>
+<td>September</td>
+<td>Southwest</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="odd">
+<td>9</td>
+<td>September</td>
+<td>France</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="even">
+<td>9</td>
+<td>September</td>
+<td>United Kingdom</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="odd">
+<td>9</td>
+<td>September</td>
+<td>Germany</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="even">
+<td>9</td>
+<td>September</td>
+<td></td>
+<td>0</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="odd">
+<td>9</td>
+<td>September</td>
+<td>Northwest</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="even">
+<td>9</td>
+<td>September</td>
+<td>Canada</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="odd">
+<td>9</td>
+<td>September</td>
+<td>Australia</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="even">
+<td>10</td>
+<td>October</td>
+<td>Southwest</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="odd">
+<td>10</td>
+<td>October</td>
+<td>Southeast</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="even">
+<td>10</td>
+<td>October</td>
+<td>United Kingdom</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="odd">
+<td>10</td>
+<td>October</td>
+<td>Northeast</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="even">
+<td>10</td>
+<td>October</td>
+<td>Canada</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="odd">
+<td>10</td>
+<td>October</td>
+<td>France</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="even">
+<td>10</td>
+<td>October</td>
+<td></td>
+<td>0</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="odd">
+<td>10</td>
+<td>October</td>
+<td>Australia</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="even">
+<td>10</td>
+<td>October</td>
+<td>Germany</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="odd">
+<td>10</td>
+<td>October</td>
+<td>Northwest</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="even">
+<td>11</td>
+<td>November</td>
+<td>Central</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="odd">
+<td>11</td>
+<td>November</td>
+<td>Southeast</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="even">
+<td>11</td>
+<td>November</td>
+<td>United Kingdom</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="odd">
+<td>11</td>
+<td>November</td>
+<td>Northeast</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="even">
+<td>11</td>
+<td>November</td>
+<td>Southwest</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="odd">
+<td>11</td>
+<td>November</td>
+<td>France</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="even">
+<td>11</td>
+<td>November</td>
+<td></td>
+<td>0</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="odd">
+<td>11</td>
+<td>November</td>
+<td>Northwest</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="even">
+<td>11</td>
+<td>November</td>
+<td>Canada</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="odd">
+<td>11</td>
+<td>November</td>
+<td>Germany</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="even">
+<td>11</td>
+<td>November</td>
+<td>Australia</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="odd">
+<td>12</td>
+<td>December</td>
+<td>Central</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="even">
+<td>12</td>
+<td>December</td>
+<td>France</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="odd">
+<td>12</td>
+<td>December</td>
+<td>United Kingdom</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="even">
+<td>12</td>
+<td>December</td>
+<td>Germany</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="odd">
+<td>12</td>
+<td>December</td>
+<td>Southwest</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="even">
+<td>12</td>
+<td>December</td>
+<td>Southeast</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="odd">
+<td>12</td>
+<td>December</td>
+<td>Canada</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="even">
+<td>12</td>
+<td>December</td>
+<td>Australia</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="odd">
+<td>12</td>
+<td>December</td>
+<td></td>
+<td>0</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="even">
+<td>12</td>
+<td>December</td>
+<td>Northeast</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+<tr class="odd">
+<td>12</td>
+<td>December</td>
+<td>Northwest</td>
+<td>7</td>
+<td>on-time delivery</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Insights:</strong> We can get the following insights from the above results:</p>
+<ul>
+<li>The average lead time between Order Date and Ship Date is consistently 7 days across all regions and months, indicating that we are meeting our operational Service Level Agreements (SLAs) for on-time delivery.</li>
+<li>There are no instances of late delivery or early delivery based on the defined SLA targets, suggesting that our logistics and supply chain operations are functioning effectively to meet customer expectations for delivery times.</li>
+<li>The consistency in average lead time across different regions and months indicates that our operational processes are standardized and reliable, which can contribute to customer satisfaction and loyalty.</li>
+<li>However, it is important to continue monitoring these metrics over time to ensure that we maintain our performance and identify any potential issues that may arise in the future, such as changes in demand, supply chain disruptions, or other factors that could impact our ability to meet SLAs.</li>
+</ul>
+</section>
+<section id="regional-freight-and-tax-cost-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="regional-freight-and-tax-cost-analysis">Regional Freight and Tax Cost Analysis</h2>
+<p><code>22. How heavily do freight and tax costs impact the final landed cost for the consumer across different countries?</code></p>
+<p><strong>Solution Method:</strong> To analyze the impact of freight and tax costs on the final landed cost for consumers across different countries, we will calculate the total revenue, total tax, total freight, and the percentage of tax and freight costs relative to the total revenue for each country. In order to calculate these, firstly, we will create a Common Table Expression (CTE) to aggregate the sales amount, tax amount, and freight amount by sales order number and country. Then, we will sum these values at the country level and calculate the percentage of tax and freight costs relative to total revenue to understand their impact on the final landed cost for consumers in each country.</p>
+<details>
+<summary>
+Show SQL Code
+</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">with</span> country_stats <span class="kw">as</span> (</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">select</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>        fis.salesordernumber,</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>        st.SalesTerritoryCountry <span class="kw">as</span> country,</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>        <span class="fu">sum</span>(fis.SalesAmount) <span class="kw">as</span> revenue,</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>        <span class="fu">sum</span>(fis.TaxAmt) <span class="kw">as</span> tax,</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>        <span class="fu">sum</span>(fis.Freight) <span class="kw">as</span> freight</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">from</span> FactInternetSales fis </span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">join</span> SalesTerritory st</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>        <span class="kw">on</span> st.SalesTerritoryKey <span class="op">=</span> fis.SalesTerritoryKey</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    <span class="kw">group</span> <span class="kw">by</span> </span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>        fis.salesordernumber,</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>        st.SalesTerritoryCountry</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="kw">select</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>    country,</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">cast</span>(<span class="fu">sum</span>(revenue) <span class="kw">as</span> <span class="dt">decimal</span> (<span class="dv">20</span>,<span class="dv">3</span>)) <span class="kw">as</span> total_revenue,</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">cast</span>(<span class="fu">sum</span>(tax) <span class="kw">as</span> <span class="dt">decimal</span> (<span class="dv">20</span>,<span class="dv">3</span>)) <span class="kw">as</span> total_tax,</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">cast</span>(<span class="fu">sum</span>(freight) <span class="kw">as</span> <span class="dt">decimal</span> (<span class="dv">20</span>,<span class="dv">3</span>)) <span class="kw">as</span> total_freight,</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">cast</span>(</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>        <span class="fu">sum</span>(tax) <span class="op">*</span> <span class="fl">1.0</span> <span class="op">/</span> <span class="fu">nullif</span>(<span class="fu">sum</span>(revenue),<span class="dv">0</span>) <span class="kw">as</span> <span class="dt">decimal</span> (<span class="dv">10</span>,<span class="dv">3</span>)</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>    ) <span class="kw">as</span> tax_pct,</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>    <span class="fu">cast</span>(</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>        <span class="fu">sum</span>(freight) <span class="op">*</span> <span class="fl">1.0</span> <span class="op">/</span> <span class="fu">nullif</span>(<span class="fu">sum</span>(revenue),<span class="dv">0</span>) <span class="kw">as</span> <span class="dt">decimal</span> (<span class="dv">10</span>,<span class="dv">3</span>)</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>    ) <span class="kw">as</span> freight_pct,</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>    <span class="fu">cast</span>(</span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>        (<span class="fu">sum</span>(tax) <span class="op">+</span> <span class="fu">sum</span>(freight)) <span class="op">*</span> <span class="fl">1.0</span> <span class="op">/</span> <span class="fu">nullif</span>(<span class="fu">sum</span>(revenue),<span class="dv">0</span>) <span class="kw">as</span> <span class="dt">decimal</span> (<span class="dv">10</span>,<span class="dv">3</span>)</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>    ) <span class="kw">as</span> tax_freight_pct</span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a><span class="kw">from</span> country_stats</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a><span class="kw">group</span> <span class="kw">by</span></span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>    country </span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a><span class="kw">order</span> <span class="kw">by</span></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>    total_revenue <span class="kw">desc</span>;</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<p><strong>Results:</strong></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 9%">
+<col style="width: 17%">
+<col style="width: 12%">
+<col style="width: 17%">
+<col style="width: 9%">
+<col style="width: 14%">
+<col style="width: 20%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>country</th>
+<th>total_revenue</th>
+<th>total_tax</th>
+<th>total_freight</th>
+<th>tax_pct</th>
+<th>freight_pct</th>
+<th>tax_freight_pct</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>United States</td>
+<td>9389789.511</td>
+<td>751183.177</td>
+<td>234745.663</td>
+<td>0.080</td>
+<td>0.025</td>
+<td>0.105</td>
+</tr>
+<tr class="even">
+<td>Australia</td>
+<td>9061000.584</td>
+<td>724880.067</td>
+<td>226525.613</td>
+<td>0.080</td>
+<td>0.025</td>
+<td>0.105</td>
+</tr>
+<tr class="odd">
+<td>United Kingdom</td>
+<td>3391712.211</td>
+<td>271336.982</td>
+<td>84793.124</td>
+<td>0.080</td>
+<td>0.025</td>
+<td>0.105</td>
+</tr>
+<tr class="even">
+<td>Germany</td>
+<td>2894312.338</td>
+<td>231544.991</td>
+<td>72358.065</td>
+<td>0.080</td>
+<td>0.025</td>
+<td>0.105</td>
+</tr>
+<tr class="odd">
+<td>France</td>
+<td>2644017.714</td>
+<td>211521.422</td>
+<td>66100.697</td>
+<td>0.080</td>
+<td>0.025</td>
+<td>0.105</td>
+</tr>
+<tr class="even">
+<td>Canada</td>
+<td>1977844.862</td>
+<td>158227.592</td>
+<td>49446.448</td>
+<td>0.080</td>
+<td>0.025</td>
+<td>0.105</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Insights:</strong> We can derive the following insights from the above results:</p>
+<ul>
+<li>The United States has the highest total revenue, followed closely by Australia, with the United Kingdom, Germany, France, and Canada contributing significantly as well. This indicates that these countries are key markets for our B2C operations.</li>
+<li>The tax and freight costs as a percentage of total revenue are consistent across all countries, with tax costs accounting for approximately 8% of total revenue and freight costs accounting for approximately 2.5% of total revenue. This suggests that the impact of tax and freight costs on the final landed cost for consumers is relatively similar across different countries.</li>
+<li>The combined tax and freight costs account for approximately 10.5% of total revenue across all countries, indicating that these costs have a significant impact on the final landed cost for consumers. This highlights the importance of managing and optimizing these costs to ensure competitive pricing and profitability in different markets.</li>
+<li>It is important to continue monitoring these costs and their impact on the final landed cost for consumers, as changes in tax regulations, shipping costs, or other factors could affect the overall cost structure and pricing strategy in different countries. Additionally, exploring opportunities to reduce tax and freight costs, such as negotiating better shipping rates or optimizing tax strategies, could help improve profitability and competitiveness in the market.</li>
+</ul>
+</section>
+<section id="regional-product-preferences" class="level2">
+<h2 class="anchored" data-anchor-id="regional-product-preferences">Regional Product Preferences</h2>
+<p><code>23. Is there a regional bias for specific Product Categories?</code></p>
+<p><strong>Solution Method:</strong> To analyze if there is a regional bias for specific product categories, we will aggregate the sales data by country and product category. We will calculate the total revenue for each product category within each country and then calculate the percentage of total revenue that each product category contributes to the overall revenue for that country. This will allow us to identify if certain product categories are more popular in specific regions, indicating a regional bias in consumer preferences for those categories.</p>
+<details>
+<summary>
+Show SQL Code
+</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">with</span> product_info <span class="kw">as</span>(</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">select</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>        pr.ProductKey,</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>        cat.ProductCategoryName <span class="kw">as</span> product_category,</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>        st.SalesTerritoryCountry <span class="kw">as</span> country,</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>        <span class="fu">sum</span>(fis.SalesAmount) <span class="kw">as</span> revenue</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">from</span> Products pr</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">join</span> ProductSubcategory sub</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>        <span class="kw">on</span> sub.ProductSubcategoryKey <span class="op">=</span> pr.ProductSubcategoryKey</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    <span class="kw">join</span> ProductCategory cat </span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>        <span class="kw">on</span> cat.ProductCategoryKey <span class="op">=</span> sub.ProductCategoryKey</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>    <span class="kw">join</span> FactInternetSales fis</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>        <span class="kw">on</span> fis.ProductKey <span class="op">=</span> pr.ProductKey</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>    <span class="kw">join</span> SalesTerritory st</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>        <span class="kw">on</span> st.SalesTerritoryKey <span class="op">=</span> fis.SalesTerritoryKey</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="kw">group</span> <span class="kw">by</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>    pr.ProductKey,</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>    cat.ProductCategoryName,</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>    st.SalesTerritoryCountry</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a><span class="kw">select</span></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>        country,</span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>        product_category,</span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>        <span class="fu">sum</span>(revenue) <span class="kw">as</span> total_revenue,</span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>        <span class="fu">cast</span>(</span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>            <span class="fu">sum</span>(revenue) <span class="op">*</span> <span class="fl">100.0</span> <span class="op">/</span> <span class="fu">nullif</span>((<span class="fu">sum</span>(<span class="fu">sum</span>(revenue)) <span class="kw">over</span>(<span class="kw">partition</span> <span class="kw">by</span> country)),<span class="dv">0</span>)</span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>            <span class="kw">as</span> <span class="dt">decimal</span>(<span class="dv">10</span>,<span class="dv">3</span>)</span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>        ) <span class="kw">as</span> revenue_pct</span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>    <span class="kw">from</span> product_info</span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>    <span class="kw">group</span> <span class="kw">by</span></span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>        country,</span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>        product_category</span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>    <span class="kw">order</span> <span class="kw">by</span> </span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a>        country,</span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>        revenue_pct <span class="kw">desc</span>;</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<p><strong>Results:</strong></p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>country</th>
+<th>product_category</th>
+<th>total_revenue</th>
+<th>revenue_pct</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Australia</td>
+<td>Bikes</td>
+<td>8852050.0044</td>
+<td>97.694</td>
+</tr>
+<tr class="even">
+<td>Australia</td>
+<td>Accessories</td>
+<td>138690.6300</td>
+<td>1.531</td>
+</tr>
+<tr class="odd">
+<td>Australia</td>
+<td>Clothing</td>
+<td>70259.9500</td>
+<td>0.775</td>
+</tr>
+<tr class="even">
+<td>Canada</td>
+<td>Bikes</td>
+<td>1821302.3921</td>
+<td>92.085</td>
+</tr>
+<tr class="odd">
+<td>Canada</td>
+<td>Accessories</td>
+<td>103377.8500</td>
+<td>5.227</td>
+</tr>
+<tr class="even">
+<td>Canada</td>
+<td>Clothing</td>
+<td>53164.6200</td>
+<td>2.688</td>
+</tr>
+<tr class="odd">
+<td>France</td>
+<td>Bikes</td>
+<td>2553575.7143</td>
+<td>96.579</td>
+</tr>
+<tr class="even">
+<td>France</td>
+<td>Accessories</td>
+<td>63406.7800</td>
+<td>2.398</td>
+</tr>
+<tr class="odd">
+<td>France</td>
+<td>Clothing</td>
+<td>27035.2200</td>
+<td>1.023</td>
+</tr>
+<tr class="even">
+<td>Germany</td>
+<td>Bikes</td>
+<td>2808514.3482</td>
+<td>97.036</td>
+</tr>
+<tr class="odd">
+<td>Germany</td>
+<td>Accessories</td>
+<td>62232.5900</td>
+<td>2.150</td>
+</tr>
+<tr class="even">
+<td>Germany</td>
+<td>Clothing</td>
+<td>23565.4000</td>
+<td>0.814</td>
+</tr>
+<tr class="odd">
+<td>United Kingdom</td>
+<td>Bikes</td>
+<td>3282842.6609</td>
+<td>96.790</td>
+</tr>
+<tr class="even">
+<td>United Kingdom</td>
+<td>Accessories</td>
+<td>76630.0400</td>
+<td>2.259</td>
+</tr>
+<tr class="odd">
+<td>United Kingdom</td>
+<td>Clothing</td>
+<td>32239.5100</td>
+<td>0.951</td>
+</tr>
+<tr class="even">
+<td>United States</td>
+<td>Bikes</td>
+<td>8999859.5308</td>
+<td>95.847</td>
+</tr>
+<tr class="odd">
+<td>United States</td>
+<td>Accessories</td>
+<td>256422.0700</td>
+<td>2.731</td>
+</tr>
+<tr class="even">
+<td>United States</td>
+<td>Clothing</td>
+<td>133507.9100</td>
+<td>1.422</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Insights:</strong> We can derive the following insights from the above results:</p>
+<ul>
+<li>Across all countries, the Bikes product category dominates the total revenue, accounting for over 95% of the revenue in each country. This indicates a strong regional bias towards the Bikes category, suggesting that consumers in these regions have a strong preference for purchasing bikes compared to other product categories.</li>
+<li>The Accessories and Clothing categories contribute a much smaller percentage of total revenue in each country, indicating that there is less consumer interest in these categories compared to Bikes. However, there are still some variations in the revenue contribution of Accessories and Clothing across different countries, which may suggest that there are some regional differences in consumer preferences for these categories, albeit not as pronounced as the bias towards Bikes.</li>
+<li>The strong regional bias towards the Bikes category may be influenced by factors such as local market trends, cultural preferences, or the availability of products in these regions. It may be beneficial to further investigate the underlying reasons for this bias and explore opportunities to capitalize on the strong demand for bikes in these regions, such as targeted marketing campaigns, product offerings, or partnerships with local retailers to further enhance our presence in the Bikes category in these markets. Additionally, understanding the factors driving consumer preferences for the Accessories and Clothing categories could help identify potential growth opportunities in these categories, even if they currently contribute a smaller percentage of total revenue.</li>
+</ul>
+</section>
+</section>
+<section id="conclusion" class="level1">
+<h1>Conclusion</h1>
+<p>In this domain, we analyzed the regional sales performance of our B2C operations by examining geographical revenue and Average Order Value (AOV), evaluating our performance against operational Service Level Agreements (SLAs), and assessing the impact of freight and tax costs on the final landed cost for consumers across different countries. We found that certain countries, such as Australia and the United States, are driving the most revenue, with a strong regional bias towards the Bikes product category. Additionally, we observed that we are consistently meeting our SLAs for on-time delivery across all regions and months. Finally, we determined that freight and tax costs have a significant impact on the final landed cost for consumers, accounting for approximately 10.5% of total revenue across all countries. These insights can help us optimize our regional sales strategies, improve customer satisfaction through reliable delivery performance, and manage costs effectively to enhance profitability in different markets.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

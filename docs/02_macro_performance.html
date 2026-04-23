@@ -1,0 +1,3219 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Macro Performance Analysis – Vasif Asadov | AdventureWorks Bike Sales Analysis</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./assets/favicon.ico" rel="icon">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark-0cda25dcbb8fe09c7138904322940710.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-095c5612e4422d114998b098e0e10f6c.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="dark">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+</head>
+
+<body class="nav-sidebar docked nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">Vasif Asadov | AdventureWorks Bike Sales Analysis</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="./index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">AdventureWorks Bike Sales</li><li class="breadcrumb-item"><a href="./02_macro_performance.html">Macro Performance Analysis</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">AdventureWorks Bike Sales</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+ <span class="menu-text">00_problem_description.qmd</span>
+  </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./01_data_preparation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data Preparation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./02_macro_performance.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Macro Performance Analysis</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./03_customer_analysis.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Customer Segmentation Analysis</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./04_performance_analysis.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Product Profit Analysis</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./05_sales_reasons.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Sales Reasons Analysis</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./06_regional_analysis.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Regional Sales Analysis</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./07_executive_dashboard.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Executive Dashboard</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a></li>
+  <li><a href="#macro-performance-analysis" id="toc-macro-performance-analysis" class="nav-link" data-scroll-target="#macro-performance-analysis">Macro Performance Analysis</a>
+  <ul class="collapse">
+  <li><a href="#gross-profit-and-gross-margin-over-time" id="toc-gross-profit-and-gross-margin-over-time" class="nav-link" data-scroll-target="#gross-profit-and-gross-margin-over-time">Gross Profit and Gross Margin over Time</a></li>
+  <li><a href="#year-over-year-yoy-revenue-growth-rate" id="toc-year-over-year-yoy-revenue-growth-rate" class="nav-link" data-scroll-target="#year-over-year-yoy-revenue-growth-rate">Year-over-Year (YoY) Revenue Growth Rate</a></li>
+  <li><a href="#seasonality-of-sales-and-quarterly-revenue-drivers" id="toc-seasonality-of-sales-and-quarterly-revenue-drivers" class="nav-link" data-scroll-target="#seasonality-of-sales-and-quarterly-revenue-drivers">Seasonality of Sales and Quarterly Revenue Drivers</a></li>
+  <li><a href="#average-order-value-aov-vs-total-order-volume-tov" id="toc-average-order-value-aov-vs-total-order-volume-tov" class="nav-link" data-scroll-target="#average-order-value-aov-vs-total-order-volume-tov">Average Order Value (AOV) vs Total Order Volume (TOV)</a></li>
+  <li><a href="#year-to-date-ytd-revenue-and-profitability" id="toc-year-to-date-ytd-revenue-and-profitability" class="nav-link" data-scroll-target="#year-to-date-ytd-revenue-and-profitability">Year-to-Date (YTD) Revenue and Profitability</a></li>
+  </ul></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">Conclusion</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">AdventureWorks Bike Sales</li><li class="breadcrumb-item"><a href="./02_macro_performance.html">Macro Performance Analysis</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Macro Performance Analysis</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="introduction" class="level1">
+<h1>Introduction</h1>
+<p>In this section, we will answer the 23 business questions that we defined in the previous section using SQL queries and data analysis techniques. We will use the star schema that we created in the previous section to write SQL queries. Each question will be answered with a SQL query that retrieves the relevant data from the database, and we will also provide insights and interpretations of the results to help us understand the implications of our findings for the business.</p>
+<p>The questions are designed in a way that they will help us to get business insights on the following domains:</p>
+<ol type="1">
+<li>Makro Performance Analysis: Here we will analyze the overall performance of the business by looking at metrics such as total sales, profit, and customer count. We will also analyze the performance of different product categories and subcategories to identify trends and patterns in customer behavior. Questions 1-5 fall under this domain.</li>
+<li>Customer Behavior Analysis: In this domain, we will analyze customer behavior by looking at metrics such as customer demographics, purchasing patterns, and customer loyalty. We will also analyze the impact of different factors such as discounts and promotions on customer behavior. Questions 6-10 fall under this domain.</li>
+<li>Product Performance Analysis: Here we will analyze the performance of different products and product categories by looking at financial metrics such as Gross Profit, Gross Margin, Product Margin, and Sales Amount. We will also analyze the impact of different factors such as discounts and promotions on product performance. Questions 11-15 fall under this domain.</li>
+<li>Sales Reason and Customer Preference Analysis: In this domain, we will analyze the reasons behind sales and customer preferences by looking at metrics such as sales reasons, importance of promotional discounts, and preference of product categories. Questions 16-19 fall under this domain.</li>
+<li>Regional and Logistic Operations Analysis: Here we will analyze the performance of the business in different regions by looking at the Regional Preferences, Tax and Freight Costs, and Regional Bias for specific product categories. SLA and delivery performance will also be analyzed in this domain. Questions 20-23 fall under this domain.</li>
+</ol>
+<p>For better clarity and organization, I will give a separate page for each domain and answer the relevant questions in that page. This way, we can focus on specific areas of analysis and gain deeper insights into each domain. As this is the first page of the SQL analysis section, we will start with the first domain, which is Makro Performance Analysis, and answer the first 5 questions related to that domain.</p>
+</section>
+<section id="macro-performance-analysis" class="level1">
+<h1>Macro Performance Analysis</h1>
+<section id="gross-profit-and-gross-margin-over-time" class="level2">
+<h2 class="anchored" data-anchor-id="gross-profit-and-gross-margin-over-time">Gross Profit and Gross Margin over Time</h2>
+<p><code>1.  What is the overall Gross Profit and Gross Margin for the B2C channel, and how has it trended year over year?</code></p>
+<p><strong>Solution Method:</strong> To answer this question, we will write a SQL query that retrieves the Gross Profit and Gross Margin for the B2C channel from the fact table, and then we will group the results by year to analyze the trend over time. We will also calculate the year-over-year growth rate for both Gross Profit and Gross Margin to understand how they have changed over time. This requires simple select statements grouped by year and filtered by the B2C channel.</p>
+<details>
+<summary>
+Show SQL Code
+</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">select</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    c.CalendarYear <span class="kw">as</span> [<span class="dt">year</span>],</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">round</span>(<span class="fu">sum</span>(fis.SalesAmount),<span class="dv">2</span>) <span class="kw">as</span> total_revenue,</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">round</span>(<span class="fu">sum</span>(fis.TotalProductCost),<span class="dv">2</span>) <span class="kw">as</span> total_cost,</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">round</span>(<span class="fu">sum</span>(fis.SalesAmount) <span class="op">-</span> <span class="fu">sum</span>(fis.TotalProductCost),<span class="dv">2</span>) <span class="kw">as</span> gross_profit,</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">cast</span>(<span class="fl">100.0</span> <span class="op">*</span> (<span class="fu">sum</span>(fis.salesamount) <span class="op">-</span> <span class="fu">sum</span>(fis.TotalProductCost)) <span class="op">/</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>        <span class="fu">nullif</span>(<span class="fu">sum</span>(fis.SalesAmount), <span class="dv">0</span>) <span class="kw">as</span> <span class="dt">decimal</span>(<span class="dv">5</span>,<span class="dv">2</span>)) <span class="kw">as</span> gross_margin_pct</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="kw">from</span> FactInternetSales fis</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="kw">left</span> <span class="kw">join</span> Calendar c</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="kw">on</span> c.DateKey <span class="op">=</span> fis.OrderDateKey</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="kw">where</span> c.CalendarYear <span class="kw">not</span> <span class="kw">in</span> (<span class="dv">2010</span>,<span class="dv">2014</span>)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="kw">group</span> <span class="kw">by</span> c.CalendarYear</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="kw">order</span> <span class="kw">by</span> [<span class="dt">year</span>] <span class="kw">asc</span>;</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<p><strong>Results:</strong></p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>year</th>
+<th>total_revenue</th>
+<th>total_cost</th>
+<th>gross_profit</th>
+<th>gross_margin_pct</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>2011</td>
+<td>7075525.9300</td>
+<td>4231462.1900</td>
+<td>2844063.7400</td>
+<td>40.20</td>
+</tr>
+<tr class="even">
+<td>2012</td>
+<td>5842485.2000</td>
+<td>3414478.1700</td>
+<td>2428007.0300</td>
+<td>41.56</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>16351550.3400</td>
+<td>9586139.3700</td>
+<td>6765410.9700</td>
+<td>41.37</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Insights:</strong></p>
+<p>The overall Gross Profit for the B2C channel has shown a significant increase from 2011 to 2013, with a growth rate of approximately 138% from 2011 to 2013. The Gross Margin has also improved over the years, increasing from 40.20% in 2011 to 41.37% in 2013. This indicates that the B2C channel has been able to generate more profit from its sales while maintaining a healthy margin, which is a positive sign for the business. The increase in Gross Profit and Gross Margin could be attributed to various factors such as increased sales volume, better pricing strategies, or improved cost management. Further analysis would be needed to identify the specific drivers behind this growth.</p>
+</section>
+<section id="year-over-year-yoy-revenue-growth-rate" class="level2">
+<h2 class="anchored" data-anchor-id="year-over-year-yoy-revenue-growth-rate">Year-over-Year (YoY) Revenue Growth Rate</h2>
+<p><code>2. What is the Year-over-Year (YoY) revenue growth rate for each month?</code></p>
+<p><strong>Solution Method:</strong> To answer this question, we will write a SQL query that retrieves the revenue for each month from the fact table, and then we will group the results by month and year to calculate the Year-over-Year (YoY) revenue growth rate. We will use the LAG function to compare the revenue of each month with the same month in the previous year to calculate the growth rate. In order to prevent any duplication problem, we should use Common Table Expressions (CTEs) which helps us to organize our query and make it more readable as well as to avoid any potential issues with duplicate data when calculating the YoY growth rate.</p>
+<details>
+<summary>
+Show SQL Code
+</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">with</span> calculations <span class="kw">as</span> (</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="kw">select</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    c.CalendarYear <span class="kw">as</span> [<span class="dt">year</span>], </span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    c.MonthNumberOfYear <span class="kw">as</span> month_number,</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    c.MonthName <span class="kw">as</span> month_name,</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">round</span>(<span class="fu">sum</span>(fis.SalesAmount),<span class="dv">2</span>) <span class="kw">as</span> curr_total_revenue,</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">lag</span>(<span class="fu">sum</span>(fis.SalesAmount), <span class="dv">1</span>) <span class="kw">over</span> (<span class="kw">partition</span> <span class="kw">by</span> c.MonthNumberOfYear </span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>        <span class="kw">order</span> <span class="kw">by</span> c.CalendarYear <span class="kw">asc</span>) <span class="kw">as</span> prev_total_revenue</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="kw">from</span> FactInternetSales fis </span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="kw">join</span> Calendar c </span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    <span class="kw">on</span> c.DateKey <span class="op">=</span> fis.OrderDateKey</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    <span class="kw">and</span> c.CalendarYear <span class="kw">not</span> <span class="kw">in</span> (<span class="dv">2010</span>,<span class="dv">2014</span>)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="kw">group</span> <span class="kw">by</span> </span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    c.CalendarYear, </span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    c.MonthNumberOfYear,</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    c.MonthName</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="kw">select</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>    [<span class="dt">year</span>], </span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>    month_number, </span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>    <span class="fu">round</span>(curr_total_revenue,<span class="dv">2</span>), </span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>    <span class="fu">round</span>(prev_total_revenue,<span class="dv">2</span>), </span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>    <span class="fu">cast</span>(<span class="fl">100.0</span> <span class="op">*</span> (curr_total_revenue <span class="op">-</span> prev_total_revenue) <span class="op">/</span> </span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>        <span class="fu">nullif</span>(prev_total_revenue, <span class="dv">0</span>) <span class="kw">as</span> <span class="dt">decimal</span>(<span class="dv">7</span>,<span class="dv">2</span>)) <span class="kw">as</span> revenue_growth_pct</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a><span class="kw">from</span> calculations cal</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a><span class="kw">order</span> <span class="kw">by</span> [<span class="dt">year</span>], month_number;</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<p><strong>Results:</strong></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 5%">
+<col style="width: 17%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>year</th>
+<th>month_number</th>
+<th>curr_total_revenue</th>
+<th>prev_total_revenue</th>
+<th>revenue_growth_pct</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>2011</td>
+<td>1</td>
+<td>469823.9100</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>2011</td>
+<td>2</td>
+<td>466334.9000</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>2011</td>
+<td>3</td>
+<td>485198.6600</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>2011</td>
+<td>4</td>
+<td>502073.8500</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>2011</td>
+<td>5</td>
+<td>561681.4800</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>2011</td>
+<td>6</td>
+<td>737839.8200</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>2011</td>
+<td>7</td>
+<td>596746.5600</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>2011</td>
+<td>8</td>
+<td>614557.9400</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>2011</td>
+<td>9</td>
+<td>603083.5000</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>2011</td>
+<td>10</td>
+<td>708208.0000</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>2011</td>
+<td>11</td>
+<td>660545.8100</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>2011</td>
+<td>12</td>
+<td>669431.5000</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>2012</td>
+<td>1</td>
+<td>495364.1300</td>
+<td>469823.9100</td>
+<td>5.44</td>
+</tr>
+<tr class="even">
+<td>2012</td>
+<td>2</td>
+<td>506994.1900</td>
+<td>466334.9000</td>
+<td>8.72</td>
+</tr>
+<tr class="odd">
+<td>2012</td>
+<td>3</td>
+<td>373483.0100</td>
+<td>485198.6600</td>
+<td>-23.02</td>
+</tr>
+<tr class="even">
+<td>2012</td>
+<td>4</td>
+<td>400335.6100</td>
+<td>502073.8500</td>
+<td>-20.26</td>
+</tr>
+<tr class="odd">
+<td>2012</td>
+<td>5</td>
+<td>358877.8900</td>
+<td>561681.4800</td>
+<td>-36.11</td>
+</tr>
+<tr class="even">
+<td>2012</td>
+<td>6</td>
+<td>555160.1400</td>
+<td>737839.8200</td>
+<td>-24.76</td>
+</tr>
+<tr class="odd">
+<td>2012</td>
+<td>7</td>
+<td>444558.2300</td>
+<td>596746.5600</td>
+<td>-25.50</td>
+</tr>
+<tr class="even">
+<td>2012</td>
+<td>8</td>
+<td>523917.3800</td>
+<td>614557.9400</td>
+<td>-14.75</td>
+</tr>
+<tr class="odd">
+<td>2012</td>
+<td>9</td>
+<td>486177.4500</td>
+<td>603083.5000</td>
+<td>-19.38</td>
+</tr>
+<tr class="even">
+<td>2012</td>
+<td>10</td>
+<td>535159.4800</td>
+<td>708208.0000</td>
+<td>-24.43</td>
+</tr>
+<tr class="odd">
+<td>2012</td>
+<td>11</td>
+<td>537955.5200</td>
+<td>660545.8100</td>
+<td>-18.56</td>
+</tr>
+<tr class="even">
+<td>2012</td>
+<td>12</td>
+<td>624502.1700</td>
+<td>669431.5000</td>
+<td>-6.71</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>1</td>
+<td>857689.9100</td>
+<td>495364.1300</td>
+<td>73.14</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>2</td>
+<td>771348.7400</td>
+<td>506994.1900</td>
+<td>52.14</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>3</td>
+<td>1049907.3900</td>
+<td>373483.0100</td>
+<td>181.11</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>4</td>
+<td>1046022.7700</td>
+<td>400335.6100</td>
+<td>161.29</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>5</td>
+<td>1284592.9300</td>
+<td>358877.8900</td>
+<td>257.95</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>6</td>
+<td>1643177.7800</td>
+<td>555160.1400</td>
+<td>195.98</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>7</td>
+<td>1371675.8100</td>
+<td>444558.2300</td>
+<td>208.55</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>8</td>
+<td>1551065.5600</td>
+<td>523917.3800</td>
+<td>196.05</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>9</td>
+<td>1447495.6900</td>
+<td>486177.4500</td>
+<td>197.73</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>10</td>
+<td>1673293.4100</td>
+<td>535159.4800</td>
+<td>212.67</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>11</td>
+<td>1780920.0600</td>
+<td>537955.5200</td>
+<td>231.05</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>12</td>
+<td>1874360.2900</td>
+<td>624502.1700</td>
+<td>200.14</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Insights:</strong> The Year-over-Year (YoY) revenue growth rate for each month shows significant fluctuations over the years. In 2012, there was a decline in revenue growth for most months compared to 2011, with some months experiencing a negative growth rate. However, in 2013, there was a substantial increase in revenue growth for all months compared to 2012, with some months experiencing a growth rate of over 200%. This indicates that the business experienced a significant recovery and growth in revenue in 2013 after a challenging year in 2012. The fluctuations in revenue growth could be attributed to various factors such as changes in market conditions, customer behavior, or the effectiveness of marketing and sales strategies. Or maybe the company launched better and became a more competitive player in the market in 2013, which led to a significant increase in revenue growth.</p>
+</section>
+<section id="seasonality-of-sales-and-quarterly-revenue-drivers" class="level2">
+<h2 class="anchored" data-anchor-id="seasonality-of-sales-and-quarterly-revenue-drivers">Seasonality of Sales and Quarterly Revenue Drivers</h2>
+<p><code>3. What is the monthly seasonality of our sales, and which quarter  drives the most revenue historically?</code></p>
+<p><strong>Solution Method:</strong> To answer this question, I have written a SQL query that calculates the monthly revenue for each month and quarter, and then identifies the quarter that drives the most revenue historically. The query uses Common Table Expressions (CTEs) to organize the calculations and make it easier to read. The first CTE calculates the monthly revenue for each month and quarter, while the second CTE calculates the total revenue for each quarter. Finally, we calculate the growth rate of each quarter compared to the previous quarter to identify trends in seasonality. To prevent any duplication and wrong calculations, we have used CTEs in a sequence in which the financial metrics are derived first, then grouped by quarter, and then grouped with window functions get the previous quarter’s revenue for growth rate calculation.</p>
+<details>
+<summary>
+Show SQL Code
+</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">with</span> revenue_calculations <span class="kw">as</span> (</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">select</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>        c.CalendarQuarter <span class="kw">as</span> [Quarter], </span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>        c.MonthNumberOfYear <span class="kw">as</span> month_number,</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>        c.MonthName <span class="kw">as</span> [<span class="dt">Month</span>],</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>        <span class="fu">coalesce</span>(<span class="fu">sum</span>(fis.SalesAmount),<span class="dv">0</span>) <span class="kw">as</span> revenue</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">from</span> FactInternetSales fis</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">join</span> Calendar c </span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>        <span class="kw">on</span> c.DateKey <span class="op">=</span> fis.OrderDateKey</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>        <span class="kw">and</span> c.CalendarYear <span class="kw">not</span> <span class="kw">in</span> (<span class="dv">2010</span>, <span class="dv">2014</span>)</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    <span class="kw">group</span> <span class="kw">by</span> </span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>        c.CalendarQuarter, </span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>        c.MonthNumberOfYear,</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>        c.MonthName</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>),</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>curr_quarter_revenue_calc <span class="kw">as</span> (</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>    <span class="kw">select</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>        [Quarter], </span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>        month_number,</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>        [<span class="dt">Month</span>], </span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>        revenue <span class="kw">as</span> monthly_revenue, </span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>        <span class="fu">sum</span>(revenue) <span class="kw">over</span> (<span class="kw">partition</span> <span class="kw">by</span> [Quarter]) <span class="kw">as</span> curr_quarter_revenue</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>    <span class="kw">from</span> revenue_calculations</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>),</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>growth_calc <span class="kw">as</span> (</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>    <span class="kw">select</span></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>            [Quarter], </span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>            month_number,</span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>            [<span class="dt">Month</span>], </span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>            monthly_revenue, </span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>            curr_quarter_revenue,</span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>            <span class="fu">lag</span>(curr_quarter_revenue,<span class="dv">3</span>) <span class="kw">over</span> (<span class="kw">order</span> <span class="kw">by</span> [Quarter], month_number) <span class="kw">as</span> prev_quarter_revenue</span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>    <span class="kw">from</span> curr_quarter_revenue_calc </span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a><span class="kw">select</span> </span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>    <span class="op">*</span>,</span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>    <span class="fu">cast</span> ((curr_quarter_revenue <span class="op">-</span> prev_quarter_revenue) <span class="op">/</span> <span class="fu">nullif</span>(prev_quarter_revenue,<span class="dv">0</span>) <span class="kw">as</span> <span class="dt">decimal</span>(<span class="dv">10</span>,<span class="dv">2</span>))</span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>        <span class="kw">as</span> Q_revenue_growth_pct</span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a><span class="kw">from</span> growth_calc</span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a><span class="kw">order</span> <span class="kw">by</span> </span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>    [Quarter], </span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>    month_number;</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<p><strong>Results:</strong></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 7%">
+<col style="width: 12%">
+<col style="width: 5%">
+<col style="width: 15%">
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Quarter</th>
+<th>month_number</th>
+<th>Month</th>
+<th>monthly_revenue</th>
+<th>curr_quarter_revenue</th>
+<th>prev_quarter_revenue</th>
+<th>Q_revenue_growth_pct</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>1</td>
+<td>January</td>
+<td>1822877.9509</td>
+<td>5476144.8363</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>2</td>
+<td>February</td>
+<td>1744677.8306</td>
+<td>5476144.8363</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>3</td>
+<td>March</td>
+<td>1908589.0548</td>
+<td>5476144.8363</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>4</td>
+<td>April</td>
+<td>1948432.2303</td>
+<td>7089762.2710</td>
+<td>5476144.8363</td>
+<td>0.29</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>5</td>
+<td>May</td>
+<td>2205152.2965</td>
+<td>7089762.2710</td>
+<td>5476144.8363</td>
+<td>0.29</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>6</td>
+<td>June</td>
+<td>2936177.7442</td>
+<td>7089762.2710</td>
+<td>5476144.8363</td>
+<td>0.29</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>7</td>
+<td>July</td>
+<td>2412980.5949</td>
+<td>7639278.1092</td>
+<td>7089762.2710</td>
+<td>0.08</td>
+</tr>
+<tr class="even">
+<td>3</td>
+<td>8</td>
+<td>August</td>
+<td>2689540.8765</td>
+<td>7639278.1092</td>
+<td>7089762.2710</td>
+<td>0.08</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>9</td>
+<td>September</td>
+<td>2536756.6378</td>
+<td>7639278.1092</td>
+<td>7089762.2710</td>
+<td>0.08</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>10</td>
+<td>October</td>
+<td>2916660.8978</td>
+<td>9064376.2478</td>
+<td>7639278.1092</td>
+<td>0.19</td>
+</tr>
+<tr class="odd">
+<td>4</td>
+<td>11</td>
+<td>November</td>
+<td>2979421.3902</td>
+<td>9064376.2478</td>
+<td>7639278.1092</td>
+<td>0.19</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>12</td>
+<td>December</td>
+<td>3168293.9598</td>
+<td>9064376.2478</td>
+<td>7639278.1092</td>
+<td>0.19</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Insights:</strong> The monthly seasonality of our sales shows that the revenue tends to increase in the second and fourth quarters of the year, with the fourth quarter driving the most revenue historically. The growth rate of the second quarter compared to the first quarter is approximately 29%, while the growth rate of the fourth quarter compared to the third quarter is approximately 19%. This indicates that there is a significant increase in sales during these quarters, which could be attributed to various factors such as seasonal demand, holidays, or promotional activities. Understanding this seasonality can help us to plan our inventory, marketing campaigns, and staffing levels more effectively to capitalize on these peak periods and maximize our revenue.</p>
+</section>
+<section id="average-order-value-aov-vs-total-order-volume-tov" class="level2">
+<h2 class="anchored" data-anchor-id="average-order-value-aov-vs-total-order-volume-tov">Average Order Value (AOV) vs Total Order Volume (TOV)</h2>
+<p><code>4. What is the Average Order Value (AOV) for the B2C channel, and how has it trended over time?</code></p>
+<p><strong>Solution Method:</strong> This question is quite straitforward. We should calculate the Average Order Value (AOV) for the B2C channel by dividing the total sales amount by the number of distinct orders. We will group the results by year and month to analyze the trend over time. The query uses a simple aggregation to calculate the total sales amount and count of distinct orders, and then divides these two metrics to get the AOV for each month and year. I did not include the years - 2010 and 2014 in the analysis as they are incomplete years in our dataset, which could skew the results and provide an inaccurate representation of the AOV trend over time. By excluding these years, we can ensure that our analysis is based on complete data and provides a more accurate picture of the AOV trend for the B2C channel.</p>
+<details>
+<summary>
+Show SQL Code
+</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">select</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    c.CalendarYear calendar_year, </span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    c.MonthNumberOfYear <span class="kw">as</span> month_number,</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">count</span>(<span class="kw">distinct</span> fis.SalesOrderNumber) <span class="kw">as</span> num_distinct_orders, </span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sum</span>(fis.OrderQuantity) <span class="kw">as</span> num_items, </span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">cast</span>(<span class="fu">sum</span>(fis.SalesAmount) <span class="op">/</span> <span class="fu">nullif</span>(<span class="fu">count</span> (<span class="kw">distinct</span> fis.SalesOrderNumber),<span class="dv">0</span>) <span class="kw">as</span> <span class="dt">float</span>)</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>        <span class="kw">as</span> avg_order_value</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="kw">from</span> FactInternetSales fis</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="kw">join</span> Calendar c</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    <span class="kw">on</span> c.DateKey <span class="op">=</span> fis.OrderDateKey</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    <span class="kw">and</span> c.CalendarYear <span class="kw">not</span> <span class="kw">in</span> (<span class="dv">2010</span>, <span class="dv">2014</span>)</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="kw">group</span> <span class="kw">by</span> </span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>    c.CalendarYear,</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>    c.MonthNumberOfYear</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="kw">order</span> <span class="kw">by</span> </span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>    calendar_year,</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>    month_number;</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<p><strong>Results:</strong></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 19%">
+<col style="width: 17%">
+<col style="width: 27%">
+<col style="width: 13%">
+<col style="width: 22%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>calendar_year</th>
+<th>month_number</th>
+<th>num_distinct_orders</th>
+<th>num_items</th>
+<th>avg_order_value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>2011</td>
+<td>1</td>
+<td>144</td>
+<td>144</td>
+<td>3262.666</td>
+</tr>
+<tr class="even">
+<td>2011</td>
+<td>2</td>
+<td>144</td>
+<td>144</td>
+<td>3238.4368</td>
+</tr>
+<tr class="odd">
+<td>2011</td>
+<td>3</td>
+<td>150</td>
+<td>150</td>
+<td>3234.6577</td>
+</tr>
+<tr class="even">
+<td>2011</td>
+<td>4</td>
+<td>157</td>
+<td>157</td>
+<td>3197.9225</td>
+</tr>
+<tr class="odd">
+<td>2011</td>
+<td>5</td>
+<td>174</td>
+<td>174</td>
+<td>3228.0544</td>
+</tr>
+<tr class="even">
+<td>2011</td>
+<td>6</td>
+<td>230</td>
+<td>230</td>
+<td>3207.9992</td>
+</tr>
+<tr class="odd">
+<td>2011</td>
+<td>7</td>
+<td>188</td>
+<td>188</td>
+<td>3174.1838</td>
+</tr>
+<tr class="even">
+<td>2011</td>
+<td>8</td>
+<td>193</td>
+<td>193</td>
+<td>3184.238</td>
+</tr>
+<tr class="odd">
+<td>2011</td>
+<td>9</td>
+<td>185</td>
+<td>185</td>
+<td>3259.9107</td>
+</tr>
+<tr class="even">
+<td>2011</td>
+<td>10</td>
+<td>221</td>
+<td>221</td>
+<td>3204.5611</td>
+</tr>
+<tr class="odd">
+<td>2011</td>
+<td>11</td>
+<td>208</td>
+<td>208</td>
+<td>3175.701</td>
+</tr>
+<tr class="even">
+<td>2011</td>
+<td>12</td>
+<td>222</td>
+<td>222</td>
+<td>3015.4572</td>
+</tr>
+<tr class="odd">
+<td>2012</td>
+<td>1</td>
+<td>252</td>
+<td>252</td>
+<td>1965.7306</td>
+</tr>
+<tr class="even">
+<td>2012</td>
+<td>2</td>
+<td>260</td>
+<td>260</td>
+<td>1949.9776</td>
+</tr>
+<tr class="odd">
+<td>2012</td>
+<td>3</td>
+<td>212</td>
+<td>212</td>
+<td>1761.7122</td>
+</tr>
+<tr class="even">
+<td>2012</td>
+<td>4</td>
+<td>219</td>
+<td>219</td>
+<td>1828.0165</td>
+</tr>
+<tr class="odd">
+<td>2012</td>
+<td>5</td>
+<td>207</td>
+<td>207</td>
+<td>1733.7096</td>
+</tr>
+<tr class="even">
+<td>2012</td>
+<td>6</td>
+<td>318</td>
+<td>318</td>
+<td>1745.7866</td>
+</tr>
+<tr class="odd">
+<td>2012</td>
+<td>7</td>
+<td>246</td>
+<td>246</td>
+<td>1807.1472</td>
+</tr>
+<tr class="even">
+<td>2012</td>
+<td>8</td>
+<td>294</td>
+<td>294</td>
+<td>1782.0319</td>
+</tr>
+<tr class="odd">
+<td>2012</td>
+<td>9</td>
+<td>269</td>
+<td>269</td>
+<td>1807.3511</td>
+</tr>
+<tr class="even">
+<td>2012</td>
+<td>10</td>
+<td>313</td>
+<td>313</td>
+<td>1709.7747</td>
+</tr>
+<tr class="odd">
+<td>2012</td>
+<td>11</td>
+<td>324</td>
+<td>324</td>
+<td>1660.3565</td>
+</tr>
+<tr class="even">
+<td>2012</td>
+<td>12</td>
+<td>355</td>
+<td>483</td>
+<td>1759.161</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>1</td>
+<td>632</td>
+<td>1662</td>
+<td>1357.1042</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>2</td>
+<td>1421</td>
+<td>3453</td>
+<td>542.821</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>3</td>
+<td>1690</td>
+<td>4087</td>
+<td>621.2469</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>4</td>
+<td>1612</td>
+<td>3979</td>
+<td>648.8975</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>5</td>
+<td>1792</td>
+<td>4399</td>
+<td>716.8487</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>6</td>
+<td>2007</td>
+<td>5025</td>
+<td>818.7233</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>7</td>
+<td>1875</td>
+<td>4671</td>
+<td>731.5604</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>8</td>
+<td>1966</td>
+<td>4865</td>
+<td>788.9448</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>9</td>
+<td>1884</td>
+<td>4616</td>
+<td>768.3098</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>10</td>
+<td>2131</td>
+<td>5300</td>
+<td>785.2151</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>11</td>
+<td>2087</td>
+<td>5224</td>
+<td>853.3397</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>12</td>
+<td>2192</td>
+<td>5520</td>
+<td>855.0913</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Insights:</strong> The Average Order Value (AOV) has shown a significant decline from 2011 to 2013. In 2011, the AOV was consistently above $3000, while in 2012, it dropped to around $1700-$1900, and in 2013, it further declined to around $500-$800. This indicates that customers in the B2C channel are spending less per order over time. The decline in AOV could be attributed to various factors such as changes in customer behavior, increased competition, or the effectiveness of marketing and sales strategies. It is important for the business to analyze the underlying reasons for this decline and take appropriate actions to improve the AOV, such as offering promotions or bundling products to encourage customers to spend more per order. Conversely, the increase in the number of distinct orders and items sold over the years suggests that while customers are spending less per order, they are making more purchases overall, which could indicate a shift in customer behavior towards more frequent but smaller purchases. Toward the end of 2013, customers tend to buy more items per order, but spend less on average per order, which could indicate a shift in customer behavior towards more frequent but smaller purchases. Overall, that compensates for the decline in AOV and could be a positive sign for the business as it indicates that customers are still engaged and making purchases, even if they are spending less per order. However, it is important to monitor this trend closely and take appropriate actions to ensure that the business continues to grow and remain competitive in the market.</p>
+</section>
+<section id="year-to-date-ytd-revenue-and-profitability" class="level2">
+<h2 class="anchored" data-anchor-id="year-to-date-ytd-revenue-and-profitability">Year-to-Date (YTD) Revenue and Profitability</h2>
+<p><code>5. What is the Year-to-Date (YTD) revenue and profitability for the current year compared to the previous year?</code></p>
+<p><strong>Solution Method:</strong> I solved this question by using window function <code>sum</code> with <code>order by day_number</code> to calculate the cumulative revenue for each day of the year. The financial metrics are calculated in a CTE on a daily basis and then for the cumulative ytd calculations, <code>sum</code> window function is used.</p>
+<details>
+<summary>
+Show SQL Code
+</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">with</span> revenue_calculation <span class="kw">as</span> (</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">select</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>        c.CalendarYear <span class="kw">as</span> calendar_year,</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>        c.MonthNumberOfYear <span class="kw">as</span> month_number,</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>        c.DayNumberOfYear <span class="kw">as</span> day_number,</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>        <span class="fu">count</span>(<span class="kw">distinct</span> fis.SalesOrderNumber) <span class="kw">as</span> num_orders,</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>        <span class="fu">coalesce</span>(<span class="fu">sum</span>(fis.salesamount), <span class="dv">0</span>) <span class="kw">as</span> daily_revenue</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">from</span> FactInternetSales fis </span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">right</span> <span class="kw">join</span> Calendar c </span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>        <span class="kw">on</span> c.DateKey <span class="op">=</span> fis.OrderDateKey</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>    <span class="kw">where</span> c.CalendarYear <span class="op">=</span> <span class="dv">2013</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>    <span class="kw">group</span> <span class="kw">by</span> </span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>        c.CalendarYear,</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>        c.MonthNumberOfYear,</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>        c.DayNumberOfYear       </span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a><span class="kw">select</span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>    <span class="op">*</span>,</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sum</span>(daily_revenue) <span class="kw">over</span> (<span class="kw">order</span> <span class="kw">by</span> day_number) <span class="kw">as</span> cumulative_revenue</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a><span class="kw">from</span> revenue_calculation r</span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a><span class="kw">order</span> <span class="kw">by</span> </span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>    calendar_year,</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>    month_number,</span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>    day_number</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<p><strong>Results:</strong></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 17%">
+<col style="width: 15%">
+<col style="width: 13%">
+<col style="width: 13%">
+<col style="width: 17%">
+<col style="width: 23%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>calendar_year</th>
+<th>month_number</th>
+<th>day_number</th>
+<th>num_orders</th>
+<th>daily_revenue</th>
+<th>cumulative_revenue</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>2013</td>
+<td>1</td>
+<td>1</td>
+<td>15</td>
+<td>29456.2500</td>
+<td>29456.2500</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>1</td>
+<td>2</td>
+<td>6</td>
+<td>12775.3300</td>
+<td>42231.5800</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>1</td>
+<td>3</td>
+<td>17</td>
+<td>32708.4500</td>
+<td>74940.0300</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>1</td>
+<td>4</td>
+<td>15</td>
+<td>27369.3400</td>
+<td>102309.3700</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>1</td>
+<td>5</td>
+<td>21</td>
+<td>32681.4400</td>
+<td>134990.8100</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>1</td>
+<td>6</td>
+<td>15</td>
+<td>21787.0200</td>
+<td>156777.8300</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>1</td>
+<td>7</td>
+<td>23</td>
+<td>43285.7400</td>
+<td>200063.5700</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>1</td>
+<td>8</td>
+<td>15</td>
+<td>22765.5900</td>
+<td>222829.1600</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>1</td>
+<td>9</td>
+<td>17</td>
+<td>29735.1400</td>
+<td>252564.3000</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>1</td>
+<td>10</td>
+<td>16</td>
+<td>27143.7400</td>
+<td>279708.0400</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>1</td>
+<td>11</td>
+<td>19</td>
+<td>30792.0700</td>
+<td>310500.1100</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>1</td>
+<td>12</td>
+<td>14</td>
+<td>24151.7200</td>
+<td>334651.8300</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>1</td>
+<td>13</td>
+<td>16</td>
+<td>29332.0600</td>
+<td>363983.8900</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>1</td>
+<td>14</td>
+<td>9</td>
+<td>16864.1700</td>
+<td>380848.0600</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>1</td>
+<td>15</td>
+<td>13</td>
+<td>17740.4800</td>
+<td>398588.5400</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>1</td>
+<td>16</td>
+<td>24</td>
+<td>43007.0600</td>
+<td>441595.6000</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>1</td>
+<td>17</td>
+<td>9</td>
+<td>10662.1000</td>
+<td>452257.7000</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>1</td>
+<td>18</td>
+<td>17</td>
+<td>29251.1300</td>
+<td>481508.8300</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>1</td>
+<td>19</td>
+<td>15</td>
+<td>27969.6300</td>
+<td>509478.4600</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>1</td>
+<td>20</td>
+<td>28</td>
+<td>46251.4900</td>
+<td>555729.9500</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>1</td>
+<td>21</td>
+<td>15</td>
+<td>24486.9700</td>
+<td>580216.9200</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>1</td>
+<td>22</td>
+<td>18</td>
+<td>37173.2900</td>
+<td>617390.2100</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>1</td>
+<td>23</td>
+<td>15</td>
+<td>20063.2400</td>
+<td>637453.4500</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>1</td>
+<td>24</td>
+<td>16</td>
+<td>21670.4100</td>
+<td>659123.8600</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>1</td>
+<td>25</td>
+<td>25</td>
+<td>46265.1100</td>
+<td>705388.9700</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>1</td>
+<td>26</td>
+<td>12</td>
+<td>21245.6500</td>
+<td>726634.6200</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>1</td>
+<td>27</td>
+<td>18</td>
+<td>32820.6000</td>
+<td>759455.2200</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>1</td>
+<td>28</td>
+<td>46</td>
+<td>22444.7800</td>
+<td>781900.0000</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>1</td>
+<td>29</td>
+<td>43</td>
+<td>17544.6500</td>
+<td>799444.6500</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>1</td>
+<td>30</td>
+<td>54</td>
+<td>34958.3200</td>
+<td>834402.9700</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>1</td>
+<td>31</td>
+<td>46</td>
+<td>23286.9400</td>
+<td>857689.9100</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>2</td>
+<td>32</td>
+<td>42</td>
+<td>10631.9600</td>
+<td>868321.8700</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>2</td>
+<td>33</td>
+<td>46</td>
+<td>31641.0400</td>
+<td>899962.9100</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>2</td>
+<td>34</td>
+<td>58</td>
+<td>39821.9000</td>
+<td>939784.8100</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>2</td>
+<td>35</td>
+<td>67</td>
+<td>41050.1100</td>
+<td>980834.9200</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>2</td>
+<td>36</td>
+<td>51</td>
+<td>36502.4900</td>
+<td>1017337.4100</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>2</td>
+<td>37</td>
+<td>36</td>
+<td>9256.8800</td>
+<td>1026594.2900</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>2</td>
+<td>38</td>
+<td>43</td>
+<td>23441.9800</td>
+<td>1050036.2700</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>2</td>
+<td>39</td>
+<td>61</td>
+<td>38978.8800</td>
+<td>1089015.1500</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>2</td>
+<td>40</td>
+<td>53</td>
+<td>27145.6800</td>
+<td>1116160.8300</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>2</td>
+<td>41</td>
+<td>55</td>
+<td>22354.9400</td>
+<td>1138515.7700</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>2</td>
+<td>42</td>
+<td>38</td>
+<td>8935.5300</td>
+<td>1147451.3000</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>2</td>
+<td>43</td>
+<td>55</td>
+<td>24718.8800</td>
+<td>1172170.1800</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>2</td>
+<td>44</td>
+<td>56</td>
+<td>30727.6500</td>
+<td>1202897.8300</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>2</td>
+<td>45</td>
+<td>52</td>
+<td>43821.1300</td>
+<td>1246718.9600</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>2</td>
+<td>46</td>
+<td>63</td>
+<td>32532.8800</td>
+<td>1279251.8400</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>2</td>
+<td>47</td>
+<td>42</td>
+<td>22848.5000</td>
+<td>1302100.3400</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>2</td>
+<td>48</td>
+<td>47</td>
+<td>22208.3300</td>
+<td>1324308.6700</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>2</td>
+<td>49</td>
+<td>33</td>
+<td>16582.6700</td>
+<td>1340891.3400</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>2</td>
+<td>50</td>
+<td>41</td>
+<td>23768.6400</td>
+<td>1364659.9800</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>2</td>
+<td>51</td>
+<td>64</td>
+<td>38394.4200</td>
+<td>1403054.4000</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>2</td>
+<td>52</td>
+<td>65</td>
+<td>34077.1600</td>
+<td>1437131.5600</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>2</td>
+<td>53</td>
+<td>52</td>
+<td>33445.8200</td>
+<td>1470577.3800</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>2</td>
+<td>54</td>
+<td>55</td>
+<td>16562.7900</td>
+<td>1487140.1700</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>2</td>
+<td>55</td>
+<td>49</td>
+<td>29636.8500</td>
+<td>1516777.0200</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>2</td>
+<td>56</td>
+<td>56</td>
+<td>33871.0600</td>
+<td>1550648.0800</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>2</td>
+<td>57</td>
+<td>53</td>
+<td>30886.4900</td>
+<td>1581534.5700</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>2</td>
+<td>58</td>
+<td>52</td>
+<td>25334.1600</td>
+<td>1606868.7300</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>2</td>
+<td>59</td>
+<td>36</td>
+<td>22169.9200</td>
+<td>1629038.6500</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>3</td>
+<td>60</td>
+<td>58</td>
+<td>39771.1000</td>
+<td>1668809.7500</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>3</td>
+<td>61</td>
+<td>52</td>
+<td>39824.6300</td>
+<td>1708634.3800</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>3</td>
+<td>62</td>
+<td>58</td>
+<td>27876.1300</td>
+<td>1736510.5100</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>3</td>
+<td>63</td>
+<td>44</td>
+<td>37420.7100</td>
+<td>1773931.2200</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>3</td>
+<td>64</td>
+<td>46</td>
+<td>34742.5300</td>
+<td>1808673.7500</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>3</td>
+<td>65</td>
+<td>57</td>
+<td>30966.9000</td>
+<td>1839640.6500</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>3</td>
+<td>66</td>
+<td>62</td>
+<td>36027.7100</td>
+<td>1875668.3600</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>3</td>
+<td>67</td>
+<td>64</td>
+<td>39610.7600</td>
+<td>1915279.1200</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>3</td>
+<td>68</td>
+<td>45</td>
+<td>31852.7300</td>
+<td>1947131.8500</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>3</td>
+<td>69</td>
+<td>37</td>
+<td>22015.5400</td>
+<td>1969147.3900</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>3</td>
+<td>70</td>
+<td>64</td>
+<td>38930.5000</td>
+<td>2008077.8900</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>3</td>
+<td>71</td>
+<td>67</td>
+<td>55983.3400</td>
+<td>2064061.2300</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>3</td>
+<td>72</td>
+<td>60</td>
+<td>36316.7000</td>
+<td>2100377.9300</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>3</td>
+<td>73</td>
+<td>54</td>
+<td>31670.5900</td>
+<td>2132048.5200</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>3</td>
+<td>74</td>
+<td>47</td>
+<td>22219.7800</td>
+<td>2154268.3000</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>3</td>
+<td>75</td>
+<td>50</td>
+<td>25425.5800</td>
+<td>2179693.8800</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>3</td>
+<td>76</td>
+<td>58</td>
+<td>32091.4500</td>
+<td>2211785.3300</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>3</td>
+<td>77</td>
+<td>72</td>
+<td>57809.7900</td>
+<td>2269595.1200</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>3</td>
+<td>78</td>
+<td>59</td>
+<td>46671.4900</td>
+<td>2316266.6100</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>3</td>
+<td>79</td>
+<td>54</td>
+<td>23583.0900</td>
+<td>2339849.7000</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>3</td>
+<td>80</td>
+<td>51</td>
+<td>41473.8800</td>
+<td>2381323.5800</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>3</td>
+<td>81</td>
+<td>60</td>
+<td>36721.2200</td>
+<td>2418044.8000</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>3</td>
+<td>82</td>
+<td>51</td>
+<td>25622.8100</td>
+<td>2443667.6100</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>3</td>
+<td>83</td>
+<td>44</td>
+<td>31296.5600</td>
+<td>2474964.1700</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>3</td>
+<td>84</td>
+<td>54</td>
+<td>28647.1200</td>
+<td>2503611.2900</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>3</td>
+<td>85</td>
+<td>62</td>
+<td>38171.1600</td>
+<td>2541782.4500</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>3</td>
+<td>86</td>
+<td>47</td>
+<td>22332.0700</td>
+<td>2564114.5200</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>3</td>
+<td>87</td>
+<td>40</td>
+<td>22851.9900</td>
+<td>2586966.5100</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>3</td>
+<td>88</td>
+<td>54</td>
+<td>30160.3500</td>
+<td>2617126.8600</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>3</td>
+<td>89</td>
+<td>52</td>
+<td>23935.6900</td>
+<td>2641062.5500</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>3</td>
+<td>90</td>
+<td>67</td>
+<td>37883.4900</td>
+<td>2678946.0400</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>4</td>
+<td>91</td>
+<td>54</td>
+<td>31103.1300</td>
+<td>2710049.1700</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>4</td>
+<td>92</td>
+<td>50</td>
+<td>34252.6900</td>
+<td>2744301.8600</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>4</td>
+<td>93</td>
+<td>58</td>
+<td>40796.0400</td>
+<td>2785097.9000</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>4</td>
+<td>94</td>
+<td>69</td>
+<td>44971.0700</td>
+<td>2830068.9700</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>4</td>
+<td>95</td>
+<td>54</td>
+<td>25428.9400</td>
+<td>2855497.9100</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>4</td>
+<td>96</td>
+<td>77</td>
+<td>45482.0100</td>
+<td>2900979.9200</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>4</td>
+<td>97</td>
+<td>54</td>
+<td>39051.4200</td>
+<td>2940031.3400</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>4</td>
+<td>98</td>
+<td>55</td>
+<td>27693.9000</td>
+<td>2967725.2400</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>4</td>
+<td>99</td>
+<td>46</td>
+<td>39658.4900</td>
+<td>3007383.7300</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>4</td>
+<td>100</td>
+<td>52</td>
+<td>37216.3600</td>
+<td>3044600.0900</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>4</td>
+<td>101</td>
+<td>48</td>
+<td>34319.7400</td>
+<td>3078919.8300</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>4</td>
+<td>102</td>
+<td>57</td>
+<td>37204.9100</td>
+<td>3116124.7400</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>4</td>
+<td>103</td>
+<td>63</td>
+<td>37378.3400</td>
+<td>3153503.0800</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>4</td>
+<td>104</td>
+<td>37</td>
+<td>26819.8400</td>
+<td>3180322.9200</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>4</td>
+<td>105</td>
+<td>48</td>
+<td>36773.1100</td>
+<td>3217096.0300</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>4</td>
+<td>106</td>
+<td>59</td>
+<td>45650.0900</td>
+<td>3262746.1200</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>4</td>
+<td>107</td>
+<td>45</td>
+<td>39352.1200</td>
+<td>3302098.2400</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>4</td>
+<td>108</td>
+<td>53</td>
+<td>22301.6700</td>
+<td>3324399.9100</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>4</td>
+<td>109</td>
+<td>53</td>
+<td>34310.9300</td>
+<td>3358710.8400</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>4</td>
+<td>110</td>
+<td>57</td>
+<td>43325.9800</td>
+<td>3402036.8200</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>4</td>
+<td>111</td>
+<td>59</td>
+<td>38076.7000</td>
+<td>3440113.5200</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>4</td>
+<td>112</td>
+<td>45</td>
+<td>17996.0600</td>
+<td>3458109.5800</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>4</td>
+<td>113</td>
+<td>48</td>
+<td>27583.8400</td>
+<td>3485693.4200</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>4</td>
+<td>114</td>
+<td>65</td>
+<td>44684.9300</td>
+<td>3530378.3500</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>4</td>
+<td>115</td>
+<td>39</td>
+<td>31332.8100</td>
+<td>3561711.1600</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>4</td>
+<td>116</td>
+<td>55</td>
+<td>35940.8000</td>
+<td>3597651.9600</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>4</td>
+<td>117</td>
+<td>56</td>
+<td>27813.4100</td>
+<td>3625465.3700</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>4</td>
+<td>118</td>
+<td>52</td>
+<td>36069.5700</td>
+<td>3661534.9400</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>4</td>
+<td>119</td>
+<td>53</td>
+<td>36041.5000</td>
+<td>3697576.4400</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>4</td>
+<td>120</td>
+<td>51</td>
+<td>27392.3700</td>
+<td>3724968.8100</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>5</td>
+<td>121</td>
+<td>59</td>
+<td>38023.4200</td>
+<td>3762992.2300</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>5</td>
+<td>122</td>
+<td>69</td>
+<td>49081.4000</td>
+<td>3812073.6300</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>5</td>
+<td>123</td>
+<td>58</td>
+<td>28476.5400</td>
+<td>3840550.1700</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>5</td>
+<td>124</td>
+<td>53</td>
+<td>32476.9600</td>
+<td>3873027.1300</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>5</td>
+<td>125</td>
+<td>52</td>
+<td>38762.5700</td>
+<td>3911789.7000</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>5</td>
+<td>126</td>
+<td>60</td>
+<td>39303.6200</td>
+<td>3951093.3200</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>5</td>
+<td>127</td>
+<td>41</td>
+<td>28390.2200</td>
+<td>3979483.5400</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>5</td>
+<td>128</td>
+<td>55</td>
+<td>46553.4100</td>
+<td>4026036.9500</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>5</td>
+<td>129</td>
+<td>58</td>
+<td>52843.5600</td>
+<td>4078880.5100</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>5</td>
+<td>130</td>
+<td>41</td>
+<td>18442.1900</td>
+<td>4097322.7000</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>5</td>
+<td>131</td>
+<td>55</td>
+<td>36868.6700</td>
+<td>4134191.3700</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>5</td>
+<td>132</td>
+<td>58</td>
+<td>36145.2100</td>
+<td>4170336.5800</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>5</td>
+<td>133</td>
+<td>57</td>
+<td>36084.7400</td>
+<td>4206421.3200</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>5</td>
+<td>134</td>
+<td>61</td>
+<td>41838.9900</td>
+<td>4248260.3100</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>5</td>
+<td>135</td>
+<td>52</td>
+<td>38193.1600</td>
+<td>4286453.4700</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>5</td>
+<td>136</td>
+<td>59</td>
+<td>41496.5200</td>
+<td>4327949.9900</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>5</td>
+<td>137</td>
+<td>62</td>
+<td>39300.1900</td>
+<td>4367250.1800</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>5</td>
+<td>138</td>
+<td>57</td>
+<td>43510.9200</td>
+<td>4410761.1000</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>5</td>
+<td>139</td>
+<td>39</td>
+<td>26966.2000</td>
+<td>4437727.3000</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>5</td>
+<td>140</td>
+<td>62</td>
+<td>38025.5000</td>
+<td>4475752.8000</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>5</td>
+<td>141</td>
+<td>65</td>
+<td>58402.9600</td>
+<td>4534155.7600</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>5</td>
+<td>142</td>
+<td>54</td>
+<td>38000.7600</td>
+<td>4572156.5200</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>5</td>
+<td>143</td>
+<td>72</td>
+<td>61004.7500</td>
+<td>4633161.2700</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>5</td>
+<td>144</td>
+<td>44</td>
+<td>35148.8500</td>
+<td>4668310.1200</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>5</td>
+<td>145</td>
+<td>55</td>
+<td>42799.3400</td>
+<td>4711109.4600</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>5</td>
+<td>146</td>
+<td>62</td>
+<td>50332.8200</td>
+<td>4761442.2800</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>5</td>
+<td>147</td>
+<td>75</td>
+<td>53495.7100</td>
+<td>4814937.9900</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>5</td>
+<td>148</td>
+<td>62</td>
+<td>45631.1100</td>
+<td>4860569.1000</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>5</td>
+<td>149</td>
+<td>62</td>
+<td>33988.4500</td>
+<td>4894557.5500</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>5</td>
+<td>150</td>
+<td>66</td>
+<td>63052.5900</td>
+<td>4957610.1400</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>5</td>
+<td>151</td>
+<td>67</td>
+<td>51951.6000</td>
+<td>5009561.7400</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>6</td>
+<td>152</td>
+<td>62</td>
+<td>62935.4600</td>
+<td>5072497.2000</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>6</td>
+<td>153</td>
+<td>71</td>
+<td>51323.5800</td>
+<td>5123820.7800</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>6</td>
+<td>154</td>
+<td>64</td>
+<td>55816.6800</td>
+<td>5179637.4600</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>6</td>
+<td>155</td>
+<td>81</td>
+<td>72376.4600</td>
+<td>5252013.9200</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>6</td>
+<td>156</td>
+<td>91</td>
+<td>77359.3400</td>
+<td>5329373.2600</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>6</td>
+<td>157</td>
+<td>69</td>
+<td>47438.0100</td>
+<td>5376811.2700</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>6</td>
+<td>158</td>
+<td>61</td>
+<td>46708.2500</td>
+<td>5423519.5200</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>6</td>
+<td>159</td>
+<td>52</td>
+<td>28462.0600</td>
+<td>5451981.5800</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>6</td>
+<td>160</td>
+<td>71</td>
+<td>57790.0200</td>
+<td>5509771.6000</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>6</td>
+<td>161</td>
+<td>72</td>
+<td>69712.4900</td>
+<td>5579484.0900</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>6</td>
+<td>162</td>
+<td>79</td>
+<td>59151.7000</td>
+<td>5638635.7900</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>6</td>
+<td>163</td>
+<td>61</td>
+<td>60327.8000</td>
+<td>5698963.5900</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>6</td>
+<td>164</td>
+<td>79</td>
+<td>57660.1800</td>
+<td>5756623.7700</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>6</td>
+<td>165</td>
+<td>56</td>
+<td>36793.0700</td>
+<td>5793416.8400</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>6</td>
+<td>166</td>
+<td>70</td>
+<td>49744.4100</td>
+<td>5843161.2500</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>6</td>
+<td>167</td>
+<td>69</td>
+<td>67078.7600</td>
+<td>5910240.0100</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>6</td>
+<td>168</td>
+<td>64</td>
+<td>63750.5500</td>
+<td>5973990.5600</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>6</td>
+<td>169</td>
+<td>71</td>
+<td>67958.6800</td>
+<td>6041949.2400</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>6</td>
+<td>170</td>
+<td>66</td>
+<td>63875.1500</td>
+<td>6105824.3900</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>6</td>
+<td>171</td>
+<td>43</td>
+<td>34686.2900</td>
+<td>6140510.6800</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>6</td>
+<td>172</td>
+<td>69</td>
+<td>54909.8000</td>
+<td>6195420.4800</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>6</td>
+<td>173</td>
+<td>66</td>
+<td>43262.2000</td>
+<td>6238682.6800</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>6</td>
+<td>174</td>
+<td>68</td>
+<td>51595.5600</td>
+<td>6290278.2400</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>6</td>
+<td>175</td>
+<td>72</td>
+<td>60689.6500</td>
+<td>6350967.8900</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>6</td>
+<td>176</td>
+<td>58</td>
+<td>48388.7800</td>
+<td>6399356.6700</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>6</td>
+<td>177</td>
+<td>61</td>
+<td>54856.9200</td>
+<td>6454213.5900</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>6</td>
+<td>178</td>
+<td>77</td>
+<td>53955.4300</td>
+<td>6508169.0200</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>6</td>
+<td>179</td>
+<td>60</td>
+<td>59653.1500</td>
+<td>6567822.1700</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>6</td>
+<td>180</td>
+<td>80</td>
+<td>58523.1500</td>
+<td>6626345.3200</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>6</td>
+<td>181</td>
+<td>44</td>
+<td>26394.2000</td>
+<td>6652739.5200</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>7</td>
+<td>182</td>
+<td>59</td>
+<td>42043.5000</td>
+<td>6694783.0200</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>7</td>
+<td>183</td>
+<td>56</td>
+<td>46519.0800</td>
+<td>6741302.1000</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>7</td>
+<td>184</td>
+<td>54</td>
+<td>39773.7300</td>
+<td>6781075.8300</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>7</td>
+<td>185</td>
+<td>57</td>
+<td>38727.3700</td>
+<td>6819803.2000</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>7</td>
+<td>186</td>
+<td>59</td>
+<td>35559.6100</td>
+<td>6855362.8100</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>7</td>
+<td>187</td>
+<td>59</td>
+<td>53206.9300</td>
+<td>6908569.7400</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>7</td>
+<td>188</td>
+<td>75</td>
+<td>49743.6100</td>
+<td>6958313.3500</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>7</td>
+<td>189</td>
+<td>51</td>
+<td>35343.9500</td>
+<td>6993657.3000</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>7</td>
+<td>190</td>
+<td>73</td>
+<td>48424.3400</td>
+<td>7042081.6400</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>7</td>
+<td>191</td>
+<td>66</td>
+<td>48800.9800</td>
+<td>7090882.6200</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>7</td>
+<td>192</td>
+<td>50</td>
+<td>46615.6000</td>
+<td>7137498.2200</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>7</td>
+<td>193</td>
+<td>50</td>
+<td>41774.3100</td>
+<td>7179272.5300</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>7</td>
+<td>194</td>
+<td>66</td>
+<td>45260.8300</td>
+<td>7224533.3600</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>7</td>
+<td>195</td>
+<td>70</td>
+<td>50908.5600</td>
+<td>7275441.9200</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>7</td>
+<td>196</td>
+<td>75</td>
+<td>43804.2400</td>
+<td>7319246.1600</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>7</td>
+<td>197</td>
+<td>52</td>
+<td>30545.3700</td>
+<td>7349791.5300</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>7</td>
+<td>198</td>
+<td>62</td>
+<td>29326.1400</td>
+<td>7379117.6700</td>
+</tr>
+<tr class="odd">
+<td>2013</td>
+<td>7</td>
+<td>199</td>
+<td>49</td>
+<td>34962.3400</td>
+<td>7414080.0100</td>
+</tr>
+<tr class="even">
+<td>2013</td>
+<td>7</td>
+<td>200</td>
+<td>75</td>
+<td>59580.2200</td>
+<td>7473660.2300</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Insights:</strong> The Year-to-Date (YTD) revenue for the current year (2013) shows a steady increase over time, with cumulative revenue reaching approximately $7.47 million by the end of July. The profitability trend can be analyzed by comparing the daily revenue and cumulative revenue, which indicates that the business is generating consistent revenue growth throughout the year. The significant increase in revenue in June and July could be attributed to seasonal factors, promotional activities, or increased customer demand during these months. It is important for the business to continue monitoring the YTD revenue and profitability trends to make informed decisions about inventory management, marketing strategies, and resource allocation to sustain growth and maximize profitability.</p>
+</section>
+</section>
+<section id="conclusion" class="level1">
+<h1>Conclusion</h1>
+<p>The first domain is focused on analyzing the revenue growth, seasonality of sales, average order value, and year-to-date revenue and profitability for the B2C channel. According to the results of the SQL queries we derived following insights:</p>
+<ul>
+<li>The Year-over-Year (YoY) revenue growth rate for each month shows significant fluctuations over the years, with a substantial increase in revenue growth in 2013 compared to 2012.</li>
+<li>The monthly seasonality of sales indicates that the second and fourth quarters of the year drive the most revenue historically, with significant growth rates compared to the previous quarters.</li>
+<li>The Average Order Value (AOV) for the B2C channel has shown a significant decline from 2011 to 2013, while the number of distinct orders and items sold has increased, indicating a shift in customer behavior towards more frequent but smaller purchases.</li>
+<li>The Year-to-Date (YTD) revenue for the current year (2013) shows a steady increase over time, with significant growth in June and July, which could be attributed to seasonal factors or increased customer demand during these months. Overall, these insights provide valuable information for the business to make informed decisions about inventory management, marketing strategies, and resource allocation to sustain growth and maximize profitability in the B2C channel. It is important for the business to continue monitoring these trends and take appropriate actions to ensure continued growth and competitiveness in the market.</li>
+</ul>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

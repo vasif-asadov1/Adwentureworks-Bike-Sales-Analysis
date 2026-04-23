@@ -1,0 +1,602 @@
+---
+title: "Product Profit Analysis"
+---
+
+
+# Introduction
+This section focuses on analyzing the profitability of our product offerings. We will explore various dimensions of product performance, including profit margins, sales volume, and customer purchasing behavior. This will allow us to identify which products are driving profitability and which may be underperforming and which are dead weight products. That information will be crucial for making informed decisions about inventory management, marketing strategies, and product development.
+
+
+# Product Profit Analysis
+
+## Profit Margin Analysis
+
+
+`11. Which product categories and subcategories drive the highest profit margins, and which are drag on profitability?`
+
+**Solution:** Solving this questions will reveal which product categories and subcategories are the most profitable and which are underperforming. So, we need to calculate financial metrics first, and then group the results by product category and subcategory to identify trends and insights. The following SQL query calculates total revenue, total cost, total profit, and profit margin for each product category and subcategory. 
+Note: When the financial metrics are calculated, there may be some categories or subcategories with no sales, which would lead to null values. To handle this effectively without corrupting the analysis, we can use the `COALESCE` function to replace null values with zeros. This ensures that our calculations for profit and profit margin are accurate and that we can still include those categories in our analysis without skewing the results.
+
+
+<details>
+<summary>Show SQL Code</summary>
+
+```sql
+with product_stats as(
+	select
+		sub.ProductSubcategoryName as product_subcategory, 
+		cat.ProductCategoryName as product_category,
+		cast(sum(fis.salesamount) as decimal(20,3)) as total_revenue,
+		cast(sum(fis.totalproductcost) as decimal(20,3)) as total_cost
+	from Products p
+	left join FactInternetSales fis
+		on fis.ProductKey = p.ProductKey
+	inner join ProductSubcategory sub
+		on p.ProductSubcategoryKey = sub.ProductSubcategoryKey
+	inner join ProductCategory cat
+		on sub.ProductCategoryKey = cat.ProductCategoryKey
+	group by
+		sub.ProductSubcategoryName, 
+		cat.ProductCategoryName
+)
+select
+	product_category,
+	product_subcategory,
+	coalesce(total_revenue,0) as total_revenue,
+	coalesce(total_cost,0) as total_cost,
+	coalesce(total_revenue - total_cost,0) as total_profit,
+	coalesce(cast(100.0 * (total_revenue - total_cost) / 
+		nullif(total_revenue,0) as decimal(10,3)),0) as profit_margin
+from product_stats
+order by 
+	profit_margin desc;
+
+```
+
+</details>
+
+
+
+
+
+**Results:** 
+
+|product_category|product_subcategory|total_revenue|total_cost|total_profit|profit_margin|
+|----------------|-------------------|-------------|----------|------------|-------------|
+|Accessories|Bike Racks|39360.000|14720.640|24639.360|62.600|
+|Accessories|Bike Stands|39591.000|14807.034|24783.966|62.600|
+|Accessories|Tires and Tubes|245529.320|91828.569|153700.751|62.600|
+|Accessories|Cleaners|7218.600|2699.756|4518.844|62.600|
+|Clothing|Shorts|71319.810|26673.650|44646.160|62.600|
+|Clothing|Vests|35687.000|13346.938|22340.062|62.600|
+|Accessories|Hydration Packs|40307.670|15075.098|25232.572|62.600|
+|Accessories|Helmets|225335.600|84275.772|141059.828|62.600|
+|Accessories|Fenders|46619.580|17435.681|29183.899|62.600|
+|Clothing|Gloves|35020.700|13097.799|21922.901|62.600|
+|Clothing|Socks|5106.320|1909.786|3196.534|62.600|
+|Accessories|Bottles and Cages|56798.190|21242.842|35555.348|62.599|
+|Bikes|Mountain Bikes|9952759.564|5439135.458|4513624.106|45.350|
+|Bikes|Road Bikes|14520584.036|8983284.338|5537299.698|38.134|
+|Bikes|Touring Bikes|3844801.050|2389928.354|1454872.696|37.840|
+|Clothing|Caps|19688.100|15159.837|4528.263|23.000|
+|Clothing|Jerseys|172950.680|133172.024|39778.656|23.000|
+|Components|Headsets|0.000|0.000|0.000|0.000|
+|Components|Chains|0.000|0.000|0.000|0.000|
+|Components|Pedals|0.000|0.000|0.000|0.000|
+|Components|Cranksets|0.000|0.000|0.000|0.000|
+|Components|Bottom Brackets|0.000|0.000|0.000|0.000|
+|Components|Mountain Frames|0.000|0.000|0.000|0.000|
+|Components|Derailleurs|0.000|0.000|0.000|0.000|
+|Accessories|Locks|0.000|0.000|0.000|0.000|
+|Components|Handlebars|0.000|0.000|0.000|0.000|
+|Accessories|Panniers|0.000|0.000|0.000|0.000|
+|Accessories|Pumps|0.000|0.000|0.000|0.000|
+|Components|Forks|0.000|0.000|0.000|0.000|
+|Clothing|Bib-Shorts|0.000|0.000|0.000|0.000|
+|Components|Wheels|0.000|0.000|0.000|0.000|
+|Components|Brakes|0.000|0.000|0.000|0.000|
+|Clothing|Tights|0.000|0.000|0.000|0.000|
+|Components|Road Frames|0.000|0.000|0.000|0.000|
+|Components|Saddles|0.000|0.000|0.000|0.000|
+|Components|Touring Frames|0.000|0.000|0.000|0.000|
+|Accessories|Lights|0.000|0.000|0.000|0.000|
+
+
+**Insights:** The analysis revealed the following insights:
+
+- The "Accessories" category, particularly subcategories like "Bike Racks," "Bike Stands," and "Tires and Tubes," consistently showed high profit margins, indicating strong profitability in these areas.
+- The "Clothing" category also demonstrated solid profit margins, with subcategories such as "Shorts" and "Vests" performing well.
+- In contrast, the "Bikes" category, while generating significant total profit, had lower profit margins compared to accessories and clothing, suggesting that the cost structure for bikes may be less favorable.
+- The "Components" category had no recorded sales, resulting in zero profit and profit margin, which indicates that these products may not be contributing to profitability and could be considered for reevaluation in the product lineup.	
+Don't forget that the highest profit margin does not mean the highest total profit. For example, the "Bikes" category has a lower profit margin than "Accessories," but it generates a much higher total profit due to its larger sales volume. This highlights the importance of considering both profit margin and total profit when evaluating product performance. Profit margin just illustrates the difference between revenue and cost, while total profit takes into account the scale of sales, which can significantly impact overall profitability. Therefore, it's crucial to analyze both metrics to get a comprehensive understanding of product performance and make informed decisions about inventory management and marketing strategies.
+
+
+
+## High Volume vs High Value Products
+
+`12. What is the disparity between our "High Volume" products and our "High Value" products?`
+
+**Solution:** To solve this question, we need to give a rank to our products based on their *Value* - total revenue coming from the product, and *Volume* - total quantity sold for that product. Then we can compare the top 10 products in each category to see if there are any disparities between high volume and high value products. If the volume rank is significantly different from the value rank, it means that the product is either a high volume product with low value or a high value product with low volume.
+The main strategy of the companies is mainly getting higher revenue. Therefore, in this analysis, we mainly focus on the high value products and try to increase the volume size of those products. However, we also need to keep an eye on the high volume products, as they can also contribute significantly to total revenue, even if their profit margins are lower. By analyzing the disparity between high volume and high value products, we can identify opportunities to optimize our product offerings and marketing strategies to maximize profitability.
+
+
+<details>
+<summary>Show SQL Code</summary>
+
+```sql
+with product_agg as(
+	select
+		p.ProductKey,
+		p.ProductName,
+		sum(salesamount) as product_revenue, 
+		sum(OrderQuantity) as product_quantity 
+
+	from FactInternetSales fis
+	join products p
+		on p.ProductKey = fis.ProductKey
+	group by 
+		p.ProductKey,
+		p.ProductName
+),
+rank_products as (
+	select
+		ProductName,
+		product_revenue,
+		product_quantity,
+		row_number() over (order by product_revenue desc) as product_value_rank,
+		row_number() over (order by product_quantity desc) as product_volume_rank
+	from product_agg
+)
+select
+	ProductName,
+	product_revenue,
+	product_quantity,
+	product_value_rank,
+	product_volume_rank
+from rank_products
+where product_value_rank <= 10 or product_volume_rank <= 10
+order by product_value_rank asc, product_volume_rank;
+```
+</details>
+
+
+**Results:**
+
+|ProductName|product_revenue|product_quantity|product_value_rank|product_volume_rank|
+|-----------|---------------|----------------|------------------|-------------------|
+|Road-150 Red, 48|1205876.9900|337|1|44|
+|Road-150 Red, 62|1202298.7200|336|2|45|
+|Road-150 Red, 52|1080637.5400|302|3|49|
+|Road-150 Red, 56|1055589.6500|295|4|51|
+|Road-150 Red, 44|1005493.8700|281|5|52|
+|Mountain-200 Black, 42|979960.7300|427|6|28|
+|Mountain-200 Silver, 38|979035.7800|422|7|29|
+|Mountain-200 Black, 46|961600.8100|419|8|30|
+|Mountain-200 Black, 38|954715.8400|416|9|31|
+|Mountain-200 Silver, 46|930315.9900|401|10|36|
+|Sport-100 Helmet, Red|78027.7000|2230|68|5|
+|Sport-100 Helmet, Blue|74353.7500|2125|70|7|
+|Sport-100 Helmet, Black|72954.1500|2085|71|9|
+|Fender Set - Mountain|46619.5800|2121|79|8|
+|Water Bottle - 30 oz.|21177.5600|4244|129|1|
+|Mountain Bottle Cage|20229.7500|2025|131|10|
+|AWC Logo Cap|19688.1000|2190|133|6|
+|Mountain Tire Tube|15444.0500|3095|136|3|
+|Road Tire Tube|9480.2400|2376|153|4|
+|Patch Kit/8 Patches|7307.3900|3191|155|2|
+
+
+**Insights:** The analysis revealed the following insights:
+
+- There is a strong disparity between high value and high volume products. The top 10 high value products are predominantly bikes, which have high revenue but relatively lower quantities sold. In contrast, the top 10 high volume products are mostly accessories, which have lower revenue but significantly higher quantities sold.
+- The high value products, such as the "Road-150 Red" series and "Mountain-200" series, generate substantial revenue but are sold in smaller quantities, indicating that they are likely premium products with higher price points. These products may require targeted marketing strategies to maintain their profitability while potentially increasing their sales volume.
+- The high volume products, such as the "Sport-100 Helmet" and "Water Bottle - 30 oz.," sell in large quantities but contribute less to total revenue, suggesting that they may be more price-sensitive and could benefit from strategies focused on cost reduction or bundling to enhance their profitability. 
+- The disparity between high value and high volume products highlights the importance of balancing our product portfolio to maximize overall profitability. While high value products can drive significant revenue, high volume products can contribute to steady cash flow and customer engagement. Therefore, it's crucial to analyze both categories and develop strategies that leverage the strengths of each to optimize our product offerings and marketing efforts.	
+We can use some optimization algorithms to find the optimal price points for high volume products to increase their revenue without significantly reducing their sales quantity. For example, as the control and automation engineering background I can build a linear programming model to determine the optimal price for each high volume product, taking into account factors such as production costs, demand elasticity, and competitive pricing. By optimizing the pricing strategy for high volume products, we can potentially increase their revenue contribution while maintaining or even boosting their sales quantity, ultimately enhancing overall profitability.
+
+
+
+## Basket Size Analysis
+
+`13. What is our basket size distribution, and how frequently do customers buy multiple items in a single transaction?`
+
+**Solution Method:** First of all we need to define the unique basket sizes. Basket size means the number of items purchased in a single transaction. To calculate this, we should group the sales data by `SalesOrderNumber` which represents a unique transaction and then count the total quantity of items in that single transaction. The results will give us all unique transactions and corresponding basket sizes. However, we need to define the number transactions for each basket size. Therefore, we should group by the obtained resutls based on the basket size and then count the number of transactions for each basket size. Finally, we can calculate the percentage of transactions for each basket size to understand how frequently customers buy multiple items in a single transaction. This analysis will provide insights into customer purchasing behavior and help us identify opportunities to encourage larger basket sizes through marketing strategies or promotions.
+
+
+
+
+```sql
+with bucket_size_calc as(
+	select
+		-- first determine bucket size
+		SalesOrderNumber, 
+		sum(OrderQuantity) as num_items
+	from FactInternetSales
+	group by SalesOrderNumber
+)
+select 
+	num_items as bucket_size, 
+	count(SalesOrderNumber) as num_orders,
+	cast(100.0 * count(SalesOrderNumber) / sum(count(SalesOrderNumber)) over()
+		as decimal(6,3)) as order_pct
+from bucket_size_calc
+group by 
+	num_items 
+order by num_orders ;
+```
+
+
+**Results:**
+
+|bucket_size|num_orders|order_pct|
+|-----------|----------|---------|
+|8|3|0.011|
+|7|12|0.043|
+|6|109|0.394|
+|5|696|2.516|
+|4|3138|11.345|
+|3|5870|21.223|
+|2|8163|29.513|
+|1|9668|34.954|
+
+
+**Insights:** The analysis revealed the following insights:
+- Most customers (34.954%) purchase a single item in a transaction, indicating that a significant portion of our sales comes from customers who buy one product at a time. This suggests that there may be opportunities to encourage customers to add more items to their baskets through targeted promotions or cross-selling strategies.
+- A substantial percentage of transactions (29.513%) involve customers purchasing two items, which indicates that there is already a significant level of multi-item purchasing behavior. This presents an opportunity to further increase the average basket size by promoting complementary products or offering discounts for purchasing multiple items.
+- The percentage of transactions decreases as the basket size increases, with only a small percentage of customers purchasing more than three items in a single transaction. This suggests that while there is some willingness among customers to purchase multiple items, there may be barriers to larger basket sizes that we can address through marketing strategies, such as offering bundled discounts or creating product packages that encourage customers to buy more items together. 
+- Overall, understanding the basket size distribution provides valuable insights into customer purchasing behavior and can inform strategies to increase average order value and enhance customer engagement by encouraging larger basket sizes through targeted promotions and cross-selling opportunities.  
+
+
+
+## Dead Weight Products
+
+
+`14. Are there any "Dead Weight" products in our active catalog that have negligible sales in the most recent year?`
+
+**Solution Method:** To solve this question, we should calculate the financial metrics for each product in the most recent year by filtering the years in the join statements. Then we can identify products with negligible sales by setting thresholds for revenue and quantity. For example, we can consider products with total revenue less than $10,000 or total quantity sold less than 50 units as "Dead Weight" products. By analyzing these products, we can make informed decisions about whether to discontinue them or implement strategies to boost their sales, such as targeted marketing campaigns or bundling them with more popular products. This analysis will help us optimize our product catalog and focus on offerings that contribute more significantly to our overall profitability.
+
+
+<details>
+<summary>Show SQL Code</summary>
+
+```sql
+select
+	p.ProductKey,
+	p.ProductName,
+	coalesce(sum(fis.SalesAmount),0) as revenue,
+	coalesce(sum(fis.OrderQuantity),0) as quantity
+from Products p
+left join FactInternetSales fis
+	on fis.ProductKey = p.ProductKey
+	and year(fis.OrderDate) = 2013
+where p.Status = 'Current'
+group by
+	p.ProductKey,
+	p.ProductName
+having 
+	coalesce(sum(fis.SalesAmount),0) < 10000
+	or 
+	coalesce(sum(fis.OrderQuantity),0) < 50
+order by 
+	coalesce(sum(fis.SalesAmount),0) desc;
+```
+
+
+**Results:** 
+
+|ProductKey|ProductName|revenue|quantity|
+|----------|-----------|-------|--------|
+|570|Touring-3000 Yellow, 54|35632.8000|48|
+|586|Touring-3000 Blue, 50|35632.8000|48|
+|571|Touring-3000 Yellow, 58|33405.7500|45|
+|595|Mountain-500 Silver, 52|27119.5200|48|
+|597|Mountain-500 Black, 42|26459.5100|49|
+|591|Mountain-500 Silver, 40|25424.5500|45|
+|592|Mountain-500 Silver, 42|25424.5500|45|
+|596|Mountain-500 Black, 40|25379.5300|47|
+|600|Mountain-500 Black, 52|22139.5900|41|
+|593|Mountain-500 Silver, 44|21469.6200|38|
+|529|Road Tire Tube|8869.7700|2223|
+|530|Touring Tire Tube|7000.9700|1403|
+|480|Patch Kit/8 Patches|6929.5400|3026|
+|484|Bike Wash - Dissolver|6908.5500|869|
+|481|Racing Socks, M|2526.1900|281|
+|482|Racing Socks, L|2337.4000|260|
+|601|LL Bottom Bracket|0.0000|0|
+|602|ML Bottom Bracket|0.0000|0|
+|603|HL Bottom Bracket|0.0000|0|
+|531|LL Mountain Frame - Black, 42|0.0000|0|
+|532|LL Mountain Frame - Black, 44|0.0000|0|
+|533|LL Mountain Frame - Black, 48|0.0000|0|
+|534|LL Mountain Frame - Black, 52|0.0000|0|
+|542|LL Mountain Pedal|0.0000|0|
+|543|ML Mountain Pedal|0.0000|0|
+|544|HL Mountain Pedal|0.0000|0|
+|545|LL Road Pedal|0.0000|0|
+|546|ML Road Pedal|0.0000|0|
+|547|HL Road Pedal|0.0000|0|
+|548|Touring Pedal|0.0000|0|
+|549|ML Mountain Frame-W - Silver, 38|0.0000|0|
+|550|LL Mountain Frame - Black, 40|0.0000|0|
+|551|LL Mountain Frame - Silver, 40|0.0000|0|
+|552|Front Derailleur|0.0000|0|
+|553|LL Touring Handlebars|0.0000|0|
+|554|HL Touring Handlebars|0.0000|0|
+|555|Front Brakes|0.0000|0|
+|556|LL Crankset|0.0000|0|
+|557|ML Crankset|0.0000|0|
+|558|HL Crankset|0.0000|0|
+|559|Chain|0.0000|0|
+|492|HL Touring Frame - Yellow, 60|0.0000|0|
+|493|LL Touring Frame - Yellow, 62|0.0000|0|
+|494|HL Touring Frame - Yellow, 46|0.0000|0|
+|495|HL Touring Frame - Yellow, 50|0.0000|0|
+|496|HL Touring Frame - Yellow, 54|0.0000|0|
+|497|HL Touring Frame - Blue, 46|0.0000|0|
+|498|HL Touring Frame - Blue, 50|0.0000|0|
+|499|HL Touring Frame - Blue, 54|0.0000|0|
+|500|HL Touring Frame - Blue, 60|0.0000|0|
+|501|Rear Derailleur|0.0000|0|
+|502|LL Touring Frame - Blue, 50|0.0000|0|
+|503|LL Touring Frame - Blue, 54|0.0000|0|
+|504|LL Touring Frame - Blue, 58|0.0000|0|
+|505|LL Touring Frame - Blue, 62|0.0000|0|
+|506|LL Touring Frame - Yellow, 44|0.0000|0|
+|507|LL Touring Frame - Yellow, 50|0.0000|0|
+|508|LL Touring Frame - Yellow, 54|0.0000|0|
+|509|LL Touring Frame - Yellow, 58|0.0000|0|
+|510|LL Touring Frame - Blue, 44|0.0000|0|
+|511|ML Mountain Frame-W - Silver, 40|0.0000|0|
+|512|ML Mountain Frame-W - Silver, 42|0.0000|0|
+|513|ML Mountain Frame-W - Silver, 46|0.0000|0|
+|514|Rear Brakes|0.0000|0|
+|515|LL Mountain Seat/Saddle|0.0000|0|
+|516|ML Mountain Seat/Saddle|0.0000|0|
+|517|HL Mountain Seat/Saddle|0.0000|0|
+|518|LL Road Seat/Saddle|0.0000|0|
+|519|ML Road Seat/Saddle|0.0000|0|
+|520|HL Road Seat/Saddle|0.0000|0|
+|521|LL Touring Seat/Saddle|0.0000|0|
+|522|ML Touring Seat/Saddle|0.0000|0|
+|523|HL Touring Seat/Saddle|0.0000|0|
+|524|LL Mountain Frame - Silver, 42|0.0000|0|
+|525|LL Mountain Frame - Silver, 44|0.0000|0|
+|526|LL Mountain Frame - Silver, 48|0.0000|0|
+|527|LL Mountain Frame - Silver, 52|0.0000|0|
+|1|Adjustable Race|0.0000|0|
+|2|Bearing Ball|0.0000|0|
+|3|BB Ball Bearing|0.0000|0|
+|4|Headset Ball Bearings|0.0000|0|
+|5|Blade|0.0000|0|
+|6|LL Crankarm|0.0000|0|
+|7|ML Crankarm|0.0000|0|
+|8|HL Crankarm|0.0000|0|
+|9|Chainring Bolts|0.0000|0|
+|10|Chainring Nut|0.0000|0|
+|11|Chainring|0.0000|0|
+|12|Crown Race|0.0000|0|
+|13|Chain Stays|0.0000|0|
+|14|Decal 1|0.0000|0|
+|15|Decal 2|0.0000|0|
+|16|Down Tube|0.0000|0|
+|17|Mountain End Caps|0.0000|0|
+|18|Road End Caps|0.0000|0|
+|19|Touring End Caps|0.0000|0|
+|20|Fork End|0.0000|0|
+|21|Freewheel|0.0000|0|
+|22|Flat Washer 1|0.0000|0|
+|23|Flat Washer 6|0.0000|0|
+|24|Flat Washer 2|0.0000|0|
+|25|Flat Washer 9|0.0000|0|
+|26|Flat Washer 4|0.0000|0|
+|27|Flat Washer 3|0.0000|0|
+|28|Flat Washer 8|0.0000|0|
+|29|Flat Washer 5|0.0000|0|
+|30|Flat Washer 7|0.0000|0|
+|31|Fork Crown|0.0000|0|
+|32|Front Derailleur Cage|0.0000|0|
+|33|Front Derailleur Linkage|0.0000|0|
+|34|Guide Pulley|0.0000|0|
+|35|LL Grip Tape|0.0000|0|
+|36|ML Grip Tape|0.0000|0|
+|37|HL Grip Tape|0.0000|0|
+|38|Thin-Jam Hex Nut 9|0.0000|0|
+|39|Thin-Jam Hex Nut 10|0.0000|0|
+|40|Thin-Jam Hex Nut 1|0.0000|0|
+|41|Thin-Jam Hex Nut 2|0.0000|0|
+|42|Thin-Jam Hex Nut 15|0.0000|0|
+|43|Thin-Jam Hex Nut 16|0.0000|0|
+|44|Thin-Jam Hex Nut 5|0.0000|0|
+|45|Thin-Jam Hex Nut 6|0.0000|0|
+|46|Thin-Jam Hex Nut 3|0.0000|0|
+|47|Thin-Jam Hex Nut 4|0.0000|0|
+|48|Thin-Jam Hex Nut 13|0.0000|0|
+|49|Thin-Jam Hex Nut 14|0.0000|0|
+|50|Thin-Jam Hex Nut 7|0.0000|0|
+|51|Thin-Jam Hex Nut 8|0.0000|0|
+|52|Thin-Jam Hex Nut 12|0.0000|0|
+|53|Thin-Jam Hex Nut 11|0.0000|0|
+|54|Hex Nut 5|0.0000|0|
+|55|Hex Nut 6|0.0000|0|
+|56|Hex Nut 16|0.0000|0|
+|57|Hex Nut 17|0.0000|0|
+|58|Hex Nut 7|0.0000|0|
+|59|Hex Nut 8|0.0000|0|
+|60|Hex Nut 9|0.0000|0|
+|61|Hex Nut 22|0.0000|0|
+|62|Hex Nut 23|0.0000|0|
+|63|Hex Nut 12|0.0000|0|
+|64|Hex Nut 13|0.0000|0|
+|65|Hex Nut 1|0.0000|0|
+|66|Hex Nut 10|0.0000|0|
+|67|Hex Nut 11|0.0000|0|
+|68|Hex Nut 2|0.0000|0|
+|69|Hex Nut 20|0.0000|0|
+|70|Hex Nut 21|0.0000|0|
+|71|Hex Nut 3|0.0000|0|
+|72|Hex Nut 14|0.0000|0|
+|73|Hex Nut 15|0.0000|0|
+|74|Hex Nut 4|0.0000|0|
+|75|Hex Nut 18|0.0000|0|
+|76|Hex Nut 19|0.0000|0|
+|77|Handlebar Tube|0.0000|0|
+|78|Head Tube|0.0000|0|
+|79|LL Hub|0.0000|0|
+|80|HL Hub|0.0000|0|
+|81|Keyed Washer|0.0000|0|
+|82|External Lock Washer 3|0.0000|0|
+|83|External Lock Washer 4|0.0000|0|
+|84|External Lock Washer 9|0.0000|0|
+|85|External Lock Washer 5|0.0000|0|
+|86|External Lock Washer 7|0.0000|0|
+|87|External Lock Washer 6|0.0000|0|
+|88|External Lock Washer 1|0.0000|0|
+|89|External Lock Washer 8|0.0000|0|
+|90|External Lock Washer 2|0.0000|0|
+|91|Internal Lock Washer 3|0.0000|0|
+|92|Internal Lock Washer 4|0.0000|0|
+|93|Internal Lock Washer 9|0.0000|0|
+|94|Internal Lock Washer 5|0.0000|0|
+|95|Internal Lock Washer 7|0.0000|0|
+|96|Internal Lock Washer 6|0.0000|0|
+|97|Internal Lock Washer 10|0.0000|0|
+|98|Internal Lock Washer 1|0.0000|0|
+|99|Internal Lock Washer 8|0.0000|0|
+|100|Internal Lock Washer 2|0.0000|0|
+|101|Thin-Jam Lock Nut 9|0.0000|0|
+|102|Thin-Jam Lock Nut 10|0.0000|0|
+|103|Thin-Jam Lock Nut 1|0.0000|0|
+|104|Thin-Jam Lock Nut 2|0.0000|0|
+|105|Thin-Jam Lock Nut 15|0.0000|0|
+|106|Thin-Jam Lock Nut 16|0.0000|0|
+|107|Thin-Jam Lock Nut 5|0.0000|0|
+|108|Thin-Jam Lock Nut 6|0.0000|0|
+|109|Thin-Jam Lock Nut 3|0.0000|0|
+|110|Thin-Jam Lock Nut 4|0.0000|0|
+|111|Thin-Jam Lock Nut 13|0.0000|0|
+|112|Thin-Jam Lock Nut 14|0.0000|0|
+|113|Thin-Jam Lock Nut 7|0.0000|0|
+|114|Thin-Jam Lock Nut 8|0.0000|0|
+|115|Thin-Jam Lock Nut 12|0.0000|0|
+|116|Thin-Jam Lock Nut 11|0.0000|0|
+|117|Lock Nut 5|0.0000|0|
+|118|Lock Nut 6|0.0000|0|
+|119|Lock Nut 16|0.0000|0|
+|120|Lock Nut 17|0.0000|0|
+|121|Lock Nut 7|0.0000|0|
+|122|Lock Nut 8|0.0000|0|
+|123|Lock Nut 9|0.0000|0|
+
+
+**Insights:** The analysis revealed the following insights:
+- Some of dead weigt products have significant revenue but low quantity sold, such as "Touring-3000 Yellow, 54" and "Mountain-500 Silver, 52". These products may be considered for reevaluation in the product lineup, as they may not be contributing significantly to overall profitability despite generating some revenue. It may be worth exploring strategies to boost their sales or considering discontinuation if they are not aligned with our business goals.
+- A large number of products have zero revenue and zero quantity sold, indicating that they are not purchased at all. These products may be candidates for removal from the active catalog, as they are not contributing to sales and may be taking up valuable inventory space. It's important to regularly review and optimize the product catalog to focus on offerings that are more likely to drive profitability and meet customer demand.
+
+
+
+## Product Pricing Tiers Effect 
+
+
+`15. How does product pricing tier affect consumer purchasing behavior?`
+
+**Solution Method:** To solve this question, we can categorize products into different pricing tiers based on their list price. For example, we can define "Entry-level" products as those with a list price of $100 or less, "Standard" products as those with a list price between $100 and $1000, and "Premium" products as those with a list price above $1000. Then we can analyze the total revenue, total quantity sold, and the percentage of total revenue for each pricing tier to understand how consumer purchasing behavior varies across different price points. This analysis will provide insights into which pricing tiers are more popular among customers and how they contribute to overall sales, allowing us to make informed decisions about product pricing strategies and inventory management.
+
+
+<details>
+<summary>Show SQL code </summary>
+
+
+```sql
+select
+	min(ListPrice) as min_price,
+	avg(ListPrice) as avg_price,
+	max(ListPrice) as max_price,
+	STDEV(ListPrice) as std
+from products;
+
+-- min price : 2.28
+-- avg price : 747.6617
+-- max price : 3578.27
+
+with product_stats as (
+	select
+		p.ProductKey,
+		p.ListPrice,
+		sum(fis.SalesAmount) as revenue,
+		sum(fis.OrderQuantity) as quantity
+	from Products p 
+	left join FactInternetSales fis
+		on fis.ProductKey = p.ProductKey
+	group by 
+		p.ProductKey,
+		p.ListPrice
+)
+
+select
+	case 
+		when ListPrice <= 100 then 'Entry-level'
+		when ListPrice > 1000 then 'Premium'
+		else 'Standard'
+	end as 'Price-Tiers',
+	
+	sum(revenue) as total_revenue,
+	sum(quantity) as total_units_sold,
+	cast(100.0 * sum(revenue) / nullif(sum(sum(revenue)) over (),0) 
+		as decimal(10,3))as revenue_pct
+from product_stats
+group by 
+	case 
+		when ListPrice <= 100 then 'Entry-level'
+		when ListPrice > 1000 then 'Premium'
+		else 'Standard'
+	end
+order by
+	revenue_pct desc;
+```
+
+</details>
+
+
+**Results:**
+
+|Price-Tiers|total_revenue|total_units_sold|revenue_pct|
+|-----------|-------------|----------------|-----------|
+|Premium|25810527.2969|11348|87.914|
+|Standard|2586568.3538|4434|8.810|
+|Entry-level|961581.5700|44616|3.275|
+
+
+**Insights:** The analysis revealed the following insights:
+- The "Premium" pricing tier generates the majority of total revenue (87.914%) despite having the lowest total units sold (11,348). This indicates that customers are willing to pay a premium price for high-value products, which suggests that there is a strong demand for premium offerings in our product catalog. This insight can inform our pricing strategy, as we may want to focus on promoting and expanding our premium product offerings to capitalize on this demand and maximize profitability.
+- The "Standard" pricing tier contributes a smaller portion of total revenue (8.810%) with a moderate number of units sold (4,434). This suggests that while there is some demand for standard-priced products, they may not be as popular as premium products. We may want to evaluate our standard product offerings and consider strategies to enhance their appeal, such as improving product features, offering promotions, or bundling them with premium products to increase their attractiveness to customers.
+- The "Entry-level" pricing tier generates the least total revenue (3.275%) despite having the highest total units sold (44,616). This indicates that while entry-level products are popular among customers, they may not be contributing significantly to overall profitability due to their lower price points. We may want to explore strategies to increase the profitability of entry-level products, such as optimizing production costs, offering value-added services, or creating bundles that include entry-level products with higher-priced items to encourage customers to spend more. 
+
+
+
+
+# Conclusion
+
+In this section, we conducted a comprehensive analysis of our product catalog, focusing on various aspects such as profitability, sales performance, customer purchasing behavior, and product pricing strategies. We defined the profit margins for the products and identified the most profitable product categories, as well as the disparity between high volume and high value products. We also analyzed the basket size distribution to understand how frequently customers buy multiple items in a single transaction and identified "Dead Weight" products that have negligible sales. Finally, we examined how product pricing tiers affect consumer purchasing behavior. Overall, these insights provide valuable information that can inform our inventory management, marketing strategies, and product development efforts to optimize profitability and meet customer demand effectively. By leveraging this analysis, we can make data-driven decisions to enhance our product offerings and drive business growth.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
