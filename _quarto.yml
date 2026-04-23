@@ -22,7 +22,7 @@ website:
     contents:
       - section: "AdventureWorks Bike Sales"
         contents:
-          - 00_problem_description.qmd
+          - index.qmd
           - 01_data_preparation.qmd
           - 02_macro_performance.qmd
           - 03_customer_analysis.qmd
